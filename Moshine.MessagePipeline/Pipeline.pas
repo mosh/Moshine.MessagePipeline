@@ -81,7 +81,9 @@ begin
           Load(savedAction);
         end;
         exit message;
-      end);
+      end,
+      new ExecutionDataflowBlockOptions(MaxDegreeOfParallelism := 5)
+      );
 
   finishProcessing := new ActionBlock<BrokeredMessage>(message ->
       begin
