@@ -7,6 +7,8 @@ Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline", "
 EndProject
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "TestHostConsoleApplication", "TestHostConsoleApplication\TestHostConsoleApplication.oxygene", "{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}"
 EndProject
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "HttpPipelineApplication", "HttpPipelineApplication\HttpPipelineApplication.oxygene", "{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -21,6 +23,10 @@ Global
 		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Debug|Mixed Platforms.Build.0 = Debug
 		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Release|Mixed Platforms.ActiveCfg = Release
 		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Release|Mixed Platforms.Build.0 = Release
+		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Debug|Mixed Platforms.ActiveCfg = Debug
+		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Debug|Mixed Platforms.Build.0 = Debug
+		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Release|Mixed Platforms.ActiveCfg = Release
+		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Release|Mixed Platforms.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

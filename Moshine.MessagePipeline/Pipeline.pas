@@ -25,7 +25,7 @@ type
     property &Method:String;
   end;
 
-  Pipeline = public class
+  Pipeline = public class(IPipeline)
   private
     tokenSource:CancellationTokenSource;
     token:CancellationToken;
