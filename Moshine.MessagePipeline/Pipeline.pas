@@ -38,9 +38,13 @@ type
 
     method Setup;
 
-    method Save<T>(methodCall: System.Linq.Expressions.Expression<System.Action<T>>):SavedAction;
     method Load(someAction:SavedAction);
     method EnQueue(someAction:SavedAction);
+
+    method FindType(typeName:String):&Type;
+
+    method Save<T>(methodCall: Expression<Action<T>>):SavedAction;
+
 
   public
     constructor(connectionString:String;queue:String);
@@ -156,7 +160,8 @@ end;
 
 method Pipeline.Load(someAction:SavedAction);
 begin
-  var someType := self.GetType().&Assembly.GetType(someAction.&Type);
+  var someType := FindType(someAction.&Type);
+
   var obj := Activator.CreateInstance(someType);
   var methodInfo := someType.GetMethod(someAction.&Method);
   methodInfo.Invoke(obj,[]);
@@ -171,6 +176,18 @@ begin
   client.Send(message);
 
 end;
+
+
+method Pipeline.FindType(typeName: String): &Type;
+begin
+  var types :=
+            from a in AppDomain.CurrentDomain.GetAssemblies()
+            from t in a.GetTypes()
+            where t.FullName = typeName
+            select t;
+  exit types.FirstOrDefault;
+end;
+
 
 end.
 
