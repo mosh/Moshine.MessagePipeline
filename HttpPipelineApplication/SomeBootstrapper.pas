@@ -4,6 +4,7 @@ interface
 
 uses
   System.Collections.Generic,
+  System.Configuration,
   System.Linq,
   System.Text, 
   Microsoft.WindowsAzure,
@@ -11,7 +12,8 @@ uses
   Moshine.MessagePipeline,
   Nancy, 
   Nancy.Bootstrappers.Autofac,
-  Nancy.TinyIoc;
+  Nancy.TinyIoc, 
+  StackExchange.Redis;
 
 type
 
@@ -30,12 +32,17 @@ begin
 
   var connectionString := CloudConfigurationManager.GetSetting('Microsoft.ServiceBus.ConnectionString');
 
+  var cacheString := ConfigurationManager.AppSettings['RedisCache'];
+  var cache := new Cache(ConnectionMultiplexer.Connect(cacheString));
+
   var builder := new ContainerBuilder();
   builder.Register(c -> begin
-                     var obj := new Pipeline(connectionString,'TestQueue');
+                     var obj := new Pipeline(connectionString,'TestQueue',cache);
                      obj.Start;
                      exit obj;
                      end).As<Pipeline>().SingleInstance;
+
+  builder.Register(c -> cache).As<Cache>().SingleInstance;
   
   builder.Update(existingContainer.ComponentRegistry);
 end;

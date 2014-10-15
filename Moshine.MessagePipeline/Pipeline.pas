@@ -18,12 +18,6 @@ uses
 
 type
 
-  [Serializable]
-  SavedAction = public class
-  public
-    property &Type:String;
-    property &Method:String;
-  end;
 
   Pipeline = public class(IPipeline)
   private
@@ -35,6 +29,7 @@ type
 
     _queue:String;
     _connectionString:String;
+    _cache:Cache;
 
     method Setup;
 
@@ -44,25 +39,28 @@ type
     method FindType(typeName:String):&Type;
 
     method Save<T>(methodCall: Expression<Action<T>>):SavedAction;
+    method Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
 
 
   public
-    constructor(connectionString:String;queue:String);
+    constructor(connectionString:String;queue:String;cache:Cache);
 
     method Stop;
     method Start;
 
-    method Send<T>(methodCall: System.Linq.Expressions.Expression<System.Action<T>>);
-    method Send<T>(methodCall: System.Linq.Expressions.Expression<System.Action<T,dynamic>>);
+    method Send<T>(methodCall: Expression<System.Action<T>>):Response;
+    method Send<T>(methodCall: Expression<System.Action<T,dynamic>>):Response;
+    method Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
 
   end;
 
 implementation
 
-constructor Pipeline(connectionString:String;queue:String);
+constructor Pipeline(connectionString:String;queue:String;cache:Cache);
 begin
   _connectionString := connectionString;
   _queue:=queue;
+  _cache:=cache;
 
   tokenSource := new CancellationTokenSource();
   token := tokenSource.Token;
@@ -136,16 +134,41 @@ begin
 
 end;
 
-method Pipeline.Send<T>(methodCall: System.Linq.Expressions.Expression<Action<T>>);
+method Pipeline.Send<T>(methodCall: Expression<Action<T>>):Response;
 begin
   if(assigned(methodCall))then
   begin
-    EnQueue(Save(methodCall));
+    var saved:=Save(methodCall);
+    EnQueue(saved);
+    exit new Response(Id:=saved.Id);
   end;
 end;
 
-method Pipeline.Send<T>(methodCall: System.Linq.Expressions.Expression<System.Action<T,dynamic>>);
+method Pipeline.Send<T>(methodCall: Expression<System.Action<T,dynamic>>):Response;
 begin
+  raise new NotImplementedException;
+end;
+
+method Pipeline.Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
+begin
+  if(assigned(methodCall))then
+  begin
+    var saved := Save(methodCall);
+    EnQueue(saved);
+    exit new Response(Id:=saved.Id);
+  end;
+
+end;
+
+method Pipeline.Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
+begin
+  var expression := MethodCallExpression(methodCall.Body);
+
+  var saved := new SavedAction;
+  saved.&Type := expression.Method.DeclaringType.ToString; 
+  saved.Method := expression.Method.Name;
+  saved.Function:= true;
+  exit saved;
 
 end;
 
@@ -166,13 +189,24 @@ begin
 
   var obj := Activator.CreateInstance(someType);
   var methodInfo := someType.GetMethod(someAction.&Method);
-  methodInfo.Invoke(obj,[]);
+  if(someAction.Function)then
+  begin
+    var returnValue:= methodInfo.Invoke(obj,[]);
+    _cache.Add(someAction.Id.ToString,returnValue);
+  end
+  else 
+  begin
+    methodInfo.Invoke(obj,[]);
+  end;
+
+
 //  exit Delegate.CreateDelegate(someType,obj,methodInfo);
 end;
 
 method Pipeline.EnQueue(someAction: SavedAction);
 begin
   var message := new BrokeredMessage(JsonConvert.SerializeObject(someAction));
+  message.Properties.Add('Id',someAction.Id.ToString);
 
   var client := QueueClient.CreateFromConnectionString(_connectionString, _queue);
   client.Send(message);
