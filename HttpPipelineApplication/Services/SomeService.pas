@@ -14,6 +14,7 @@ type
   public
     method SomeMethod;
     method SomeMethodWithObject:dynamic;
+    method CausesException:dynamic;
   end;
 
 implementation
@@ -28,6 +29,11 @@ begin
   var obj:dynamic := new ExpandoObject;
   obj.Id := 4;
   exit obj;
+end;
+
+method SomeService.CausesException: dynamic;
+begin
+  raise new NotImplementedException;
 end;
 
 end.

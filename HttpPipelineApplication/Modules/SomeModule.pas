@@ -39,7 +39,14 @@ begin
     begin 
       var pipelineResponse:=_pipeline.Send<SomeService>(s -> s.SomeMethodWithObject);
       var obj:Object:=pipelineResponse.WaitForResult(_cache);
-      exit Response.AsJson(obj);  
+      exit iif(assigned(obj), Response.AsJson(obj), HttpStatusCode.InternalServerError);
+    end;
+
+  Get['/CausesException'] := _ -> 
+    begin 
+      var pipelineResponse:=_pipeline.Send<SomeService>(s -> s.CausesException);
+      var obj:Object:=pipelineResponse.WaitForResult(_cache);
+      exit iif(assigned(obj), Response.AsJson(obj), HttpStatusCode.InternalServerError);
     end;
 
 end;
