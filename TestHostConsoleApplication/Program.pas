@@ -40,11 +40,10 @@ end;
 
 class method ConsoleApp.Main(args: array of String);
 begin
-  var someString := '{"id":4}';
   var cacheString := ConfigurationManager.AppSettings['RedisCache'];
   var cache := new Cache(ConnectionMultiplexer.Connect(cacheString));
 
-
+  PipelineTest(cache);
 
 
 

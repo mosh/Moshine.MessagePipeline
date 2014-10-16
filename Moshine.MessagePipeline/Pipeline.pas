@@ -21,10 +21,12 @@ type
 
   Pipeline = public class(IPipeline)
   private
+    _maxRetries:Integer;
     tokenSource:CancellationTokenSource;
     token:CancellationToken;
-    processMessage:TransformBlock<BrokeredMessage, BrokeredMessage>;
-    finishProcessing:ActionBlock<BrokeredMessage>;
+    processMessage:TransformBlock<MessageParcel, MessageParcel>;
+    finishProcessing:ActionBlock<MessageParcel>;
+    faultedInProcessing:ActionBlock<MessageParcel>;
     t:Task;
 
     _queue:String;
@@ -58,6 +60,7 @@ implementation
 
 constructor Pipeline(connectionString:String;queue:String;cache:Cache);
 begin
+  _maxRetries := 5;
   _connectionString := connectionString;
   _queue:=queue;
   _cache:=cache;
@@ -70,38 +73,42 @@ end;
 
 method Pipeline.Setup;
 begin
-  processMessage := new TransformBlock<BrokeredMessage, BrokeredMessage>(message ->
+  processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel ->
       begin
-        var body := message.GetBody<String>;
-        var savedAction := JsonConvert.DeserializeObject<SavedAction>(body);
-        using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
-        begin
-          Load(savedAction);
+        try
+          var body := parcel.Message.GetBody<String>;
+          var savedAction := JsonConvert.DeserializeObject<SavedAction>(body);
+          using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
+          begin
+            Load(savedAction);
+          end;
+          parcel.State := MessageStateEnum.Processed;
+        except
+          on E:Exception do
+          begin
+            parcel.State := MessageStateEnum.Faulted;
+            parcel.ReTryCount := parcel.ReTryCount+1;
+          end;
         end;
-        exit message;
+        exit parcel;
       end,
       new ExecutionDataflowBlockOptions(MaxDegreeOfParallelism := 5)
       );
 
-  finishProcessing := new ActionBlock<BrokeredMessage>(message ->
+  faultedInProcessing := new ActionBlock<MessageParcel>(parcel ->
       begin
-        message.Complete;
+        parcel.Message.Complete;
       end);
 
-  processMessage.LinkTo(finishProcessing);
-
-  processMessage.Completion.ContinueWith(t ->
+  finishProcessing := new ActionBlock<MessageParcel>(parcel ->
       begin
-        if (t.IsFaulted) then
-        begin
-          IDataflowBlock(finishProcessing).Fault(t.Exception);
-        end
-         else finishProcessing.Complete();
+        parcel.Message.Complete;
       end);
 
-
-
-
+  processMessage.LinkTo(finishProcessing, p -> p.State = MessageStateEnum.Processed);
+  processMessage.LinkTo(processMessage, p -> (p.State = MessageStateEnum.Faulted) and (p.ReTryCount < self._maxRetries));
+  processMessage.LinkTo(faultedInProcessing, p -> (p.State = MessageStateEnum.Faulted) and (p.ReTryCount >= self._maxRetries));
+  
 end;
 
 method Pipeline.Stop;
@@ -126,7 +133,8 @@ begin
 
         if(assigned(someMessage))then
         begin
-          processMessage.Post(someMessage);
+          var parcel := new MessageParcel(Message := someMessage);
+          processMessage.Post(parcel);
         end;
 
       until token.IsCancellationRequested;

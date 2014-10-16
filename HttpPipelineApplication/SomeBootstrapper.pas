@@ -11,7 +11,9 @@ uses
   Autofac,
   Moshine.MessagePipeline,
   Nancy, 
+  Nancy.Bootstrapper,
   Nancy.Bootstrappers.Autofac,
+  Nancy.Elmah,
   Nancy.TinyIoc, 
   StackExchange.Redis;
 
@@ -21,6 +23,7 @@ type
   private
   protected
     method ConfigureApplicationContainer(existingContainer:ILifetimeScope);override;
+    method ApplicationStartup(container: ILifetimeScope; pipelines: Nancy.Bootstrapper.IPipelines); override;
   public
   end;
 
@@ -45,6 +48,12 @@ begin
   builder.Register(c -> cache).As<Cache>().SingleInstance;
   
   builder.Update(existingContainer.ComponentRegistry);
+end;
+
+method SomeBootstrapper.ApplicationStartup(container: ILifetimeScope; pipelines: Nancy.Bootstrapper.IPipelines);
+begin
+  inherited.ApplicationStartup(container, pipelines);
+  Elmahlogging.Enable(pipelines, "elmah");
 end;
 
 end.

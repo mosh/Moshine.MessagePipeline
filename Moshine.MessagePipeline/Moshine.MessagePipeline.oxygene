@@ -93,6 +93,7 @@
   <ItemGroup>
     <Compile Include="Cache.pas" />
     <Compile Include="IPipeline.pas" />
+    <Compile Include="MessageParcel.pas" />
     <Compile Include="Pipeline.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
     <Compile Include="Response.pas" />
