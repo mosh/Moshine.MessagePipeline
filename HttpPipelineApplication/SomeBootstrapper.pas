@@ -41,6 +41,14 @@ begin
   var builder := new ContainerBuilder();
   builder.Register(c -> begin
                      var obj := new Pipeline(connectionString,'TestQueue',cache);
+                     obj.ErrorCallback := e -> 
+                     begin
+                      Console.WriteLine(e.Message);
+                     end;
+                     obj.TraceCallback := m -> 
+                     begin
+                      Console.WriteLine(m);
+                     end;
                      obj.Start;
                      exit obj;
                      end).As<Pipeline>().SingleInstance;

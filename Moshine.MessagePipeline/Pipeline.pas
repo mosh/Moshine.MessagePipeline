@@ -18,7 +18,6 @@ uses
 
 type
 
-
   Pipeline = public class(IPipeline)
   private
     _maxRetries:Integer;
@@ -43,6 +42,8 @@ type
     method Save<T>(methodCall: Expression<Action<T>>):SavedAction;
     method Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
 
+    method HandleTrace(message:String);
+    method HandleException(e:Exception);
 
   public
     constructor(connectionString:String;queue:String;cache:Cache);
@@ -53,6 +54,9 @@ type
     method Send<T>(methodCall: Expression<System.Action<T>>):Response;
     method Send<T>(methodCall: Expression<System.Action<T,dynamic>>):Response;
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
+
+    property ErrorCallback:Action<Exception>;
+    property TraceCallback:Action<String>;
 
   end;
 
@@ -76,16 +80,19 @@ begin
   processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel ->
       begin
         try
+          HandleTrace('ProcessMessage');
           var body := parcel.Message.GetBody<String>;
           var savedAction := JsonConvert.DeserializeObject<SavedAction>(body);
           using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
           begin
+            HandleTrace('LoadAction');
             Load(savedAction);
           end;
           parcel.State := MessageStateEnum.Processed;
         except
           on E:Exception do
           begin
+            HandleException(e);
             parcel.State := MessageStateEnum.Faulted;
             parcel.ReTryCount := parcel.ReTryCount+1;
           end;
@@ -97,12 +104,30 @@ begin
 
   faultedInProcessing := new ActionBlock<MessageParcel>(parcel ->
       begin
-        parcel.Message.Complete;
+        HandleTrace('Fault in processing');
+        try
+          parcel.Message.Complete;
+        except
+          on E:Exception do
+          begin
+            HandleException(e);
+            raise;
+          end;
+        end;
       end);
 
   finishProcessing := new ActionBlock<MessageParcel>(parcel ->
       begin
-        parcel.Message.Complete;
+        HandleTrace('Finished processing');
+        try
+          parcel.Message.Complete;
+        except
+          on E:Exception do
+          begin
+            HandleException(e);
+            raise;
+          end;
+        end;
       end);
 
   processMessage.LinkTo(finishProcessing, p -> p.State = MessageStateEnum.Processed);
@@ -123,21 +148,32 @@ end;
 
 method Pipeline.Start;
 begin
+  HandleTrace('Start');
+
   t := Task.Factory.StartNew( () -> 
     begin
-      var client := QueueClient.CreateFromConnectionString(_connectionString, _queue);
+      try
+        var client := QueueClient.CreateFromConnectionString(_connectionString, _queue);
 
-      repeat
-        var serverWaitTime := new TimeSpan(0,0,2);
-        var someMessage := client.Receive(serverWaitTime);
+        repeat
+          var serverWaitTime := new TimeSpan(0,0,2);
+          var someMessage := client.Receive(serverWaitTime);
 
-        if(assigned(someMessage))then
+          if(assigned(someMessage))then
+          begin
+            HandleTrace('Posting message');
+            var parcel := new MessageParcel(Message := someMessage);
+            processMessage.Post(parcel);
+          end;
+
+        until token.IsCancellationRequested;
+      except
+        on E:Exception do
         begin
-          var parcel := new MessageParcel(Message := someMessage);
-          processMessage.Post(parcel);
+          HandleException(e);
+          raise;
         end;
-
-      until token.IsCancellationRequested;
+      end;
     end, token);
 
 end;
@@ -193,6 +229,8 @@ end;
 
 method Pipeline.Load(someAction:SavedAction);
 begin
+  HandleTrace('Invoking action');
+
   var someType := FindType(someAction.&Type);
 
   var obj := Activator.CreateInstance(someType);
@@ -230,6 +268,22 @@ begin
             where t.FullName = typeName
             select t;
   exit types.FirstOrDefault;
+end;
+
+method Pipeline.HandleTrace(message:String);
+begin
+  if(assigned(self.TraceCallback))then
+  begin
+    self.TraceCallback(message);
+  end;
+end;
+
+method Pipeline.HandleException(e:Exception);
+begin
+  if(assigned(self.ErrorCallback))then
+  begin
+    self.ErrorCallback(e);
+  end;
 end;
 
 
