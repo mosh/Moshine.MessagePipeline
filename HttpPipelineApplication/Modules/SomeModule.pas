@@ -17,14 +17,14 @@ type
   SomeModule = public class(NancyModule)
   private
     _pipeline:Pipeline;
-    _cache:Cache;
+    _cache:ICache;
   public
-    constructor(pipeline:Pipeline;cache:Cache);
+    constructor(pipeline:Pipeline;cache:ICache);
   end;
 
 implementation
 
-constructor SomeModule(pipeline:Pipeline;cache:Cache);
+constructor SomeModule(pipeline:Pipeline;cache:ICache);
 begin
   _pipeline := pipeline;
   _cache := cache;

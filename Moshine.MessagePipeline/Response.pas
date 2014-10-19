@@ -14,12 +14,12 @@ type
   protected
   public
     property Id:Guid;
-    method WaitForResult(cache:Cache):dynamic;
+    method WaitForResult(cache:ICache):dynamic;
   end;
 
 implementation
 
-method Response.WaitForResult(cache:Cache): dynamic;
+method Response.WaitForResult(cache:ICache): dynamic;
 begin
   var pollingTask := Task.Factory.StartNew(() -> 
     begin

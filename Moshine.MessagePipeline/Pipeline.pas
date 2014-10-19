@@ -35,7 +35,7 @@ type
 
     _name:String;
     _connectionString:String;
-    _cache:Cache;
+    _cache:ICache;
 
     _pipelineTopicDescription:TopicDescription;
 
@@ -55,7 +55,7 @@ type
     method Setup;
 
   public
-    constructor(connectionString:String;name:String;cache:Cache);
+    constructor(connectionString:String;name:String;cache:ICache);
 
     method Stop;
     method Start;
@@ -71,9 +71,9 @@ type
 
 implementation
 
-constructor Pipeline(connectionString:String;name:String;cache:Cache);
+constructor Pipeline(connectionString:String;name:String;cache:ICache);
 begin
-  _maxRetries := 5;
+  _maxRetries := 4;
   _connectionString := connectionString;
   _name:=name;
   _cache:=cache;
@@ -92,7 +92,9 @@ begin
       begin
         try
           HandleTrace('ProcessMessage');
-          var body := parcel.Message.GetBody<String>;
+
+          var clone := parcel.Message.Clone;
+          var body := clone.GetBody<String>;
           var savedAction := JsonConvert.DeserializeObject<SavedAction>(body);
           using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
           begin

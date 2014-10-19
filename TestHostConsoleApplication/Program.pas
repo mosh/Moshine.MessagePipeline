@@ -15,7 +15,7 @@ type
   ConsoleApp = class
   public
     class method Main(args: array of String);
-    class method PipelineTest(cache:Cache);
+    class method PipelineTest(cache:ICache);
   end;
 
   ServiceClass = public class
@@ -41,14 +41,14 @@ end;
 class method ConsoleApp.Main(args: array of String);
 begin
   var cacheString := ConfigurationManager.AppSettings['RedisCache'];
-  var cache := new Cache(ConnectionMultiplexer.Connect(cacheString));
+  var cache := new RedisCache(ConnectionMultiplexer.Connect(cacheString));
 
   PipelineTest(cache);
 
 
 end;
 
-class method ConsoleApp.PipelineTest(cache:Cache);
+class method ConsoleApp.PipelineTest(cache:ICache);
 begin
   var connectionString := CloudConfigurationManager.GetSetting('Microsoft.ServiceBus.ConnectionString');
   var pipeline := new Pipeline(connectionString,'pipeline',cache);

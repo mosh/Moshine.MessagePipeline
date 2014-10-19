@@ -35,8 +35,9 @@ begin
 
   var connectionString := CloudConfigurationManager.GetSetting('Microsoft.ServiceBus.ConnectionString');
 
-  var cacheString := ConfigurationManager.AppSettings['RedisCache'];
-  var cache := new Cache(ConnectionMultiplexer.Connect(cacheString));
+//  var cacheString := ConfigurationManager.AppSettings['RedisCache'];
+//  var cache:ICache := new RedisCache(ConnectionMultiplexer.Connect(cacheString));
+  var cache:ICache := new InMemoryCache;
 
   var builder := new ContainerBuilder();
   builder.Register(c -> begin
@@ -53,7 +54,7 @@ begin
                      exit obj;
                      end).As<Pipeline>().SingleInstance;
 
-  builder.Register(c -> cache).As<Cache>().SingleInstance;
+  builder.Register(c -> cache).As<ICache>().SingleInstance;
   
   builder.Update(existingContainer.ComponentRegistry);
 end;
