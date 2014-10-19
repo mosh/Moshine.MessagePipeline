@@ -46,14 +46,12 @@ begin
   PipelineTest(cache);
 
 
-
-
 end;
 
 class method ConsoleApp.PipelineTest(cache:Cache);
 begin
   var connectionString := CloudConfigurationManager.GetSetting('Microsoft.ServiceBus.ConnectionString');
-  var pipeline := new Pipeline(connectionString,'TestQueue',cache);
+  var pipeline := new Pipeline(connectionString,'pipeline',cache);
 
 
   pipeline.Start;

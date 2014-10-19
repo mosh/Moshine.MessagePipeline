@@ -12,6 +12,7 @@ uses
   System.Threading.Tasks,
   System.Threading.Tasks.Dataflow, 
   System.Transactions,
+  Microsoft.ServiceBus,
   Microsoft.ServiceBus.Messaging, 
   Microsoft.WindowsAzure, 
   Newtonsoft.Json;
@@ -19,6 +20,10 @@ uses
 type
 
   Pipeline = public class(IPipeline)
+  const
+    workSubscription = 'work';
+    errorSubscription = 'error';
+
   private
     _maxRetries:Integer;
     tokenSource:CancellationTokenSource;
@@ -28,11 +33,13 @@ type
     faultedInProcessing:ActionBlock<MessageParcel>;
     t:Task;
 
-    _queue:String;
+    _name:String;
     _connectionString:String;
     _cache:Cache;
 
-    method Setup;
+    _pipelineTopicDescription:TopicDescription;
+
+    method Initialize;
 
     method Load(someAction:SavedAction);
     method EnQueue(someAction:SavedAction);
@@ -45,8 +52,10 @@ type
     method HandleTrace(message:String);
     method HandleException(e:Exception);
 
+    method Setup;
+
   public
-    constructor(connectionString:String;queue:String;cache:Cache);
+    constructor(connectionString:String;name:String;cache:Cache);
 
     method Stop;
     method Start;
@@ -62,12 +71,14 @@ type
 
 implementation
 
-constructor Pipeline(connectionString:String;queue:String;cache:Cache);
+constructor Pipeline(connectionString:String;name:String;cache:Cache);
 begin
   _maxRetries := 5;
   _connectionString := connectionString;
-  _queue:=queue;
+  _name:=name;
   _cache:=cache;
+
+  Initialize;
 
   tokenSource := new CancellationTokenSource();
   token := tokenSource.Token;
@@ -92,7 +103,7 @@ begin
         except
           on E:Exception do
           begin
-            HandleException(e);
+            HandleException(E);
             parcel.State := MessageStateEnum.Faulted;
             parcel.ReTryCount := parcel.ReTryCount+1;
           end;
@@ -106,9 +117,19 @@ begin
       begin
         HandleTrace('Fault in processing');
         try
-          parcel.Message.Complete;
+          var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_name);
+
+          using scope := new TransactionScope() do
+          begin
+            var copiedMessage := parcel.Message.Clone;
+            copiedMessage.Properties.Remove('State');
+            copiedMessage.Properties.Add('State','Error');
+            topicClient.Send(copiedMessage);
+            scope.Complete;
+          end;
+
         except
-          on E:Exception do
+          on e:Exception do
           begin
             HandleException(e);
             raise;
@@ -122,7 +143,7 @@ begin
         try
           parcel.Message.Complete;
         except
-          on E:Exception do
+          on e:Exception do
           begin
             HandleException(e);
             raise;
@@ -153,11 +174,12 @@ begin
   t := Task.Factory.StartNew( () -> 
     begin
       try
-        var client := QueueClient.CreateFromConnectionString(_connectionString, _queue);
+        var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_name);
+        var processingClient:= SubscriptionClient.CreateFromConnectionString(_connectionString, topicClient.Path, workSubscription,ReceiveMode.PeekLock);
 
         repeat
           var serverWaitTime := new TimeSpan(0,0,2);
-          var someMessage := client.Receive(serverWaitTime);
+          var someMessage := processingClient.Receive(serverWaitTime);
 
           if(assigned(someMessage))then
           begin
@@ -168,7 +190,7 @@ begin
 
         until token.IsCancellationRequested;
       except
-        on E:Exception do
+        on e:Exception do
         begin
           HandleException(e);
           raise;
@@ -253,9 +275,10 @@ method Pipeline.EnQueue(someAction: SavedAction);
 begin
   var message := new BrokeredMessage(JsonConvert.SerializeObject(someAction));
   message.Properties.Add('Id',someAction.Id.ToString);
+  message.Properties.Add('State','UnProcessed');
 
-  var client := QueueClient.CreateFromConnectionString(_connectionString, _queue);
-  client.Send(message);
+  var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_name);
+  topicClient.Send(message);
 
 end;
 
@@ -285,6 +308,39 @@ begin
     self.ErrorCallback(e);
   end;
 end;
+
+method Pipeline.Initialize;
+begin
+  var namespaceManager := NamespaceManager.CreateFromConnectionString(_connectionString);
+
+  if(not namespaceManager.TopicExists(_name))then
+  begin
+    _pipelineTopicDescription:=namespaceManager.CreateTopic(_name);
+  end
+  else 
+  begin
+    _pipelineTopicDescription:= namespaceManager.GetTopic(_name)
+  end;
+
+  if (not namespaceManager.SubscriptionExists(_pipelineTopicDescription.Path, workSubscription))then
+  begin
+    var workFilter := new SqlFilter("State = 'UnProcessed' ");
+    namespaceManager.CreateSubscription(_pipelineTopicDescription.Path, workSubscription,workFilter);
+  end;
+
+  if (not namespaceManager.SubscriptionExists(_pipelineTopicDescription.Path, errorSubscription))then
+  begin
+    var errorFilter := new SqlFilter("State = 'Error' ");
+    namespaceManager.CreateSubscription(_pipelineTopicDescription.Path, errorSubscription, errorFilter);
+  end;
+  
+end;
+
+//  if (not namespaceManager.SubscriptionExists(pipelineTopicDescription.Path, errorSubscription))then
+//  begin
+//    var errorFilter := new SqlFilter("State = 'Error' ");
+//    errorSubscriptionDescription:=namespaceManager.CreateSubscription(pipelineTopicDescription.Path, errorSubscription, errorFilter);
+//  end;
 
 
 end.

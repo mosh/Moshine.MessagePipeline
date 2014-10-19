@@ -40,7 +40,7 @@ begin
 
   var builder := new ContainerBuilder();
   builder.Register(c -> begin
-                     var obj := new Pipeline(connectionString,'TestQueue',cache);
+                     var obj := new Pipeline(connectionString,'pipeline',cache);
                      obj.ErrorCallback := e -> 
                      begin
                       Console.WriteLine(e.Message);
