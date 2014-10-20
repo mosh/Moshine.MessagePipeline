@@ -47,6 +47,7 @@ type
     method FindType(typeName:String):&Type;
 
     method Save<T>(methodCall: Expression<Action<T>>):SavedAction;
+    method Save<T>(methodCall: Expression<System.Action<T,dynamic>>):SavedAction;
     method Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
 
     method HandleTrace(message:String);
@@ -61,7 +62,7 @@ type
     method Start;
 
     method Send<T>(methodCall: Expression<System.Action<T>>):Response;
-    method Send<T>(methodCall: Expression<System.Action<T,dynamic>>):Response;
+    method Send2<T>(methodCall: Expression<System.Action<T,dynamic>>):Response;
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
 
     property ErrorCallback:Action<Exception>;
@@ -212,9 +213,14 @@ begin
   end;
 end;
 
-method Pipeline.Send<T>(methodCall: Expression<System.Action<T,dynamic>>):Response;
+method Pipeline.Send2<T>(methodCall: Expression<System.Action<T,dynamic>>):Response;
 begin
-  raise new NotImplementedException;
+  if(assigned(methodCall))then
+  begin
+    var saved:=Save(methodCall);
+    EnQueue(saved);
+    exit new Response(Id := saved.Id);
+  end;
 end;
 
 method Pipeline.Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
@@ -224,6 +230,19 @@ begin
     var saved := Save(methodCall);
     EnQueue(saved);
     exit new Response(Id:=saved.Id);
+  end;
+
+end;
+
+method Pipeline.Save<T>(methodCall: Expression<System.Action<T, dynamic>>): SavedAction;
+begin
+  var expression := MethodCallExpression(methodCall.Body);
+
+  var objects := new List<object>;
+
+  for each argument in expression.Arguments do
+  begin
+    objects.Add(argument);
   end;
 
 end;

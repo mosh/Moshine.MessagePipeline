@@ -22,6 +22,7 @@ type
   public
     method SomeMethod;
     method SomeOtherMethod:dynamic;
+    method SomeMethodWithParam(param:Object);
   end;
 
 implementation
@@ -38,10 +39,18 @@ begin
   exit obj;
 end;
 
+method ServiceClass.SomeMethodWithParam(param:Object);
+begin
+
+end;
+
+
 class method ConsoleApp.Main(args: array of String);
 begin
-  var cacheString := ConfigurationManager.AppSettings['RedisCache'];
-  var cache := new RedisCache(ConnectionMultiplexer.Connect(cacheString));
+//  var cacheString := ConfigurationManager.AppSettings['RedisCache'];
+//  var cache := new RedisCache(ConnectionMultiplexer.Connect(cacheString));
+
+  var cache := new InMemoryCache;
 
   PipelineTest(cache);
 
@@ -57,7 +66,11 @@ begin
   pipeline.Start;
   try
 
-    pipeline.Send<ServiceClass>(s -> s.SomeMethod);
+    var obj:dynamic := new ExpandoObject;
+    obj.Id := 1;
+
+    pipeline.Send2<ServiceClass>(s -> s.SomeMethodWithParam(object(obj)));
+    pipeline.Send<ServiceClass>(s -> s.SomeMethod());
 
     Console.WriteLine('Press enter to quit.');
     Console.ReadLine();
