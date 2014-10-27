@@ -3,19 +3,28 @@
 interface
 
 uses
+  System.Runtime.Serialization,
   System.Collections.Generic,
   System.Linq,
   System.Text;
 
 type
-  [Serializable]
+
+  [KnownType(typeOf(DynamicDomainObject))]
+  [DataContract]
   SavedAction = public class
   public
     constructor;
+    [DataMember]
     property &Type:String;
+    [DataMember]
     property &Method:String;
+    [DataMember]
     property &Function:Boolean;
-    property Id:Guid read write;
+    [DataMember]
+    property Id:Guid;
+    [DataMember]
+    property Parameters:List<Object>;
   end;
 
 implementation

@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache.pas" />
+    <Compile Include="DynamicDomainObject.pas" />
     <Compile Include="IPipeline.pas" />
     <Compile Include="MessageParcel.pas" />
     <Compile Include="Pipeline.pas" />

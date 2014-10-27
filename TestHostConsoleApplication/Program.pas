@@ -23,6 +23,7 @@ type
     method SomeMethod;
     method SomeOtherMethod:dynamic;
     method SomeMethodWithParam(param:Object);
+    method SomeMethodWithInteger(param:Integer);
   end;
 
 implementation
@@ -34,6 +35,7 @@ end;
 
 method ServiceClass.SomeOtherMethod: dynamic;
 begin
+  Console.WriteLine('SomeOtherMethod');
   var obj:dynamic := new ExpandoObject;
   obj.Id := 1;
   exit obj;
@@ -41,13 +43,17 @@ end;
 
 method ServiceClass.SomeMethodWithParam(param:Object);
 begin
-
+  Console.WriteLine('SomeMethodWithParam');
 end;
 
+method ServiceClass.SomeMethodWithInteger(param:Integer);
+begin
+  Console.WriteLine('SomeMethodWithInteger');
+end;
 
 class method ConsoleApp.Main(args: array of String);
 begin
-//  var cacheString := ConfigurationManager.AppSettings['RedisCache'];
+  //  var cacheString := ConfigurationManager.AppSettings['RedisCache'];
 //  var cache := new RedisCache(ConnectionMultiplexer.Connect(cacheString));
 
   var cache := new InMemoryCache;
@@ -66,10 +72,13 @@ begin
   pipeline.Start;
   try
 
-    var obj:dynamic := new ExpandoObject;
+    var obj:dynamic := new DynamicDomainObject;
     obj.Id := 1;
+    obj.Title := 'John Smith';
 
-    pipeline.Send2<ServiceClass>(s -> s.SomeMethodWithParam(object(obj)));
+    pipeline.Send<ServiceClass>(s -> s.SomeMethodWithInteger(4));
+    var obj2:Object := obj;	
+    pipeline.Send<ServiceClass>(s -> s.SomeMethodWithParam(obj2));
     pipeline.Send<ServiceClass>(s -> s.SomeMethod());
 
     Console.WriteLine('Press enter to quit.');

@@ -4,14 +4,18 @@ interface
 
 uses
   System.Collections.Generic,
+  System.IO,
   System.Linq,
   System.Linq.Expressions,
   System.Runtime.CompilerServices,
+  System.Runtime.Serialization,
   System.Text, 
   System.Threading,
   System.Threading.Tasks,
   System.Threading.Tasks.Dataflow, 
   System.Transactions,
+  System.Xml,
+  System.Xml.Serialization,
   Microsoft.ServiceBus,
   Microsoft.ServiceBus.Messaging, 
   Microsoft.WindowsAzure, 
@@ -47,13 +51,16 @@ type
     method FindType(typeName:String):&Type;
 
     method Save<T>(methodCall: Expression<Action<T>>):SavedAction;
-    method Save<T>(methodCall: Expression<System.Action<T,dynamic>>):SavedAction;
     method Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
 
     method HandleTrace(message:String);
     method HandleException(e:Exception);
 
     method Setup;
+
+    method Serialize<T>(value:T):String;
+    method Deserialize<T>(value:String):T;
+
 
   public
     constructor(connectionString:String;name:String;cache:ICache);
@@ -62,7 +69,6 @@ type
     method Start;
 
     method Send<T>(methodCall: Expression<System.Action<T>>):Response;
-    method Send2<T>(methodCall: Expression<System.Action<T,dynamic>>):Response;
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
 
     property ErrorCallback:Action<Exception>;
@@ -96,7 +102,7 @@ begin
 
           var clone := parcel.Message.Clone;
           var body := clone.GetBody<String>;
-          var savedAction := JsonConvert.DeserializeObject<SavedAction>(body);
+          var savedAction := Deserialize<SavedAction>(body);
           using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
           begin
             HandleTrace('LoadAction');
@@ -128,6 +134,7 @@ begin
             copiedMessage.Properties.Remove('State');
             copiedMessage.Properties.Add('State','Error');
             topicClient.Send(copiedMessage);
+            parcel.Message.Complete;
             scope.Complete;
           end;
 
@@ -213,16 +220,6 @@ begin
   end;
 end;
 
-method Pipeline.Send2<T>(methodCall: Expression<System.Action<T,dynamic>>):Response;
-begin
-  if(assigned(methodCall))then
-  begin
-    var saved:=Save(methodCall);
-    EnQueue(saved);
-    exit new Response(Id := saved.Id);
-  end;
-end;
-
 method Pipeline.Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
 begin
   if(assigned(methodCall))then
@@ -230,19 +227,6 @@ begin
     var saved := Save(methodCall);
     EnQueue(saved);
     exit new Response(Id:=saved.Id);
-  end;
-
-end;
-
-method Pipeline.Save<T>(methodCall: Expression<System.Action<T, dynamic>>): SavedAction;
-begin
-  var expression := MethodCallExpression(methodCall.Body);
-
-  var objects := new List<object>;
-
-  for each argument in expression.Arguments do
-  begin
-    objects.Add(argument);
   end;
 
 end;
@@ -267,6 +251,23 @@ begin
   var saved := new SavedAction;
   saved.&Type := expression.Method.DeclaringType.ToString; 
   saved.Method := expression.Method.Name;
+
+  var objects := new List<Object>;
+  for each argument in expression.Arguments do
+  begin
+    if(argument is ConstantExpression)then
+    begin
+      objects.Add(ConstantExpression(argument).Value);
+    end
+    else 
+    begin
+      raise new ApplicationException;
+    end;
+
+
+  end;
+  saved.Parameters := objects;
+
   exit saved;
 end;
 
@@ -285,7 +286,15 @@ begin
   end
   else 
   begin
-    methodInfo.Invoke(obj,[]);
+    if(someAction.Parameters.Count > 0 )then
+    begin
+      methodInfo.Invoke(obj,someAction.Parameters.ToArray);
+    end
+    else
+    begin
+      methodInfo.Invoke(obj,[]);
+    end;
+
   end;
 
 
@@ -294,7 +303,8 @@ end;
 
 method Pipeline.EnQueue(someAction: SavedAction);
 begin
-  var message := new BrokeredMessage(JsonConvert.SerializeObject(someAction));
+  var stringRepresentation := Serialize(someAction);
+  var message := new BrokeredMessage(stringRepresentation);
   message.Properties.Add('Id',someAction.Id.ToString);
   message.Properties.Add('State','UnProcessed');
 
@@ -303,6 +313,33 @@ begin
 
 end;
 
+method Pipeline.Deserialize<T>(value:String):T;
+begin
+  var serializer := new DataContractSerializer(typeOf(T));
+
+  var sReader:= new StringReader(value);
+  var xReader := XmlReader.Create(sReader);
+  exit serializer.ReadObject(xReader) as T;
+
+end;
+
+method Pipeline.Serialize<T>(value:T):String;
+begin
+  if(not assigned(value))then
+  begin
+    exit String.Empty;
+  end;
+
+  var serializer := new DataContractSerializer(typeOf(T));
+
+  var sWriter := new StringWriter;
+  var xWriter := XmlWriter.Create(sWriter);
+  serializer.WriteObject(xWriter,value);
+  xWriter.Flush;
+  exit sWriter.ToString;
+
+
+end;
 
 method Pipeline.FindType(typeName: String): &Type;
 begin
