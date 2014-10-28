@@ -6,7 +6,8 @@ uses
   System.Collections.Generic,
   System.Dynamic,
   System.Linq,
-  System.Text;
+  System.Text, 
+  Newtonsoft.Json;
 
 type
 
@@ -15,6 +16,7 @@ type
     method SomeMethod;
     method SomeMethodWithObject:dynamic;
     method CausesException:dynamic;
+    method SomeDomainObject(param:Object);
   end;
 
 implementation
@@ -34,6 +36,12 @@ end;
 method SomeService.CausesException: dynamic;
 begin
   raise new NotImplementedException;
+end;
+
+method SomeService.SomeDomainObject(param: Object);
+begin
+  var obj := param as dynamic;
+  Console.WriteLine(JsonConvert.SerializeObject(obj));
 end;
 
 end.

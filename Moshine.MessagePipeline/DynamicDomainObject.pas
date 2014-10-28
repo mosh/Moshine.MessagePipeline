@@ -21,6 +21,7 @@ type
     method GetObjectData(info: SerializationInfo; context: StreamingContext);
     constructor(info:SerializationInfo;context:StreamingContext);
     constructor;
+    constructor(someValues:Dictionary<String, Object>);
   end;
 
 
@@ -57,6 +58,11 @@ method DynamicDomainObject.TryGetMember(binder: GetMemberBinder; out &result: Ob
 begin
   &result := values[binder.Name];
   exit true;
+end;
+
+constructor DynamicDomainObject(someValues: Dictionary<String, Object>);
+begin
+  self.values := someValues;
 end;
 
 

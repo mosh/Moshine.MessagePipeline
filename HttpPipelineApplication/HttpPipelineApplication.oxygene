@@ -97,6 +97,10 @@
       <HintPath>..\packages\Nancy.Owin.0.23.2\lib\net40\Nancy.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
@@ -127,6 +131,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\NancyExtensions.pas" />
     <Compile Include="Modules\SomeModule.pas" />
     <Compile Include="Program.pas" />
     <Compile Include="Services\SomeService.pas" />
@@ -146,6 +151,7 @@
   <ItemGroup>
     <Folder Include="App_Readme\" />
     <Folder Include="Modules" />
+    <Folder Include="Extensions" />
     <Folder Include="Services" />
     <Folder Include="Properties\" />
   </ItemGroup>

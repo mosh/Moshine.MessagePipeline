@@ -44,6 +44,9 @@ end;
 method ServiceClass.SomeMethodWithParam(param:Object);
 begin
   Console.WriteLine('SomeMethodWithParam');
+  var obj := param as dynamic;
+  Console.WriteLine(obj.Id);
+  Console.WriteLine(obj.Title);
 end;
 
 method ServiceClass.SomeMethodWithInteger(param:Integer);
