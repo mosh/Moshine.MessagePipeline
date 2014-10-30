@@ -17,6 +17,7 @@ type
     method SomeMethodWithObject:dynamic;
     method CausesException:dynamic;
     method SomeDomainObject(param:Object);
+    method SomeDomainObjectReturnsId(param:Object):dynamic;
   end;
 
 implementation
@@ -42,6 +43,13 @@ method SomeService.SomeDomainObject(param: Object);
 begin
   var obj := param as dynamic;
   Console.WriteLine(JsonConvert.SerializeObject(obj));
+end;
+
+method SomeService.SomeDomainObjectReturnsId(param: Object): dynamic;
+begin
+  var obj:dynamic := new ExpandoObject;
+  obj.Id := 4;
+  exit obj;
 end;
 
 end.

@@ -239,6 +239,19 @@ begin
   saved.&Type := expression.Method.DeclaringType.ToString; 
   saved.Method := expression.Method.Name;
   saved.Function:= true;
+  var objects := new List<Object>;
+  for each argument in expression.Arguments do
+  begin
+    if(argument is ConstantExpression)then
+    begin
+      objects.Add(ConstantExpression(argument).Value);
+    end
+    else 
+    begin
+      raise new ApplicationException;
+    end;
+  end;
+  saved.Parameters := objects;
   exit saved;
 
 end;
@@ -263,8 +276,6 @@ begin
     begin
       raise new ApplicationException;
     end;
-
-
   end;
   saved.Parameters := objects;
 
@@ -281,7 +292,7 @@ begin
   var methodInfo := someType.GetMethod(someAction.&Method);
   if(someAction.Function)then
   begin
-    var returnValue:= methodInfo.Invoke(obj,[]);
+    var returnValue:= methodInfo.Invoke(obj,someAction.Parameters.ToArray);
     _cache.Add(someAction.Id.ToString,returnValue);
   end
   else 

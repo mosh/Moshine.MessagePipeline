@@ -58,6 +58,15 @@ begin
       exit Response.AsJson(new class());  
     end;
 
+    
+  Post['/SomeDomainObjectReturnsId'] := _ -> 
+    begin 
+      var obj2 := self.Request.Body.AsDomainObject as Object;
+      var pipelineResponse:=_pipeline.Send<SomeService>(s -> s.SomeDomainObjectReturnsId(obj2));
+      var obj:Object:=pipelineResponse.WaitForResult(_cache);
+      exit iif(assigned(obj), Response.AsJson(obj), HttpStatusCode.InternalServerError);
+    end;
+
 end;
 
 end.
