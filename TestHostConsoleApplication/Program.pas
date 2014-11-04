@@ -3,6 +3,7 @@
 interface
 
 uses
+  System.Collections.Generic,
   System.Configuration,
   System.Dynamic,
   System.Linq, 
@@ -59,10 +60,14 @@ begin
   //  var cacheString := ConfigurationManager.AppSettings['RedisCache'];
 //  var cache := new RedisCache(ConnectionMultiplexer.Connect(cacheString));
 
-  var cache := new InMemoryCache;
+//  var cache := new InMemoryCache;
+//
+//  PipelineTest(cache);
 
-  PipelineTest(cache);
+    var obj:dynamic := new DynamicDomainObject;
+    obj.Id := 4;
 
+    var dictionary := IDictionary<String,Object>(obj);
 
 end;
 

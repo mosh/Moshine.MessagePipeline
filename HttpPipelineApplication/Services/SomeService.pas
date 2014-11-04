@@ -47,6 +47,7 @@ end;
 
 method SomeService.SomeDomainObjectReturnsId(param: Object): dynamic;
 begin
+  var dict := Dictionary<String, Object>(param);
   var obj:dynamic := new ExpandoObject;
   obj.Id := 4;
   exit obj;

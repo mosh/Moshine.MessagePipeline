@@ -107,6 +107,7 @@ begin
           begin
             HandleTrace('LoadAction');
             Load(savedAction);
+            scope.Complete;
           end;
           parcel.State := MessageStateEnum.Processed;
         except
