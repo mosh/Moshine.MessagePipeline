@@ -58,10 +58,6 @@ type
 
     method Setup;
 
-    method Serialize<T>(value:T):String;
-    method Deserialize<T>(value:String):T;
-
-
   public
     constructor(connectionString:String;name:String;cache:ICache);
 
@@ -102,7 +98,7 @@ begin
 
           var clone := parcel.Message.Clone;
           var body := clone.GetBody<String>;
-          var savedAction := Deserialize<SavedAction>(body);
+          var savedAction := PipelineSerializer.Deserialize<SavedAction>(body);
           using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
           begin
             HandleTrace('LoadAction');
@@ -315,7 +311,7 @@ end;
 
 method Pipeline.EnQueue(someAction: SavedAction);
 begin
-  var stringRepresentation := Serialize(someAction);
+  var stringRepresentation := PipelineSerializer.Serialize(someAction);
   var message := new BrokeredMessage(stringRepresentation);
   message.Properties.Add('Id',someAction.Id.ToString);
   message.Properties.Add('State','UnProcessed');
@@ -325,33 +321,6 @@ begin
 
 end;
 
-method Pipeline.Deserialize<T>(value:String):T;
-begin
-  var serializer := new DataContractSerializer(typeOf(T));
-
-  var sReader:= new StringReader(value);
-  var xReader := XmlReader.Create(sReader);
-  exit serializer.ReadObject(xReader) as T;
-
-end;
-
-method Pipeline.Serialize<T>(value:T):String;
-begin
-  if(not assigned(value))then
-  begin
-    exit String.Empty;
-  end;
-
-  var serializer := new DataContractSerializer(typeOf(T));
-
-  var sWriter := new StringWriter;
-  var xWriter := XmlWriter.Create(sWriter);
-  serializer.WriteObject(xWriter,value);
-  xWriter.Flush;
-  exit sWriter.ToString;
-
-
-end;
 
 method Pipeline.FindType(typeName: String): &Type;
 begin

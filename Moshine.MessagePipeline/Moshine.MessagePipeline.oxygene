@@ -99,6 +99,7 @@
     <Compile Include="IPipeline.pas" />
     <Compile Include="MessageParcel.pas" />
     <Compile Include="Pipeline.pas" />
+    <Compile Include="PipelineSerializer.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
     <Compile Include="Response.pas" />
     <Compile Include="SavedAction.pas" />

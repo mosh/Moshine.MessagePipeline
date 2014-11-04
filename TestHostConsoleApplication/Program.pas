@@ -66,8 +66,17 @@ begin
 
     var obj:dynamic := new DynamicDomainObject;
     obj.Id := 4;
+    obj.Name := 'RedisCache';
 
-    var dictionary := IDictionary<String,Object>(obj);
+    var action := new SavedAction;
+    action.Id := Guid.NewGuid;
+    action.Method:='SomeMethod';
+    action.Parameters := new List<Object>;
+    action.Parameters.Add(obj);
+
+    var objAsString := PipelineSerializer.Serialize(action);
+
+    var savedAction := PipelineSerializer.Deserialize<SavedAction>(objAsString);
 
 end;
 
