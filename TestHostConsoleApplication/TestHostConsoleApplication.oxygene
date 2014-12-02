@@ -64,6 +64,9 @@
     <Reference Include="RemObjects.Elements.Dynamic">
       <HintPath>C:\Program Files\RemObjects Software\Oxygene\Echoes\Reference Assemblies\RemObjects.Elements.Dynamic.dll</HintPath>
     </Reference>
+    <Reference Include="RemObjects.Elements.EUnit">
+      <HintPath>C:\Program Files\RemObjects Software\Oxygene\EUnit\Echoes\RemObjects.Elements.EUnit.dll</HintPath>
+    </Reference>
     <Reference Include="StackExchange.Redis">
       <HintPath>..\packages\StackExchange.Redis.1.0.371\lib\net45\StackExchange.Redis.dll</HintPath>
       <Private>True</Private>
@@ -89,6 +92,22 @@
   <ItemGroup>
     <Compile Include="Program.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
+    <Compile Include="Services\ServiceClass.pas">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests\DomainObjectTest.pas">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests\IntegerParameterTest.pas">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests\NoParameterTest.pas">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Tests\PipelineTestBase.pas" />
+    <Compile Include="Tests\SerializerTests.pas">
+      <SubType>Code</SubType>
+    </Compile>
     <Content Include="App.config">
       <SubType>Content</SubType>
     </Content>
@@ -106,6 +125,8 @@
     <Compile Include="Properties\Settings.Designer.pas" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Services" />
+    <Folder Include="Tests" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

@@ -14,7 +14,7 @@ type
 
   PipelineSerializer = public static class
   private
-  protected
+    method CreateSerializer<T>:DataContractSerializer;
   public
     method Serialize<T>(value:T):String;
     method Deserialize<T>(value:String):T;
@@ -24,7 +24,7 @@ implementation
 
 method PipelineSerializer.Deserialize<T>(value:String):T;
 begin
-  var serializer := new DataContractSerializer(typeOf(T));
+  var serializer := CreateSerializer<T>;
 
   var sReader:= new StringReader(value);
   var xReader := XmlReader.Create(sReader);
@@ -39,7 +39,7 @@ begin
     exit String.Empty;
   end;
 
-  var serializer := new DataContractSerializer(typeOf(T));
+  var serializer := CreateSerializer<T>;
 
   var sWriter := new StringWriter;
   var xWriter := XmlWriter.Create(sWriter);
@@ -48,6 +48,14 @@ begin
   exit sWriter.ToString;
 
 
+end;
+
+method PipelineSerializer.CreateSerializer<T>: DataContractSerializer;
+begin
+  var knownTypes := new List<&Type> ();
+  knownTypes.Add(typeOf(List<Integer>));
+  var serializer := new DataContractSerializer(typeOf(T), knownTypes);
+  exit serializer;
 end;
 
 
