@@ -166,10 +166,11 @@ end;
 
 method Pipeline.Stop;
 begin
+  tokenSource.Cancel();
+
   processMessage.Complete();
   finishProcessing.Completion.Wait();
 
-  tokenSource.Cancel();
   Task.WaitAll(t);
 
 end;
