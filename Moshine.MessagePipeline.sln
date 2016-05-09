@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline", "Moshine.MessagePipeline\Moshine.MessagePipeline.oxygene", "{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}"
 EndProject
@@ -9,22 +9,41 @@ Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "TestHostConsoleApplication"
 EndProject
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "HttpPipelineApplication", "HttpPipelineApplication\HttpPipelineApplication.oxygene", "{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{3A679AAD-7F1F-4138-A87C-03C6E811199B}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Release|Any CPU = Release|Any CPU
 		Release|Mixed Platforms = Release|Mixed Platforms
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Debug|Any CPU.ActiveCfg = Debug
+		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Debug|Any CPU.Build.0 = Debug
 		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Debug|Mixed Platforms.Build.0 = Debug
+		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Release|Any CPU.ActiveCfg = Release
+		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Release|Any CPU.Build.0 = Release
 		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Release|Mixed Platforms.ActiveCfg = Release
 		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Release|Mixed Platforms.Build.0 = Release
+		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Debug|Any CPU.ActiveCfg = Debug
+		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Debug|Any CPU.Build.0 = Debug
 		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Debug|Mixed Platforms.Build.0 = Debug
+		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Release|Any CPU.ActiveCfg = Release
+		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Release|Any CPU.Build.0 = Release
 		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Release|Mixed Platforms.ActiveCfg = Release
 		{7D1FB0A8-9368-4648-B1C2-9902FADDC82C}.Release|Mixed Platforms.Build.0 = Release
+		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Debug|Any CPU.ActiveCfg = Debug
+		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Debug|Any CPU.Build.0 = Debug
 		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Debug|Mixed Platforms.ActiveCfg = Debug
 		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Debug|Mixed Platforms.Build.0 = Debug
+		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Release|Any CPU.ActiveCfg = Release
+		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Release|Any CPU.Build.0 = Release
 		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Release|Mixed Platforms.ActiveCfg = Release
 		{FC16B7A3-65C2-4175-8BF1-0D5C885B236A}.Release|Mixed Platforms.Build.0 = Release
 	EndGlobalSection

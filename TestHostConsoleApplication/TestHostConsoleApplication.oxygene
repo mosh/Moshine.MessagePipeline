@@ -4,7 +4,7 @@
     <ProductVersion>3.5</ProductVersion>
     <RootNamespace>TestHostConsoleApplication</RootNamespace>
     <ProjectGuid>{7d1fb0a8-9368-4648-b1c2-9902faddc82c}</ProjectGuid>
-    <OutputType>exe</OutputType>
+    <OutputType>Exe</OutputType>
     <AssemblyName>TestHostConsoleApplication</AssemblyName>
     <AllowGlobals>False</AllowGlobals>
     <AllowLegacyWith>False</AllowLegacyWith>
@@ -13,8 +13,12 @@
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <ApplicationIcon>Properties\App.ico</ApplicationIcon>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <Name>TestHostConsoleApplication</Name>
+    <DefaultUses />
+    <StartupClass />
+    <InternalAssemblyName />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>false</Optimize>
@@ -61,7 +65,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="RemObjects.Elements.Dynamic">
+    <Reference Include="Echoes">
       <HintPath>C:\Program Files\RemObjects Software\Oxygene\Echoes\Reference Assemblies\RemObjects.Elements.Dynamic.dll</HintPath>
     </Reference>
     <Reference Include="RemObjects.Elements.EUnit">
@@ -92,22 +96,12 @@
   <ItemGroup>
     <Compile Include="Program.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
-    <Compile Include="Services\ServiceClass.pas">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Tests\DomainObjectTest.pas">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Tests\IntegerParameterTest.pas">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Tests\NoParameterTest.pas">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Services\ServiceClass.pas" />
+    <Compile Include="Tests\DomainObjectTest.pas" />
+    <Compile Include="Tests\IntegerParameterTest.pas" />
+    <Compile Include="Tests\NoParameterTest.pas" />
     <Compile Include="Tests\PipelineTestBase.pas" />
-    <Compile Include="Tests\SerializerTests.pas">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Tests\SerializerTests.pas" />
     <Content Include="App.config">
       <SubType>Content</SubType>
     </Content>
@@ -137,5 +131,8 @@
       <HintPath>..\Moshine.MessagePipeline\bin\Debug\Moshine.MessagePipeline.dll</HintPath>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Oxygene\RemObjects.Oxygene.Echoes.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
+  <PropertyGroup>
+    <PreBuildEvent />
+  </PropertyGroup>
 </Project>

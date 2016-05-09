@@ -8,8 +8,7 @@ uses
   System.Linq,
   System.Runtime.Caching,
   System.Text, 
-  Newtonsoft.Json,
-  StackExchange.Redis;
+  Newtonsoft.Json;
 
 type
 
@@ -47,43 +46,7 @@ type
     method CreateKeyWithRegion(key: String; region: String): String;
   end;
 
-
-  RedisCache = public class(ICache)
-  private
-    _connection:ConnectionMultiplexer;
-  protected
-  public
-    constructor(connection:ConnectionMultiplexer);
-    method Add(key:String;value:Object);
-    method Get(key:String):dynamic;
-  end;
-
 implementation
-
-method RedisCache.Add(key: String; value: Object);
-begin
-  var database := _connection.GetDatabase;
-  var stringValue:= JsonConvert.SerializeObject(value);
-  database.StringSet(key,stringValue);
-end;
-
-method RedisCache.Get(key: String): dynamic;
-begin
-  var obj:dynamic:=nil;
-  var database := _connection.GetDatabase;
-  var value:RedisValue:=database.StringGet(key);
-  if(value.HasValue)then
-  begin
-    var stringValue:String := value;
-    obj:=JsonConvert.DeserializeObject<ExpandoObject>(stringValue);
-  end;
-  exit obj;
-end;
-
-constructor RedisCache(connection: ConnectionMultiplexer);
-begin
-  _connection:=connection;
-end;
 
 constructor InMemoryCache;
 begin

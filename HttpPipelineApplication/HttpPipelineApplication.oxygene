@@ -5,7 +5,7 @@
     <ProjectGuid>{fc16b7a3-65c2-4175-8bf1-0d5c885b236a}</ProjectGuid>
     <RootNamespace>HttpPipelineApplication</RootNamespace>
     <StartupClass />
-    <OutputType>exe</OutputType>
+    <OutputType>Exe</OutputType>
     <AssemblyName>HttpPipelineApplication</AssemblyName>
     <AllowGlobals>False</AllowGlobals>
     <AllowLegacyWith>False</AllowLegacyWith>
@@ -14,8 +14,11 @@
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <ApplicationIcon>App.ico</ApplicationIcon>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <Name>HttpPipelineApplication</Name>
+    <DefaultUses />
+    <InternalAssemblyName />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>false</Optimize>
@@ -105,7 +108,7 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RemObjects.Elements.Dynamic">
+    <Reference Include="Echoes">
       <HintPath>C:\Program Files\RemObjects Software\Oxygene\Echoes\Reference Assemblies\RemObjects.Elements.Dynamic.dll</HintPath>
     </Reference>
     <Reference Include="StackExchange.Redis">
@@ -163,5 +166,8 @@
       <HintPath>..\Moshine.MessagePipeline\bin\Debug\Moshine.MessagePipeline.dll</HintPath>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Oxygene\RemObjects.Oxygene.Echoes.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
+  <PropertyGroup>
+    <PreBuildEvent />
+  </PropertyGroup>
 </Project>

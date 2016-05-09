@@ -18,7 +18,6 @@ uses
   System.Xml.Serialization,
   Microsoft.ServiceBus,
   Microsoft.ServiceBus.Messaging, 
-  Microsoft.WindowsAzure, 
   Newtonsoft.Json;
 
 type
