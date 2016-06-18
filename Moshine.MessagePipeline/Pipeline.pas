@@ -4,6 +4,7 @@ interface
 
 uses
   System.Collections.Generic,
+  System.Collections.ObjectModel,
   System.IO,
   System.Linq,
   System.Linq.Expressions,
@@ -136,6 +137,49 @@ type
       
     end;
 
+    method ArgumentsToObjectList(arguments:ReadOnlyCollection<Expression>):List<Object>;
+    begin
+
+      var objects := new List<Object>;
+      for each argument in arguments do
+      begin
+
+        if(argument is ConstantExpression)then
+        begin
+          objects.Add(ConstantExpression(argument).Value);
+        end
+        else if(argument is MemberExpression)then
+        begin
+          var mExpression := MemberExpression(argument);
+
+
+          if(mExpression.Expression is ConstantExpression)then
+          begin
+            var cExpression := ConstantExpression(mExpression.Expression);
+
+            var fieldInfo := cExpression.Value.GetType().GetField(mExpression.Member.Name, BindingFlags.Instance or BindingFlags.Public or BindingFlags.NonPublic);
+            var value := fieldInfo.GetValue(cExpression.Value);
+
+            objects.Add(value);
+          end
+          else 
+          begin
+            raise new ApplicationException('arguments of type '+mExpression.Expression.GetType.ToString+' not supported');
+          end;
+    
+        end
+        else 
+        begin
+          raise new ApplicationException('arguments of type '+argument.GetType.ToString+' not supported');
+        end;
+    
+      end;
+
+      exit objects;
+
+    end;
+
+
   public
     constructor(cache:ICache;bus:IBus);
     begin
@@ -224,6 +268,7 @@ begin
 
 end;
 
+
 method Pipeline.Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
 begin
   var expression := MethodCallExpression(methodCall.Body);
@@ -232,19 +277,8 @@ begin
   saved.&Type := expression.Method.DeclaringType.ToString; 
   saved.Method := expression.Method.Name;
   saved.Function:= true;
-  var objects := new List<Object>;
-  for each argument in expression.Arguments do
-  begin
-    if(argument is ConstantExpression)then
-    begin
-      objects.Add(ConstantExpression(argument).Value);
-    end
-    else 
-    begin
-      raise new ApplicationException;
-    end;
-  end;
-  saved.Parameters := objects;
+  saved.Parameters := ArgumentsToObjectList(expression.Arguments);
+
   exit saved;
 
 end;
@@ -258,41 +292,7 @@ begin
   saved.&Type := expression.Method.DeclaringType.ToString; 
   saved.Method := expression.Method.Name;
 
-  var objects := new List<Object>;
-  for each argument in expression.Arguments do
-  begin
-
-    if(argument is ConstantExpression)then
-    begin
-      objects.Add(ConstantExpression(argument).Value);
-    end
-    else if(argument is MemberExpression)then
-    begin
-      var mExpression := MemberExpression(argument);
-
-
-      if(mExpression.Expression is ConstantExpression)then
-      begin
-        var cExpression := ConstantExpression(mExpression.Expression);
-
-        var fieldInfo := cExpression.Value.GetType().GetField(mExpression.Member.Name, BindingFlags.Instance or BindingFlags.Public or BindingFlags.NonPublic);
-        var value := fieldInfo.GetValue(cExpression.Value);
-
-        objects.Add(value);
-      end
-      else 
-      begin
-        raise new ApplicationException('arguments of type '+mExpression.Expression.GetType.ToString+' not supported');
-      end;
-    
-    end
-    else 
-    begin
-      raise new ApplicationException('arguments of type '+argument.GetType.ToString+' not supported');
-    end;
-    
-  end;
-  saved.Parameters := objects;
+  saved.Parameters := ArgumentsToObjectList(expression.Arguments);
 
   exit saved;
 end;
