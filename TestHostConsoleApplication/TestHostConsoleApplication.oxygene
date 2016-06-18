@@ -57,7 +57,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.ServiceBus">
-      <HintPath>..\packages\WindowsAzure.ServiceBus.2.4.9.0\lib\net40-full\Microsoft.ServiceBus.dll</HintPath>
+      <HintPath>..\packages\WindowsAzure.ServiceBus.3.1.7\lib\net45-full\Microsoft.ServiceBus.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration">
@@ -70,10 +70,6 @@
     </Reference>
     <Reference Include="RemObjects.Elements.EUnit">
       <HintPath>C:\Program Files\RemObjects Software\Oxygene\EUnit\Echoes\RemObjects.Elements.EUnit.dll</HintPath>
-    </Reference>
-    <Reference Include="StackExchange.Redis">
-      <HintPath>..\packages\StackExchange.Redis.1.0.371\lib\net45\StackExchange.Redis.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration">
@@ -97,11 +93,10 @@
     <Compile Include="Program.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
     <Compile Include="Services\ServiceClass.pas" />
-    <Compile Include="Tests\DomainObjectTest.pas" />
-    <Compile Include="Tests\IntegerParameterTest.pas" />
-    <Compile Include="Tests\NoParameterTest.pas" />
-    <Compile Include="Tests\PipelineTestBase.pas" />
     <Compile Include="Tests\SerializerTests.pas" />
+    <Compile Include="Tests\Transport\InMemoryTests.pas" />
+    <Compile Include="Tests\Transport\ServiceBusTests.pas" />
+    <Compile Include="Transport\InMemoryBus.pas" />
     <Content Include="App.config">
       <SubType>Content</SubType>
     </Content>
@@ -119,6 +114,8 @@
     <Compile Include="Properties\Settings.Designer.pas" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Tests\Transport\" />
+    <Folder Include="Transport" />
     <Folder Include="Services" />
     <Folder Include="Tests" />
     <Folder Include="Properties\" />

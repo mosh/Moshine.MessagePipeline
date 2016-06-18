@@ -10,6 +10,8 @@ uses
   Microsoft.WindowsAzure,
   Autofac,
   Moshine.MessagePipeline,
+  Moshine.MessagePipeline.Cache,
+  Moshine.MessagePipeline.Transport,
   Nancy, 
   Nancy.Bootstrapper,
   Nancy.Bootstrappers.Autofac,
@@ -39,9 +41,11 @@ begin
 //  var cache:ICache := new RedisCache(ConnectionMultiplexer.Connect(cacheString));
   var cache:ICache := new InMemoryCache;
 
+  var bus:IBus := new ServiceBus(connectionString,'pipeline');
+
   var builder := new ContainerBuilder();
   builder.Register(c -> begin
-                     var obj := new Pipeline(connectionString,'pipeline',cache);
+                     var obj := new Pipeline(cache,bus);
                      obj.ErrorCallback := e -> 
                      begin
                       Console.WriteLine(e.Message);

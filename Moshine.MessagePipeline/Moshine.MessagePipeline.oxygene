@@ -96,7 +96,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache.pas" />
+    <Compile Include="Cache\Cache.pas" />
+    <Compile Include="Cache\InMemoryCache.pas" />
+    <Compile Include="Cache\RegionMemoryCache.pas" />
     <Compile Include="DynamicDomainObject.pas" />
     <Compile Include="IPipeline.pas" />
     <Compile Include="MessageParcel.pas" />
@@ -105,6 +107,8 @@
     <Compile Include="Properties\AssemblyInfo.pas" />
     <Compile Include="Response.pas" />
     <Compile Include="SavedAction.pas" />
+    <Compile Include="Transport\IBus.pas" />
+    <Compile Include="Transport\ServiceBus.pas" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
@@ -115,6 +119,8 @@
     <Compile Include="Properties\Settings.Designer.pas" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Cache" />
+    <Folder Include="Transport" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

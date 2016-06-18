@@ -9,6 +9,7 @@ uses
   System.Text, 
   HttpPipelineApplication.Services,
   Moshine.MessagePipeline,
+  Moshine.MessagePipeline.Cache,
   Nancy, 
   HttpPipelineApplication.Extensions,
   StackExchange.Redis;

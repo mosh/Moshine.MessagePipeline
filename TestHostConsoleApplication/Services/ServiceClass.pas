@@ -1,50 +1,95 @@
 ﻿namespace TestHostConsoleApplication.Services;
 
-interface
-
 uses
   System.Collections.Generic,
   System.Dynamic,
   System.Linq,
-  System.Text;
+  System.Text, 
+  System.Threading;
 
 type
+
+  ServiceExecuted = public static class
+
+  public
+
+    Bouncer:Semaphore; 
+
+    method Init;
+    begin
+      if(assigned(Bouncer))then
+      begin
+        raise new ApplicationException('Already in progress');
+      end;
+      Bouncer := new Semaphore(1, 1);
+      Bouncer.WaitOne;
+    end;
+
+    method Done;
+    begin
+      if(assigned(Bouncer))then
+      begin
+        Bouncer.Release;
+      end;
+
+    end;
+
+    method Wait;
+    begin
+      if(assigned(Bouncer))then
+      begin
+        Bouncer.WaitOne;
+        Bouncer.Release;
+      end;
+      Bouncer := nil;
+
+    end;
+  end;
+
+  Employee = public class
+  public
+    property Id:Integer;
+    property Name:String;
+  end;
 
   ServiceClass = public class
   public
     method SomeMethod;
+    begin
+      Console.WriteLine('Hello World');
+      ServiceExecuted.Done;
+    end;
+
     method SomeOtherMethod:dynamic;
+    begin
+      Console.WriteLine('SomeOtherMethod');
+      var obj:dynamic := new ExpandoObject;
+      obj.Id := 1;
+      ServiceExecuted.Done;
+      exit obj;
+    end;
+
     method SomeMethodWithParam(param:Object);
+    begin
+      Console.WriteLine('SomeMethodWithParam');
+      var obj := param as dynamic;
+      Console.WriteLine(obj.Id);
+      Console.WriteLine(obj.Title);
+      ServiceExecuted.Done;
+    end;
+
     method SomeMethodWithInteger(param:Integer);
+    begin
+      Console.WriteLine('SomeMethodWithInteger');
+      Console.WriteLine(param);
+      ServiceExecuted.Done;
+    end;
+
+    method DisplayEmployee(e:Employee);
+    begin
+      Console.WriteLine('{0} {1}',e.Id, e.Name);
+      ServiceExecuted.Done;
+    end;
   end;
-
-implementation
-
-method ServiceClass.SomeMethod;
-begin
-  Console.WriteLine('Hello World');
-end;
-
-method ServiceClass.SomeOtherMethod: dynamic;
-begin
-  Console.WriteLine('SomeOtherMethod');
-  var obj:dynamic := new ExpandoObject;
-  obj.Id := 1;
-  exit obj;
-end;
-
-method ServiceClass.SomeMethodWithParam(param:Object);
-begin
-  Console.WriteLine('SomeMethodWithParam');
-  var obj := param as dynamic;
-  Console.WriteLine(obj.Id);
-  Console.WriteLine(obj.Title);
-end;
-
-method ServiceClass.SomeMethodWithInteger(param:Integer);
-begin
-  Console.WriteLine('SomeMethodWithInteger');
-end;
-
 
 end.

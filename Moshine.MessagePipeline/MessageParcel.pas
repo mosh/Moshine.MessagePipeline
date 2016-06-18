@@ -3,10 +3,10 @@
 interface
 
 uses
+  Moshine.MessagePipeline.Transport,
   System.Collections.Generic,
   System.Linq,
-  System.Text, 
-  Microsoft.ServiceBus.Messaging;
+  System.Text;
 
 type
 
@@ -16,7 +16,7 @@ type
   private
   protected
   public
-    property Message:BrokeredMessage;
+    property Message:IMessage;
     property State:MessageStateEnum;
     property ReTryCount:Integer;
   end;

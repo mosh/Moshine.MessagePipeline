@@ -1,7 +1,5 @@
 ﻿namespace TestHostConsoleApplication;
 
-interface
-
 uses
   System.Collections.Generic,
   System.Configuration,
@@ -11,24 +9,20 @@ uses
   Microsoft.WindowsAzure, 
   RemObjects.Elements.EUnit,
   Moshine.MessagePipeline, 
-  TestHostConsoleApplication.Tests;
+  TestHostConsoleApplication.Tests, 
+  TestHostConsoleApplication.Tests.Transport;
 
 type
   ConsoleApp = class
   public
     class method Main(args: array of String);
+    begin
+    //  var lTests := Discovery.DiscoverTests();
+      var lTests := Discovery.FromType(typeOf(ServiceBusTests));
+      Runner.RunTests(lTests) withListener(new ConsoleTestListener());
+
+      System.Console.ReadLine;
+    end;
   end;
-
-
-implementation
-
-
-class method ConsoleApp.Main(args: array of String);
-begin
-//  var lTests := Discovery.DiscoverTests();
-  var lTests := Discovery.FromType(typeOf(SerializerTests));
-  Runner.RunTests(lTests) withListener(new ConsoleTestListener());
-
-end;
 
 end.

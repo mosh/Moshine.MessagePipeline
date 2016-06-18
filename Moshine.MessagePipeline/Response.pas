@@ -6,7 +6,8 @@ uses
   System.Collections.Generic,
   System.Linq,
   System.Text, 
-  System.Threading.Tasks;
+  System.Threading.Tasks, 
+  Moshine.MessagePipeline.Cache;
 
 type
   Response = public class
