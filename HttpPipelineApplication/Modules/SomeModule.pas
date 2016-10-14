@@ -1,7 +1,5 @@
 ﻿namespace HttpPipelineApplication.Modules;
 
-interface
-
 uses
   System.Collections.Generic,
   System.Configuration,
@@ -22,52 +20,50 @@ type
     _cache:ICache;
   public
     constructor(pipeline:Pipeline;cache:ICache);
+    begin
+      _pipeline := pipeline;
+      _cache := cache;
+    
+      Post['/Something'] := _ -> 
+        begin 
+          _pipeline.Send<SomeService>(s -> s.SomeMethod);
+    
+          exit Response.AsJson(new class());  
+        end;
+      Put['/SomeObjectResponse'] := _ -> 
+        begin 
+          var pipelineResponse:=_pipeline.Send<SomeService>(s -> s.SomeMethodWithObject);
+          var obj:Object:=pipelineResponse.WaitForResult(_cache);
+          exit iif(assigned(obj), Response.AsJson(obj), HttpStatusCode.InternalServerError);
+        end;
+    
+      Get['/CausesException'] := _ -> 
+        begin 
+          var pipelineResponse:=_pipeline.Send<SomeService>(s -> s.CausesException);
+          var obj:Object:=pipelineResponse.WaitForResult(_cache);
+          exit iif(assigned(obj), Response.AsJson(obj), HttpStatusCode.InternalServerError);
+        end;
+      Post['/SomeDomainObject'] := _ -> 
+        begin 
+          var obj2 := self.Request.Body.AsDomainObject as Object;
+    
+          _pipeline.Send<SomeService>(s -> s.SomeDomainObject(obj2));
+    
+          exit Response.AsJson(new class());  
+        end;
+    
+        
+      Post['/SomeDomainObjectReturnsId'] := _ -> 
+        begin 
+          var obj2 := self.Request.Body.AsDomainObject as Object;
+          var pipelineResponse:=_pipeline.Send<SomeService>(s -> s.SomeDomainObjectReturnsId(obj2));
+          var obj:Object:=pipelineResponse.WaitForResult(_cache);
+          exit iif(assigned(obj), Response.AsJson(obj), HttpStatusCode.InternalServerError);
+        end;
+    
+    end;
+    
   end;
 
-implementation
-
-constructor SomeModule(pipeline:Pipeline;cache:ICache);
-begin
-  _pipeline := pipeline;
-  _cache := cache;
-
-  Post['/Something'] := _ -> 
-    begin 
-      _pipeline.Send<SomeService>(s -> s.SomeMethod);
-
-      exit Response.AsJson(new class());  
-    end;
-  Put['/SomeObjectResponse'] := _ -> 
-    begin 
-      var pipelineResponse:=_pipeline.Send<SomeService>(s -> s.SomeMethodWithObject);
-      var obj:Object:=pipelineResponse.WaitForResult(_cache);
-      exit iif(assigned(obj), Response.AsJson(obj), HttpStatusCode.InternalServerError);
-    end;
-
-  Get['/CausesException'] := _ -> 
-    begin 
-      var pipelineResponse:=_pipeline.Send<SomeService>(s -> s.CausesException);
-      var obj:Object:=pipelineResponse.WaitForResult(_cache);
-      exit iif(assigned(obj), Response.AsJson(obj), HttpStatusCode.InternalServerError);
-    end;
-  Post['/SomeDomainObject'] := _ -> 
-    begin 
-      var obj2 := self.Request.Body.AsDomainObject as Object;
-
-      _pipeline.Send<SomeService>(s -> s.SomeDomainObject(obj2));
-
-      exit Response.AsJson(new class());  
-    end;
-
-    
-  Post['/SomeDomainObjectReturnsId'] := _ -> 
-    begin 
-      var obj2 := self.Request.Body.AsDomainObject as Object;
-      var pipelineResponse:=_pipeline.Send<SomeService>(s -> s.SomeDomainObjectReturnsId(obj2));
-      var obj:Object:=pipelineResponse.WaitForResult(_cache);
-      exit iif(assigned(obj), Response.AsJson(obj), HttpStatusCode.InternalServerError);
-    end;
-
-end;
 
 end.

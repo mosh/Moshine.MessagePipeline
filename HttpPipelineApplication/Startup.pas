@@ -1,7 +1,5 @@
 ﻿namespace HttpPipelineApplication;
 
-interface
-
 uses
   System.Collections.Generic,
   System.Linq,
@@ -14,13 +12,10 @@ type
   protected
   public
     method Configuration(app:IAppBuilder);
+    begin
+      app.UseNancy;
+    end;
+    
   end;
-
-implementation
-
-method Startup.Configuration(app: IAppBuilder);
-begin
-  app.UseNancy;
-end;
 
 end.
