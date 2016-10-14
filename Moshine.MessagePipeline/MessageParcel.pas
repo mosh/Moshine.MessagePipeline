@@ -1,7 +1,5 @@
 ﻿namespace Moshine.MessagePipeline;
 
-interface
-
 uses
   Moshine.MessagePipeline.Transport,
   System.Collections.Generic,
@@ -21,6 +19,5 @@ type
     property ReTryCount:Integer;
   end;
 
-implementation
 
 end.

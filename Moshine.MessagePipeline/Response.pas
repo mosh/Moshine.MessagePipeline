@@ -1,7 +1,5 @@
 ﻿namespace Moshine.MessagePipeline;
 
-interface
-
 uses
   System.Collections.Generic,
   System.Linq,
@@ -15,33 +13,31 @@ type
   protected
   public
     property Id:Guid;
+    
     method WaitForResult(cache:ICache):dynamic;
-  end;
-
-implementation
-
-method Response.WaitForResult(cache:ICache): dynamic;
-begin
-  var pollingTask := Task.Factory.StartNew(() -> 
     begin
-      var obj:Object := nil;
-      var startTime:=DateTime.Now;
-      var difference:TimeSpan;
-      repeat
-        obj:=cache.Get(Id.ToString);
-        difference:=DateTime.Now.Subtract(startTime);
-      until (assigned(obj)) or (difference.TotalSeconds > 30);
-      exit obj;
-    end
-  );
+      var pollingTask := Task.Factory.StartNew(() -> 
+      begin
+        var obj:Object := nil;
+        var startTime:=DateTime.Now;
+        var difference:TimeSpan;
+        repeat
+          obj:=cache.Get(Id.ToString);
+          difference:=DateTime.Now.Subtract(startTime);
+          until (assigned(obj)) or (difference.TotalSeconds > 30);
+        exit obj;
+      end
+      );
 
-  pollingTask.Wait;
+      pollingTask.Wait;
 
-  if(assigned(pollingTask.Result))then
-  begin
-    exit pollingTask.Result;
+      if(assigned(pollingTask.Result))then
+      begin
+        exit pollingTask.Result;
+      end;
+      exit nil;
+    end;
+    
   end;
-  exit nil;
-end;
-
+  
 end.

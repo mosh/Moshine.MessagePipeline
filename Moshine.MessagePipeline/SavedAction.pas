@@ -1,7 +1,5 @@
 ﻿namespace Moshine.MessagePipeline;
 
-interface
-
 uses
   System.Runtime.Serialization,
   System.Collections.Generic,
@@ -15,6 +13,10 @@ type
   SavedAction = public class
   public
     constructor;
+    begin
+      self.Id := Guid.NewGuid;
+    end;
+    
     [DataMember]
     property &Type:String;
     [DataMember]
@@ -26,14 +28,5 @@ type
     [DataMember]
     property Parameters:List<Object>;
   end;
-
-implementation
-
-constructor SavedAction;
-begin
-  self.Id := Guid.NewGuid;
-end;
-
-
 
 end.
