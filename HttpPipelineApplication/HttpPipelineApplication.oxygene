@@ -159,6 +159,18 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements">
+      <Name>Moshine.MessagePipeline.Core</Name>
+      <Project>{d6fddd36-602c-49c1-b399-30852f6f8b98}</Project>
+      <Private>True</Private>
+      <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
+    </ProjectReference>
+    <ProjectReference Include="..\Moshine.MessagePipeline.Transports.ServiceBus\Moshine.MessagePipeline.Transports.ServiceBus.elements">
+      <Name>Moshine.MessagePipeline.Transports.ServiceBus</Name>
+      <Project>{5341e3c0-40ef-415c-9517-eb3c8a2eff98}</Project>
+      <Private>True</Private>
+      <HintPath>..\Moshine.MessagePipeline.Transports.ServiceBus\bin\Debug\Moshine.MessagePipeline.Transports.ServiceBus.dll</HintPath>
+    </ProjectReference>
     <ProjectReference Include="..\Moshine.MessagePipeline\Moshine.MessagePipeline.oxygene">
       <Name>Moshine.MessagePipeline</Name>
       <Project>{5116edc8-7bf4-4a3b-ba8b-9f875f54fab0}</Project>

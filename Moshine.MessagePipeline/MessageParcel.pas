@@ -1,7 +1,7 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
-  Moshine.MessagePipeline.Transport,
+  Moshine.MessagePipeline.Core,
   System.Collections.Generic,
   System.Linq,
   System.Text;
@@ -19,8 +19,4 @@ type
     property ReTryCount:Integer;
   end;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
 end.

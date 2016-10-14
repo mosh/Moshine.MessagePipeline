@@ -1,4 +1,4 @@
-﻿namespace Moshine.MessagePipeline.Transport;
+﻿namespace Moshine.MessagePipeline.Core;
 
 type
 

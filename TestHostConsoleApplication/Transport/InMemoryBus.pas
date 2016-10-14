@@ -1,7 +1,8 @@
 ﻿namespace TestHostConsoleApplication.Tests.Transport;
 
 uses 
-  Moshine.MessagePipeline.Transport,
+  Moshine.MessagePipeline.Core,
+  Moshine.MessagePipeline.Transports.ServiceBus,
   System.Collections.Concurrent, 
   System.Threading;
 

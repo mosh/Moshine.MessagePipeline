@@ -57,10 +57,6 @@
     <WarnOnCaseMismatch>True</WarnOnCaseMismatch>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.ServiceBus">
-      <HintPath>..\packages\WindowsAzure.ServiceBus.3.1.7\lib\net45-full\Microsoft.ServiceBus.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration">
       <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.3.2.1\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
       <Private>True</Private>
@@ -107,8 +103,6 @@
     <Compile Include="Properties\AssemblyInfo.pas" />
     <Compile Include="Response.pas" />
     <Compile Include="SavedAction.pas" />
-    <Compile Include="Transport\IBus.pas" />
-    <Compile Include="Transport\ServiceBus.pas" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
@@ -120,7 +114,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Cache" />
-    <Folder Include="Transport" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +123,14 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements">
+      <Name>Moshine.MessagePipeline.Core</Name>
+      <Project>{d6fddd36-602c-49c1-b399-30852f6f8b98}</Project>
+      <Private>True</Private>
+      <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>

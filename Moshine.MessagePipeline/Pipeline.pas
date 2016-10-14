@@ -17,7 +17,7 @@ uses
   System.Xml,
   System.Xml.Serialization,
   Moshine.MessagePipeline.Cache,
-  Moshine.MessagePipeline.Transport,
+  Moshine.MessagePipeline.Core,
   Newtonsoft.Json;
 
 type

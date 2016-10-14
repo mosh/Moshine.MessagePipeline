@@ -1,6 +1,7 @@
-﻿namespace Moshine.MessagePipeline.Transport;
+﻿namespace Moshine.MessagePipeline.Transports.ServiceBus;
 
 uses 
+  Moshine.MessagePipeline.Core,
   Microsoft.ServiceBus,
   Microsoft.ServiceBus.Messaging;
 

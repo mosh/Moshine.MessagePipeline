@@ -5,7 +5,8 @@ uses
   RemObjects.Elements.EUnit, 
   Moshine.MessagePipeline, 
   Moshine.MessagePipeline.Cache,
-  Moshine.MessagePipeline.Transport,
+  Moshine.MessagePipeline.Core,
+  Moshine.MessagePipeline.Transports.ServiceBus,
   TestHostConsoleApplication.Services;
 
 type

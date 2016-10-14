@@ -9,12 +9,13 @@ uses
   Autofac,
   Moshine.MessagePipeline,
   Moshine.MessagePipeline.Cache,
-  Moshine.MessagePipeline.Transport,
+  Moshine.MessagePipeline.Core,
   Nancy, 
   Nancy.Bootstrapper,
   Nancy.Bootstrappers.Autofac,
   Nancy.Elmah,
   Nancy.TinyIoc, 
+  Moshine.MessagePipeline.Transports.ServiceBus,
   StackExchange.Redis;
 
 type
@@ -28,8 +29,6 @@ type
     
       var connectionString := CloudConfigurationManager.GetSetting('Microsoft.ServiceBus.ConnectionString');
     
-    //  var cacheString := ConfigurationManager.AppSettings['RedisCache'];
-    //  var cache:ICache := new RedisCache(ConnectionMultiplexer.Connect(cacheString));
       var cache:ICache := new InMemoryCache;
     
       var bus:IBus := new ServiceBus(connectionString,'pipeline');
