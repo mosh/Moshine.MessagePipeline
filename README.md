@@ -9,15 +9,12 @@ Declare a service
 
 SomeService = public class
 public
-  method SomeMethod;
+	method SomeMethod;
+	begin
+	  Console.WriteLine('Somemethod')
+	end;
 end;
 
-implementation
-
-method SomeService.SomeMethod;
-begin
-  Console.WriteLine('Somemethod')
-end;
 
 end.
 
