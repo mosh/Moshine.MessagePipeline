@@ -5,17 +5,16 @@ uses
   System.Configuration,
   System.Linq,
   System.Text, 
-  Microsoft.WindowsAzure,
   Autofac,
   Moshine.MessagePipeline,
   Moshine.MessagePipeline.Cache,
   Moshine.MessagePipeline.Core,
+  Moshine.MessagePipeline.Transports.ServiceBus,
   Nancy, 
   Nancy.Bootstrapper,
   Nancy.Bootstrappers.Autofac,
   Nancy.Elmah,
   Nancy.TinyIoc, 
-  Moshine.MessagePipeline.Transports.ServiceBus,
   StackExchange.Redis;
 
 type
@@ -26,12 +25,10 @@ type
     method ConfigureApplicationContainer(existingContainer:ILifetimeScope);override;
     begin
       inherited.ConfigureApplicationContainer(existingContainer);
-    
-      var connectionString := CloudConfigurationManager.GetSetting('Microsoft.ServiceBus.ConnectionString');
-    
+        
       var cache:ICache := new InMemoryCache;
     
-      var bus:IBus := new ServiceBus(connectionString,'pipeline');
+      var bus:IBus := new ServiceBus('Microsoft.ServiceBus.ConnectionString','pipeline');
     
       var builder := new ContainerBuilder();
       builder.Register(c -> begin

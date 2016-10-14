@@ -6,7 +6,6 @@ uses
   System.Dynamic,
   System.Linq, 
   System.Threading.Tasks,
-  Microsoft.WindowsAzure, 
   RemObjects.Elements.EUnit,
   Moshine.MessagePipeline, 
   TestHostConsoleApplication.Tests, 

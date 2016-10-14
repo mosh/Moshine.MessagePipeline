@@ -1,7 +1,6 @@
 ﻿namespace TestHostConsoleApplication.Tests.Transport;
 
 uses 
-  Microsoft.WindowsAzure,
   RemObjects.Elements.EUnit, 
   Moshine.MessagePipeline, 
   Moshine.MessagePipeline.Cache,
@@ -21,9 +20,8 @@ type
     method SetupTest; override;
     begin
       _cache := new InMemoryCache;
-      var connectionString := CloudConfigurationManager.GetSetting('Microsoft.ServiceBus.ConnectionString');
     
-      _bus:= new ServiceBus(connectionString,'pipeline');
+      _bus:= new ServiceBus('Microsoft.ServiceBus.ConnectionString','pipeline');
     
       _pipeline := new Pipeline(_cache,_bus);
       _pipeline.Start;

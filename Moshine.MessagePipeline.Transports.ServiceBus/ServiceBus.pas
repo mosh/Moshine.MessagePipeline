@@ -1,6 +1,7 @@
 ﻿namespace Moshine.MessagePipeline.Transports.ServiceBus;
 
 uses 
+  Microsoft.WindowsAzure,
   Moshine.MessagePipeline.Core,
   Microsoft.ServiceBus,
   Microsoft.ServiceBus.Messaging;
@@ -21,9 +22,9 @@ type
 
   
   public
-    constructor(connectionString:String; name:String);
+    constructor(appSettingKey:String; name:String);
     begin
-      _connectionString := connectionString;
+      _connectionString := CloudConfigurationManager.GetSetting(appSettingKey);
       _name:=name;
     end;
 
