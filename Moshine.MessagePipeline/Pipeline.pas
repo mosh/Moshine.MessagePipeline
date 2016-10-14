@@ -1,7 +1,5 @@
 ﻿namespace Moshine.MessagePipeline;
 
-interface
-
 uses
   System.Collections.Generic,
   System.Collections.ObjectModel,
@@ -48,14 +46,89 @@ type
     end;
 
     method Load(someAction:SavedAction);
+    begin
+      HandleTrace('Invoking action');
+
+      var someType := FindType(someAction.&Type);
+
+      var obj := Activator.CreateInstance(someType);
+      var methodInfo := someType.GetMethod(someAction.&Method);
+      if(someAction.Function)then
+      begin
+        var returnValue:= methodInfo.Invoke(obj,someAction.Parameters.ToArray);
+        _cache.Add(someAction.Id.ToString,returnValue);
+      end
+      else 
+      begin
+        if(someAction.Parameters.Count > 0 )then
+        begin
+          methodInfo.Invoke(obj,someAction.Parameters.ToArray);
+        end
+        else
+        begin
+          methodInfo.Invoke(obj,[]);
+        end;
+
+      end;
+
+
+    end;
+    
     method EnQueue(someAction:SavedAction);
+    begin
+      var stringRepresentation := PipelineSerializer.Serialize(someAction);
+
+      _bus.Send(stringRepresentation, someAction.Id.ToString);
+
+    end;
 
     method FindType(typeName:String):&Type;
+    begin
+      var types :=
+      from a in AppDomain.CurrentDomain.GetAssemblies()
+      from t in a.GetTypes()
+      where t.FullName = typeName
+      select t;
+      exit types.FirstOrDefault;
+    end;
+
 
     method Save<T>(methodCall: Expression<Action<T>>):SavedAction;
+    begin
+      var expression := MethodCallExpression(methodCall.Body);
+
+      var saved := new SavedAction;
+      saved.&Type := expression.Method.DeclaringType.ToString; 
+      saved.Method := expression.Method.Name;
+
+      saved.Parameters := ArgumentsToObjectList(expression.Arguments);
+
+      exit saved;
+    end;
+    
     method Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
+    begin
+      var expression := MethodCallExpression(methodCall.Body);
+
+      var saved := new SavedAction;
+      saved.&Type := expression.Method.DeclaringType.ToString; 
+      saved.Method := expression.Method.Name;
+      saved.Function:= true;
+      saved.Parameters := ArgumentsToObjectList(expression.Arguments);
+
+      exit saved;
+
+    end;
 
     method HandleTrace(message:String);
+    begin
+      if(assigned(self.TraceCallback))then
+      begin
+        self.TraceCallback(message);
+      end;
+    end;
+
+    
     method HandleException(e:Exception);
     begin
       if(assigned(self.ErrorCallback))then
@@ -205,6 +278,7 @@ type
       Task.WaitAll(t);
     
     end;
+    
     method Start;
     begin
       HandleTrace('Start');
@@ -238,122 +312,31 @@ type
     end;
 
     method Send<T>(methodCall: Expression<System.Action<T>>):Response;
+    begin
+      if(assigned(methodCall))then
+      begin
+        var saved:=Save(methodCall);
+        EnQueue(saved);
+        exit new Response(Id:=saved.Id);
+      end;
+    end;
+    
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
+    begin
+      if(assigned(methodCall))then
+      begin
+        var saved := Save(methodCall);
+        EnQueue(saved);
+        exit new Response(Id:=saved.Id);
+      end;
+
+    end;
+
 
     property ErrorCallback:Action<Exception>;
     property TraceCallback:Action<String>;
 
   end;
-
-implementation
-
-method Pipeline.Send<T>(methodCall: Expression<Action<T>>):Response;
-begin
-  if(assigned(methodCall))then
-  begin
-    var saved:=Save(methodCall);
-    EnQueue(saved);
-    exit new Response(Id:=saved.Id);
-  end;
-end;
-
-method Pipeline.Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
-begin
-  if(assigned(methodCall))then
-  begin
-    var saved := Save(methodCall);
-    EnQueue(saved);
-    exit new Response(Id:=saved.Id);
-  end;
-
-end;
-
-
-method Pipeline.Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
-begin
-  var expression := MethodCallExpression(methodCall.Body);
-
-  var saved := new SavedAction;
-  saved.&Type := expression.Method.DeclaringType.ToString; 
-  saved.Method := expression.Method.Name;
-  saved.Function:= true;
-  saved.Parameters := ArgumentsToObjectList(expression.Arguments);
-
-  exit saved;
-
-end;
-
-
-method Pipeline.Save<T>(methodCall: Expression<Action<T>>):SavedAction;
-begin
-  var expression := MethodCallExpression(methodCall.Body);
-
-  var saved := new SavedAction;
-  saved.&Type := expression.Method.DeclaringType.ToString; 
-  saved.Method := expression.Method.Name;
-
-  saved.Parameters := ArgumentsToObjectList(expression.Arguments);
-
-  exit saved;
-end;
-
-method Pipeline.Load(someAction:SavedAction);
-begin
-  HandleTrace('Invoking action');
-
-  var someType := FindType(someAction.&Type);
-
-  var obj := Activator.CreateInstance(someType);
-  var methodInfo := someType.GetMethod(someAction.&Method);
-  if(someAction.Function)then
-  begin
-    var returnValue:= methodInfo.Invoke(obj,someAction.Parameters.ToArray);
-    _cache.Add(someAction.Id.ToString,returnValue);
-  end
-  else 
-  begin
-    if(someAction.Parameters.Count > 0 )then
-    begin
-      methodInfo.Invoke(obj,someAction.Parameters.ToArray);
-    end
-    else
-    begin
-      methodInfo.Invoke(obj,[]);
-    end;
-
-  end;
-
-
-//  exit Delegate.CreateDelegate(someType,obj,methodInfo);
-end;
-
-method Pipeline.EnQueue(someAction: SavedAction);
-begin
-  var stringRepresentation := PipelineSerializer.Serialize(someAction);
-
-  _bus.Send(stringRepresentation, someAction.Id.ToString);
-
-end;
-
-
-method Pipeline.FindType(typeName: String): &Type;
-begin
-  var types :=
-            from a in AppDomain.CurrentDomain.GetAssemblies()
-            from t in a.GetTypes()
-            where t.FullName = typeName
-            select t;
-  exit types.FirstOrDefault;
-end;
-
-method Pipeline.HandleTrace(message:String);
-begin
-  if(assigned(self.TraceCallback))then
-  begin
-    self.TraceCallback(message);
-  end;
-end;
-
 
 end.
 

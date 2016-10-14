@@ -19,4 +19,8 @@ type
     property ReTryCount:Integer;
   end;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 end.
