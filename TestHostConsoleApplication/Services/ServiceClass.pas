@@ -90,6 +90,21 @@ type
       Console.WriteLine('{0} {1}',e.Id, e.Name);
       ServiceExecuted.Done;
     end;
+
+    method SomeMethodWithObject:dynamic;
+    begin
+      var obj:dynamic := new ExpandoObject;
+      obj.Id := 4;
+      ServiceExecuted.Done;
+      exit obj;
+    end;
+
+    method SomeMethodWithIntegerParams(oneParam:Integer; twoParam:Integer; threeParam:INteger);
+    begin
+      Console.WriteLine('{0} {1} {2}',oneParam, twoParam, threeParam);
+      ServiceExecuted.Done;
+    end;
+
   end;
 
 end.

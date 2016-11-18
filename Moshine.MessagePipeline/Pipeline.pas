@@ -3,6 +3,7 @@
 uses
   System.Collections.Generic,
   System.Collections.ObjectModel,
+  System.Data,
   System.IO,
   System.Linq,
   System.Linq.Expressions,
@@ -97,6 +98,11 @@ type
     begin
       var expression := MethodCallExpression(methodCall.Body);
 
+      if not assigned(expression) then
+      begin
+        raise new ApplicationException('Not a static or instance method');
+      end;
+
       var saved := new SavedAction;
       saved.&Type := expression.Method.DeclaringType.ToString; 
       saved.Method := expression.Method.Name;
@@ -109,6 +115,11 @@ type
     method Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
     begin
       var expression := MethodCallExpression(methodCall.Body);
+
+      if not assigned(expression) then
+      begin
+        raise new ApplicationException('Not a static or instance method');
+      end;
 
       var saved := new SavedAction;
       saved.&Type := expression.Method.DeclaringType.ToString; 

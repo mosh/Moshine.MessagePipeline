@@ -17,7 +17,7 @@ type
     class method Main(args: array of String);
     begin
     //  var lTests := Discovery.DiscoverTests();
-      var lTests := Discovery.FromType(typeOf(ServiceBusTests));
+      var lTests := Discovery.FromType(typeOf(InMemoryTests));
       Runner.RunTests(lTests) withListener(new ConsoleTestListener());
 
       System.Console.ReadLine;

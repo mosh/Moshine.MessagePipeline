@@ -44,6 +44,21 @@ type
       Console.WriteLine('Done');
 
     end;
+   
+
+    method InvokeSomeMethodWithObject;
+    begin
+      ServiceExecuted.Init;
+
+      var obj2:Object := new Object;	
+
+      _pipeline.Send<ServiceClass>(s -> s.SomeMethodWithObject(obj2));
+
+      ServiceExecuted.Wait;
+
+
+    end;
+
     */
     
     method InvokeSomeMethodWithParam;
@@ -82,6 +97,21 @@ type
       ServiceExecuted.Init;
 
       _pipeline.Send<ServiceClass>(s -> s.SomeMethodWithInteger(4));
+
+      ServiceExecuted.Wait;
+
+      Console.WriteLine('Done');
+    end;
+
+    method  InvokeSomeMethodWithIntegerParams;
+    begin
+      ServiceExecuted.Init;
+
+      var oneParam:Integer := 1;
+      var twoParam:Integer := 2;
+      var threeParam:Integer := 3;
+
+      _pipeline.Send<ServiceClass>(s -> s.SomeMethodWithIntegerParams(oneParam,twoParam,threeParam) );
 
       ServiceExecuted.Wait;
 

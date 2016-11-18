@@ -13,6 +13,25 @@ type
   protected
   public
     property Id:Guid;
+
+    method WaitForResultAsync(cache:ICache):Task<dynamic>;
+    begin
+      var pollingTask := Task.Factory.StartNew(() -> 
+      begin
+        var obj:Object := nil;
+        var startTime:=DateTime.Now;
+        var difference:TimeSpan;
+        repeat
+          obj:=cache.Get(Id.ToString);
+          difference:=DateTime.Now.Subtract(startTime);
+          until (assigned(obj)) or (difference.TotalSeconds > 30);
+        exit obj;
+      end
+      );
+
+      exit pollingTask;
+
+    end;
     
     method WaitForResult(cache:ICache):dynamic;
     begin
