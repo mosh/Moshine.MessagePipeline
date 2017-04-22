@@ -1,11 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProductVersion>3.5</ProductVersion>
-    <RootNamespace>Moshine.MessagePipeline.Core</RootNamespace>
-    <ProjectGuid>{d6fddd36-602c-49c1-b399-30852f6f8b98}</ProjectGuid>
-    <OutputType>library</OutputType>
-    <AssemblyName>Moshine.MessagePipeline.Core</AssemblyName>
+    <RootNamespace>Moshine.MessagePipline.Transports.RabbitMQ</RootNamespace>
+    <ProjectGuid>a3b7fb18-599c-481c-943e-7413b4920ffe</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>Moshine.MessagePipline.Transports.RabbitMQ</AssemblyName>
     <AllowGlobals>False</AllowGlobals>
     <AllowLegacyWith>False</AllowLegacyWith>
     <AllowLegacyOutParams>False</AllowLegacyOutParams>
@@ -13,7 +12,6 @@
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <Name>Moshine.MessagePipeline.Core</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>false</Optimize>
@@ -66,8 +64,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IBus.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
+    <Compile Include="RabbitMQBus.pas" />
+    <Compile Include="RabbitMQMessage.pas" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
@@ -78,6 +77,7 @@
     <Compile Include="Properties\Settings.Designer.pas" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

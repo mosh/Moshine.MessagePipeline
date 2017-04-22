@@ -152,10 +152,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Readme\" />
-    <Folder Include="Modules" />
-    <Folder Include="Extensions" />
-    <Folder Include="Services" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

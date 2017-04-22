@@ -114,11 +114,6 @@
     <Compile Include="Properties\Settings.Designer.pas" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Tests\Transport\" />
-    <Folder Include="Transport" />
-    <Folder Include="Services" />
-    <Folder Include="Tests" />
-    <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements">
