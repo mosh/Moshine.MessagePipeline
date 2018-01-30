@@ -2,10 +2,10 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProductVersion>3.5</ProductVersion>
-    <RootNamespace>Moshine.MessagePipeline</RootNamespace>
-    <ProjectGuid>{5116edc8-7bf4-4a3b-ba8b-9f875f54fab0}</ProjectGuid>
+    <RootNamespace>Moshine.MessagePipeline.Transports.AmazonSQS</RootNamespace>
+    <ProjectGuid>{9F703BFC-4459-43B8-A46C-6741901E9ACC}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Moshine.MessagePipeline</AssemblyName>
+    <AssemblyName>Moshine.MessagePipeline.Transports.AmazonSQS</AssemblyName>
     <AllowGlobals>False</AllowGlobals>
     <AllowLegacyWith>False</AllowLegacyWith>
     <AllowLegacyOutParams>False</AllowLegacyOutParams>
@@ -13,11 +13,10 @@
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <TargetFramework>.Net,Version=4.6.2</TargetFramework>
-    <Name>Moshine.MessagePipeline</Name>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <DefaultUses>RemObjects.Elements.RTL</DefaultUses>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>.\bin\Debug</OutputPath>
     <DefineConstants>DEBUG;TRACE;</DefineConstants>
     <GeneratePDB>True</GeneratePDB>
@@ -53,18 +52,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
-    <NuGetReference Include="Newtonsoft.Json:8.0.3" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.Caching">
-      <HintPath>C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Caching.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <NuGetReference Include="System.Threading.Tasks.Dataflow:4.5.24" />
-    <Reference Include="System.Transactions">
-      <HintPath>C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Transactions.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -75,19 +64,20 @@
     <Reference Include="System.Data.DataSetExtensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Elements">
+      <Private>True</Private>
+    </Reference>
+    <ProjectReference Include="Moshine.MessagePipeline.Core">
+      <Name>Moshine.MessagePipeline.Core</Name>
+      <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
+      <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
+      <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
+      <Private>True</Private>
+    </ProjectReference>
+    <NuGetReference Include="awssdk.sqs:*" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\Cache.pas" />
-    <Compile Include="Cache\InMemoryCache.pas" />
-    <Compile Include="Cache\RegionMemoryCache.pas" />
-    <Compile Include="DynamicDomainObject.pas" />
-    <Compile Include="IPipeline.pas" />
-    <Compile Include="MessageParcel.pas" />
-    <Compile Include="Pipeline.pas" />
-    <Compile Include="PipelineSerializer.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
-    <Compile Include="Response.pas" />
-    <Compile Include="SavedAction.pas" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
@@ -96,27 +86,8 @@
       <Generator>SettingsSingleFileGenerator</Generator>
     </None>
     <Compile Include="Properties\Settings.Designer.pas" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="packages.config">
-      <SubType>Content</SubType>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Moshine.MessagePipeline.Core">
-      <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
-      <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
-      <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
-      <Private>True</Private>
-    </ProjectReference>
+    <Compile Include="AmazonSQSBus.pas" />
+    <Compile Include="AmazonSQSMessage.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
-  <PropertyGroup>
-    <PreBuildEvent />
-    <PostBuildEvent>REM Create a NuGet package for this project and place the .nupkg file in the project's output directory.
-REM If you see this in Visual Studio's Error List window, check the Output window's Build tab for the actual error.
-ECHO Creating NuGet package in Post-Build event...
-PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -BuildConfiguration '$(ConfigurationName)' -BuildPlatform 'Any CPU'"</PostBuildEvent>
-    <PostBuildEvent></PostBuildEvent>
-  </PropertyGroup>
 </Project>

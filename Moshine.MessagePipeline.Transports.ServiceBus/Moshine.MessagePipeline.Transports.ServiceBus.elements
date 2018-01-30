@@ -12,7 +12,7 @@
     <AllowLegacyCreate>False</AllowLegacyCreate>
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFramework>.Net,Version=4.6.2</TargetFramework>    
     <Name>Moshine.MessagePipeline.Transports.ServiceBus</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -51,14 +51,10 @@
     <WarnOnCaseMismatch>True</WarnOnCaseMismatch>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.ServiceBus">
-      <HintPath>..\packages\WindowsAzure.ServiceBus.3.4.2\lib\net45-full\Microsoft.ServiceBus.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.WindowsAzure.Configuration">
-      <HintPath>..\packages\Microsoft.WindowsAzure.ConfigurationManager.3.2.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+
+    <NuGetReference Include="Microsoft.WindowsAzure.ConfigurationManager:3.2.3" />
+    <NuGetReference Include="WindowsAzure.ServiceBus:4.1.6" />
+  
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Data" />

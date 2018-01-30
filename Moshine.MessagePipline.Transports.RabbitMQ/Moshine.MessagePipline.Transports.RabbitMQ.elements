@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProductVersion>3.5</ProductVersion>
     <RootNamespace>Moshine.MessagePipline.Transports.RabbitMQ</RootNamespace>
@@ -11,7 +12,7 @@
     <AllowLegacyCreate>False</AllowLegacyCreate>
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFramework>.Net,Version=4.6.2</TargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>false</Optimize>
@@ -49,6 +50,7 @@
     <WarnOnCaseMismatch>True</WarnOnCaseMismatch>
   </PropertyGroup>
   <ItemGroup>
+    <NuGetReference Include="RabbitMQ.Client:4.1.3" />
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -77,7 +79,13 @@
     <Compile Include="Properties\Settings.Designer.pas" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements" />
+    <ProjectReference Include="Moshine.MessagePipeline.Core">
+      <Name>Moshine.MessagePipeline.Core</Name>
+      <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
+      <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
+      <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

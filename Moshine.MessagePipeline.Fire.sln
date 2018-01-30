@@ -1,0 +1,44 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# RemObjects Fire
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline", "Moshine.MessagePipeline\Moshine.MessagePipeline.oxygene", "{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}"
+EndProject
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Core", "Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements", "{D6FDDD36-602C-49C1-B399-30852F6F8B98}"
+EndProject
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Transports.AmazonSQS", "Moshine.MessagePipeline.Transports.AmazonSQS\Moshine.MessagePipeline.Transports.AmazonSQS.elements", "{9F703BFC-4459-43B8-A46C-6741901E9ACC}"
+EndProject
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Transports.ServiceBus", "Moshine.MessagePipeline.Transports.ServiceBus\Moshine.MessagePipeline.Transports.ServiceBus.elements", "{5341E3C0-40EF-415C-9517-EB3C8A2EFF98}"
+EndProject
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipline.Transports.RabbitMQ", "Moshine.MessagePipline.Transports.RabbitMQ\Moshine.MessagePipline.Transports.RabbitMQ.elements", "{A3B7FB18-599C-481C-943E-7413B4920FFE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AnyCPU = Debug|AnyCPU
+		Release|AnyCPU = Release|AnyCPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
+		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
+		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
+		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Release|AnyCPU.Build.0 = Release|AnyCPU
+		{D6FDDD36-602C-49C1-B399-30852F6F8B98}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
+		{D6FDDD36-602C-49C1-B399-30852F6F8B98}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
+		{D6FDDD36-602C-49C1-B399-30852F6F8B98}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
+		{D6FDDD36-602C-49C1-B399-30852F6F8B98}.Release|AnyCPU.Build.0 = Release|AnyCPU
+		{9F703BFC-4459-43B8-A46C-6741901E9ACC}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
+		{9F703BFC-4459-43B8-A46C-6741901E9ACC}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
+		{9F703BFC-4459-43B8-A46C-6741901E9ACC}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
+		{9F703BFC-4459-43B8-A46C-6741901E9ACC}.Release|AnyCPU.Build.0 = Release|AnyCPU
+		{5341E3C0-40EF-415C-9517-EB3C8A2EFF98}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
+		{5341E3C0-40EF-415C-9517-EB3C8A2EFF98}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
+		{5341E3C0-40EF-415C-9517-EB3C8A2EFF98}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
+		{5341E3C0-40EF-415C-9517-EB3C8A2EFF98}.Release|AnyCPU.Build.0 = Release|AnyCPU
+		{A3B7FB18-599C-481C-943E-7413B4920FFE}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
+		{A3B7FB18-599C-481C-943E-7413B4920FFE}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
+		{A3B7FB18-599C-481C-943E-7413B4920FFE}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
+		{A3B7FB18-599C-481C-943E-7413B4920FFE}.Release|AnyCPU.Build.0 = Release|AnyCPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

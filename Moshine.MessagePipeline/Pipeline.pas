@@ -10,10 +10,10 @@ uses
   System.Reflection,
   System.Runtime.CompilerServices,
   System.Runtime.Serialization,
-  System.Text, 
+  System.Text,
   System.Threading,
   System.Threading.Tasks,
-  System.Threading.Tasks.Dataflow, 
+  System.Threading.Tasks.Dataflow,
   System.Transactions,
   System.Xml,
   System.Xml.Serialization,
@@ -43,7 +43,7 @@ type
 
     method Initialize;
     begin
-      _bus.Initialize;  
+      _bus.Initialize;
     end;
 
     method Load(someAction:SavedAction);
@@ -59,7 +59,7 @@ type
         var returnValue:= methodInfo.Invoke(obj,someAction.Parameters.ToArray);
         _cache.Add(someAction.Id.ToString,returnValue);
       end
-      else 
+      else
       begin
         if(someAction.Parameters.Count > 0 )then
         begin
@@ -74,7 +74,7 @@ type
 
 
     end;
-    
+
     method EnQueue(someAction:SavedAction);
     begin
       var stringRepresentation := PipelineSerializer.Serialize(someAction);
@@ -104,14 +104,14 @@ type
       end;
 
       var saved := new SavedAction;
-      saved.&Type := expression.Method.DeclaringType.ToString; 
+      saved.&Type := expression.Method.DeclaringType.ToString;
       saved.Method := expression.Method.Name;
 
       saved.Parameters := ArgumentsToObjectList(expression.Arguments);
 
       exit saved;
     end;
-    
+
     method Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
     begin
       var expression := MethodCallExpression(methodCall.Body);
@@ -122,7 +122,7 @@ type
       end;
 
       var saved := new SavedAction;
-      saved.&Type := expression.Method.DeclaringType.ToString; 
+      saved.&Type := expression.Method.DeclaringType.ToString;
       saved.Method := expression.Method.Name;
       saved.Function:= true;
       saved.Parameters := ArgumentsToObjectList(expression.Arguments);
@@ -139,7 +139,7 @@ type
       end;
     end;
 
-    
+
     method HandleException(e:Exception);
     begin
       if(assigned(self.ErrorCallback))then
@@ -154,7 +154,7 @@ type
           begin
             try
               HandleTrace('ProcessMessage');
-    
+
               var clone := parcel.Message.Clone;
               var body := clone.GetBody;
               var savedAction := PipelineSerializer.Deserialize<SavedAction>(body);
@@ -177,12 +177,12 @@ type
           end,
           new ExecutionDataflowBlockOptions(MaxDegreeOfParallelism := 5)
           );
-    
+
       faultedInProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
             HandleTrace('Fault in processing');
             try
-    
+
               using scope := new TransactionScope() do
               begin
                 var copiedMessage := parcel.Message.Clone;
@@ -191,7 +191,7 @@ type
                 parcel.Message.Complete;
                 scope.Complete;
               end;
-    
+
             except
               on e:Exception do
               begin
@@ -200,7 +200,7 @@ type
               end;
             end;
           end);
-    
+
       finishProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
             HandleTrace('Finished processing');
@@ -214,11 +214,11 @@ type
               end;
             end;
           end);
-    
+
       processMessage.LinkTo(finishProcessing, p -> p.State = MessageStateEnum.Processed);
       processMessage.LinkTo(processMessage, p -> (p.State = MessageStateEnum.Faulted) and (p.ReTryCount < self._maxRetries));
       processMessage.LinkTo(faultedInProcessing, p -> (p.State = MessageStateEnum.Faulted) and (p.ReTryCount >= self._maxRetries));
-      
+
     end;
 
     method ArgumentsToObjectList(arguments:ReadOnlyCollection<Expression>):List<Object>;
@@ -246,17 +246,17 @@ type
 
             objects.Add(value);
           end
-          else 
+          else
           begin
             raise new ApplicationException('arguments of type '+mExpression.Expression.GetType.ToString+' not supported');
           end;
-    
+
         end
-        else 
+        else
         begin
           raise new ApplicationException('arguments of type '+argument.GetType.ToString+' not supported');
         end;
-    
+
       end;
 
       exit objects;
@@ -265,6 +265,7 @@ type
 
 
   public
+
     constructor(cache:ICache;bus:IBus);
     begin
       _maxRetries := 4;
@@ -282,34 +283,34 @@ type
     method Stop;
     begin
       tokenSource.Cancel();
-    
+
       processMessage.Complete();
       finishProcessing.Completion.Wait();
-    
+
       Task.WaitAll(t);
-    
+
     end;
-    
+
     method Start;
     begin
       HandleTrace('Start');
-    
-      t := Task.Factory.StartNew( () -> 
+
+      t := Task.Factory.StartNew( () ->
         begin
           try
-    
+
             repeat
               var serverWaitTime := new TimeSpan(0,0,2);
-    
+
               var someMessage:=_bus.Receive(serverWaitTime);
-    
+
               if(assigned(someMessage))then
               begin
                 HandleTrace('Posting message');
                 var parcel := new MessageParcel(Message := someMessage);
                 processMessage.Post(parcel);
               end;
-    
+
             until token.IsCancellationRequested;
           except
             on e:Exception do
@@ -319,7 +320,7 @@ type
             end;
           end;
         end, token);
-    
+
     end;
 
     method Send<T>(methodCall: Expression<System.Action<T>>):Response;
@@ -331,7 +332,7 @@ type
         exit new Response(Id:=saved.Id);
       end;
     end;
-    
+
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
     begin
       if(assigned(methodCall))then
@@ -350,4 +351,3 @@ type
   end;
 
 end.
-
