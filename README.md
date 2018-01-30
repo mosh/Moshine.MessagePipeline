@@ -26,6 +26,4 @@ Queue up the method invocation for later processing in a controlled manner using
 _pipeline.Send<SomeService>(s -> s.SomeMethod);
 </code></pre>
 
-Developed in Oxygene using Azure ServiceBus.
-
-Example uses Nancy and Owin to illustrated how it can be used in a Web Application.
+Developed in Oxygene using Azure ServiceBus or Amazon SQS.
