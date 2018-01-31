@@ -53,7 +53,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
-    <NuGetReference Include="Newtonsoft.Json:8.0.3" />
+    <NuGetReference Include="Newtonsoft.Json:8.0.3">
+      <Private>True</Private>
+    </NuGetReference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Caching">
@@ -61,7 +63,9 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
-    <NuGetReference Include="System.Threading.Tasks.Dataflow:4.5.24" />
+    <NuGetReference Include="System.Threading.Tasks.Dataflow:[4.6.0]">
+      <Private>True</Private>
+    </NuGetReference>
     <Reference Include="System.Transactions">
       <HintPath>C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Transactions.dll</HintPath>
     </Reference>
