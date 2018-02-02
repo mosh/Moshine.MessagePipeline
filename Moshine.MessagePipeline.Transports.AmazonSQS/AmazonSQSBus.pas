@@ -20,8 +20,18 @@ type
     _accountId:String;
     _url:GetQueueUrlResponse;
 
+    method Guard;
+    begin
+      if ((not assigned(_url)) or (not assigned(_client)))then
+      begin
+        raise new ApplicationException('Initialize has not been called');
+      end;
+    end;
+
     method SendMessage(id:String; messageBody:String):SendMessageResponse;
     begin
+      Guard;
+
       try
         var messageRequest := new SendMessageRequest;
         messageRequest.QueueUrl := _url.QueueUrl;
@@ -92,6 +102,7 @@ type
 
     method DeleteMessage(message:Message);
     begin
+      Guard;
       var deleteMessageRequest := new DeleteMessageRequest();
 
       deleteMessageRequest.QueueUrl := _url.QueueUrl;
@@ -102,6 +113,7 @@ type
 
     method Receive(serverWaitTime:TimeSpan):IMessage;
     begin
+      Guard;
 
       var receiveMessageRequest := new ReceiveMessageRequest();
       receiveMessageRequest.WaitTimeSeconds := Int32(serverWaitTime.TotalSeconds);
