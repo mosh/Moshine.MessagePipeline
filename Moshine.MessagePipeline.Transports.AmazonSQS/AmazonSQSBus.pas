@@ -71,6 +71,9 @@ type
 
     end;
 
+    property Url:GetQueueUrlResponse read _url;
+
+
     method Initialize;
     begin
       if(not(assigned(_credentials)))then
@@ -97,7 +100,10 @@ type
 
     method Send(message:IMessage);
     begin
-      raise new NotImplementedException;
+      var amazonMessage := message as AmazonSQSMessage;
+
+      SendMessage(amazonMessage.GetBody, amazonMessage.Id);
+
     end;
 
     method DeleteMessage(message:Message);
