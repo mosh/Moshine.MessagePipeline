@@ -60,7 +60,8 @@ type
 
     method AsError;
     begin
-
+      // assuming we have setup a dead-letter queue this shouldnt be required
+      // also
     end;
 
     method Complete;
