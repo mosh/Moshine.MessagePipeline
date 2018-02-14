@@ -1,6 +1,6 @@
 ﻿namespace Moshine.MessagePipeline.Transports.ServiceBus;
 
-uses 
+uses
   Microsoft.Azure,
   Moshine.MessagePipeline.Core,
   Microsoft.ServiceBus,
@@ -16,16 +16,16 @@ type
 
   private
     _connectionString:String;
-    _name:String;
+    _topic:String;
 
     _pipelineTopicDescription:TopicDescription;
 
-  
+
   public
-    constructor(appSettingKey:String; name:String);
+    constructor(appSettingKey:String; topic:String);
     begin
       _connectionString := CloudConfigurationManager.GetSetting(appSettingKey);
-      _name:=name;
+      _topic := topic;
     end;
 
     method Initialize;
@@ -33,13 +33,13 @@ type
 
       var namespaceManager := NamespaceManager.CreateFromConnectionString(_connectionString);
 
-      if(not namespaceManager.TopicExists(_name))then
+      if(not namespaceManager.TopicExists(_topic))then
       begin
-        _pipelineTopicDescription:=namespaceManager.CreateTopic(_name);
+        _pipelineTopicDescription:=namespaceManager.CreateTopic(_topic);
       end
-      else 
+      else
       begin
-        _pipelineTopicDescription:= namespaceManager.GetTopic(_name)
+        _pipelineTopicDescription:= namespaceManager.GetTopic(_topic);
       end;
 
       if (not namespaceManager.SubscriptionExists(_pipelineTopicDescription.Path, workSubscription))then
@@ -64,21 +64,21 @@ type
       message.Properties.Add('Id',id);
       message.Properties.Add('State','UnProcessed');
 
-      var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_name);
+      var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_topic);
       topicClient.Send(message);
 
     end;
 
     method Send(message:IMessage);
     begin
-      var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_name);
+      var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_topic);
       topicClient.Send((message as ServiceBusMessage).InternalMessage);
 
     end;
 
     method Receive(serverWaitTime:TimeSpan):IMessage;
     begin
-      var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_name);
+      var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_topic);
       var processingClient:= SubscriptionClient.CreateFromConnectionString(_connectionString, topicClient.Path, workSubscription,ReceiveMode.PeekLock);
 
       var someMessage := processingClient.Receive(serverWaitTime);
