@@ -62,6 +62,13 @@ type
     begin
       // assuming we have setup a dead-letter queue this shouldnt be required
       // also
+      if(not assigned(_message))then
+      begin
+        raise new ApplicationException('No available message');
+      end;
+
+      self._bus.ReturnMessage(_message);
+
     end;
 
     method Complete;

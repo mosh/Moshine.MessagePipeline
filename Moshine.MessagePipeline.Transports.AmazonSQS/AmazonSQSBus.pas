@@ -73,6 +73,11 @@ type
 
     property Url:GetQueueUrlResponse read _url;
 
+    // The duration (in seconds) that the received messages are hidden from subsequent retrieve requests
+    // after being retrieved by a ReceiveMessage request.
+
+    property VisibilityTimeout:Integer := 60*15; // 15 minutes;
+
 
     method Initialize;
     begin
@@ -117,17 +122,32 @@ type
       _client.DeleteMessage(deleteMessageRequest);
     end;
 
+    method ReturnMessage(message:Message);
+    begin
+
+      var request := new ChangeMessageVisibilityRequest;
+      request.QueueUrl := _url.QueueUrl;
+      request.ReceiptHandle := message.ReceiptHandle;
+      request.VisibilityTimeout := 0;
+
+      _client.ChangeMessageVisibility(request);
+
+    end;
+
     method Receive(serverWaitTime:TimeSpan):IMessage;
     begin
       Guard;
 
       var receiveMessageRequest := new ReceiveMessageRequest();
       receiveMessageRequest.WaitTimeSeconds := Int32(serverWaitTime.TotalSeconds);
+      receiveMessageRequest.VisibilityTimeout := VisibilityTimeout;
+      receiveMessageRequest.MaxNumberOfMessages := 1; // only return 1 message
       receiveMessageRequest.QueueUrl := _url.QueueUrl;
 
       var receiveMessageResponse := _client.ReceiveMessage(receiveMessageRequest);
 
       var someMessage := receiveMessageResponse.Messages.FirstOrDefault;
+
 
       exit iif(assigned(someMessage),new AmazonSQSMessage(self,someMessage),nil);
 
