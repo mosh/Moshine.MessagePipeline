@@ -105,6 +105,8 @@
     <Content Include="packages.config">
       <SubType>Content</SubType>
     </Content>
+    <Compile Include="MethodCallHelpers.pas" />
+    <Compile Include="ActionInvokerHelpers.pas" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Moshine.MessagePipeline.Core">

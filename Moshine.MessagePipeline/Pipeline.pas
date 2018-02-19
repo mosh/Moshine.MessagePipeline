@@ -2,7 +2,6 @@
 
 uses
   System.Collections.Generic,
-  System.Collections.ObjectModel,
   System.Data,
   System.IO,
   System.Linq,
@@ -40,6 +39,9 @@ type
     _cache:ICache;
     _bus:IBus;
 
+    _methodCallHelpers:MethodCallHelpers := new MethodCallHelpers;
+    _actionInvokerHelpers:ActionInvokerHelpers := new ActionInvokerHelpers;
+
 
     method Initialize;
     begin
@@ -50,28 +52,13 @@ type
     begin
       HandleTrace('Invoking action');
 
-      var someType := FindType(someAction.&Type);
+      var returnValue := _actionInvokerHelpers.InvokeAction(someAction);
 
-      var obj := Activator.CreateInstance(someType);
-      var methodInfo := someType.GetMethod(someAction.&Method);
-      if(someAction.Function)then
+      if(assigned(returnValue))then
       begin
-        var returnValue:= methodInfo.Invoke(obj,someAction.Parameters.ToArray);
         _cache.Add(someAction.Id.ToString,returnValue);
-      end
-      else
-      begin
-        if(someAction.Parameters.Count > 0 )then
-        begin
-          methodInfo.Invoke(obj,someAction.Parameters.ToArray);
-        end
-        else
-        begin
-          methodInfo.Invoke(obj,[]);
-        end;
 
       end;
-
 
     end;
 
@@ -80,54 +67,6 @@ type
       var stringRepresentation := PipelineSerializer.Serialize(someAction);
 
       _bus.Send(stringRepresentation, someAction.Id.ToString);
-
-    end;
-
-    method FindType(typeName:String):&Type;
-    begin
-      var types :=
-      from a in AppDomain.CurrentDomain.GetAssemblies()
-      from t in a.GetTypes()
-      where t.FullName = typeName
-      select t;
-      exit types.FirstOrDefault;
-    end;
-
-
-    method Save<T>(methodCall: Expression<Action<T>>):SavedAction;
-    begin
-      var expression := MethodCallExpression(methodCall.Body);
-
-      if not assigned(expression) then
-      begin
-        raise new ApplicationException('Not a static or instance method');
-      end;
-
-      var saved := new SavedAction;
-      saved.&Type := expression.Method.DeclaringType.ToString;
-      saved.Method := expression.Method.Name;
-
-      saved.Parameters := ArgumentsToObjectList(expression.Arguments);
-
-      exit saved;
-    end;
-
-    method Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
-    begin
-      var expression := MethodCallExpression(methodCall.Body);
-
-      if not assigned(expression) then
-      begin
-        raise new ApplicationException('Not a static or instance method');
-      end;
-
-      var saved := new SavedAction;
-      saved.&Type := expression.Method.DeclaringType.ToString;
-      saved.Method := expression.Method.Name;
-      saved.Function:= true;
-      saved.Parameters := ArgumentsToObjectList(expression.Arguments);
-
-      exit saved;
 
     end;
 
@@ -221,47 +160,6 @@ type
 
     end;
 
-    method ArgumentsToObjectList(arguments:ReadOnlyCollection<Expression>):List<Object>;
-    begin
-
-      var objects := new List<Object>;
-      for each argument in arguments do
-      begin
-
-        if(argument is ConstantExpression)then
-        begin
-          objects.Add(ConstantExpression(argument).Value);
-        end
-        else if(argument is MemberExpression)then
-        begin
-          var mExpression := MemberExpression(argument);
-
-
-          if(mExpression.Expression is ConstantExpression)then
-          begin
-            var cExpression := ConstantExpression(mExpression.Expression);
-
-            var fieldInfo := cExpression.Value.GetType().GetField(mExpression.Member.Name, BindingFlags.Instance or BindingFlags.Public or BindingFlags.NonPublic);
-            var value := fieldInfo.GetValue(cExpression.Value);
-
-            objects.Add(value);
-          end
-          else
-          begin
-            raise new ApplicationException('arguments of type '+mExpression.Expression.GetType.ToString+' not supported');
-          end;
-
-        end
-        else
-        begin
-          raise new ApplicationException('arguments of type '+argument.GetType.ToString+' not supported');
-        end;
-
-      end;
-
-      exit objects;
-
-    end;
 
 
   public
@@ -327,7 +225,7 @@ type
     begin
       if(assigned(methodCall))then
       begin
-        var saved:=Save(methodCall);
+        var saved := _methodCallHelpers.Save(methodCall);
         EnQueue(saved);
         exit new Response(Id:=saved.Id);
       end;
@@ -337,7 +235,7 @@ type
     begin
       if(assigned(methodCall))then
       begin
-        var saved := Save(methodCall);
+        var saved := _methodCallHelpers.Save(methodCall);
         EnQueue(saved);
         exit new Response(Id:=saved.Id);
       end;
