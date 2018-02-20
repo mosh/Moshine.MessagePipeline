@@ -12,6 +12,24 @@ type
 
   private
 
+    method SaveFunctionExpression(expression:MethodCallExpression):SavedAction;
+    begin
+      if not assigned(expression) then
+      begin
+        raise new ApplicationException('Not a static or instance method');
+      end;
+
+      var saved := new SavedAction;
+      saved.&Type := expression.Method.DeclaringType.ToString;
+      saved.Method := expression.Method.Name;
+      saved.Function:= true;
+      saved.Parameters := ArgumentsToObjectList(expression.Arguments);
+
+      exit saved;
+
+    end;
+
+
     method ArgumentsToObjectList(arguments:ReadOnlyCollection<Expression>):List<Object>;
     begin
 
@@ -57,6 +75,47 @@ type
 
   public
 
+    method Save<T>(methodCall: Expression<System.Func<T,LongWord>>):SavedAction;
+    begin
+      exit SaveFunctionExpression(MethodCallExpression(methodCall.Body));
+    end;
+
+    method Save<T>(methodCall: Expression<System.Func<T,Word>>):SavedAction;
+    begin
+      exit SaveFunctionExpression(MethodCallExpression(methodCall.Body));
+    end;
+
+    method Save<T>(methodCall: Expression<System.Func<T,ShortInt>>):SavedAction;
+    begin
+      exit SaveFunctionExpression(MethodCallExpression(methodCall.Body));
+    end;
+
+    method Save<T>(methodCall: Expression<System.Func<T,SmallInt>>):SavedAction;
+    begin
+      exit SaveFunctionExpression(MethodCallExpression(methodCall.Body));
+    end;
+
+    method Save<T>(methodCall: Expression<System.Func<T,Single>>):SavedAction;
+    begin
+      exit SaveFunctionExpression(MethodCallExpression(methodCall.Body));
+    end;
+
+    method Save<T>(methodCall: Expression<System.Func<T,Double>>):SavedAction;
+    begin
+      exit SaveFunctionExpression(MethodCallExpression(methodCall.Body));
+    end;
+
+    method Save<T>(methodCall: Expression<System.Func<T,Integer>>):SavedAction;
+    begin
+      exit SaveFunctionExpression(MethodCallExpression(methodCall.Body));
+    end;
+
+    method Save<T>(methodCall: Expression<System.Func<T,Boolean>>):SavedAction;
+    begin
+      exit SaveFunctionExpression(MethodCallExpression(methodCall.Body));
+    end;
+
+
     method Save<T>(methodCall: Expression<Action<T>>):SavedAction;
     begin
       var expression := MethodCallExpression(methodCall.Body);
@@ -75,23 +134,10 @@ type
       exit saved;
     end;
 
+
     method Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
     begin
-      var expression := MethodCallExpression(methodCall.Body);
-
-      if not assigned(expression) then
-      begin
-        raise new ApplicationException('Not a static or instance method');
-      end;
-
-      var saved := new SavedAction;
-      saved.&Type := expression.Method.DeclaringType.ToString;
-      saved.Method := expression.Method.Name;
-      saved.Function:= true;
-      saved.Parameters := ArgumentsToObjectList(expression.Arguments);
-
-      exit saved;
-
+      exit SaveFunctionExpression(MethodCallExpression(methodCall.Body));
     end;
 
 
