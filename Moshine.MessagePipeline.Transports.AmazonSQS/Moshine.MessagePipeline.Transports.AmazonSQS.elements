@@ -12,7 +12,7 @@
     <AllowLegacyCreate>False</AllowLegacyCreate>
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.Net,Version=4.6.2</TargetFramework>
+    <TargetFramework>.NETFramework4.6.2</TargetFramework>
     <DefaultUses>RemObjects.Elements.RTL</DefaultUses>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -68,13 +68,14 @@
       <Private>True</Private>
     </Reference>
     <ProjectReference Include="Moshine.MessagePipeline.Core">
-      <Name>Moshine.MessagePipeline.Core</Name>
       <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="awssdk.sqs:*" />
+    <NuGetReference Include="awssdk.sqs:*">
+      <Private>True</Private>
+    </NuGetReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.pas" />
@@ -88,6 +89,7 @@
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="AmazonSQSBus.pas" />
     <Compile Include="AmazonSQSMessage.pas" />
+    <None Include="Moshine.MessagePipeline.Transports.AmazonSQS.Nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

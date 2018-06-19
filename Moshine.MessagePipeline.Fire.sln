@@ -9,8 +9,6 @@ Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Tra
 EndProject
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Transports.ServiceBus", "Moshine.MessagePipeline.Transports.ServiceBus\Moshine.MessagePipeline.Transports.ServiceBus.elements", "{5341E3C0-40EF-415C-9517-EB3C8A2EFF98}"
 EndProject
-Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipline.Transports.RabbitMQ", "Moshine.MessagePipline.Transports.RabbitMQ\Moshine.MessagePipline.Transports.RabbitMQ.elements", "{A3B7FB18-599C-481C-943E-7413B4920FFE}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AnyCPU = Debug|AnyCPU
@@ -33,10 +31,6 @@ Global
 		{5341E3C0-40EF-415C-9517-EB3C8A2EFF98}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
 		{5341E3C0-40EF-415C-9517-EB3C8A2EFF98}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
 		{5341E3C0-40EF-415C-9517-EB3C8A2EFF98}.Release|AnyCPU.Build.0 = Release|AnyCPU
-		{A3B7FB18-599C-481C-943E-7413B4920FFE}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
-		{A3B7FB18-599C-481C-943E-7413B4920FFE}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
-		{A3B7FB18-599C-481C-943E-7413B4920FFE}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
-		{A3B7FB18-599C-481C-943E-7413B4920FFE}.Release|AnyCPU.Build.0 = Release|AnyCPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

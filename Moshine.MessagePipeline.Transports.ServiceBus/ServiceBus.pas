@@ -87,6 +87,16 @@ type
 
     end;
 
+    method CannotBeProcessed(message:IMessage);
+    begin
+
+      var clone := message.Clone;
+      clone.AsError;
+      self.Send(clone);
+      message.Complete;
+    end;
+
+
   end;
 
 end.

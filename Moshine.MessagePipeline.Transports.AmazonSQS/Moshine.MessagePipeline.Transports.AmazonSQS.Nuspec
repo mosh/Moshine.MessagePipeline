@@ -1,0 +1,24 @@
+﻿<?xml version="1.0"?>
+<package  xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Moshine.MessagePipeline.Transports.AmazonSQS</id>
+    <version>1.0.1</version>
+    <title>Moshine MessagePipeline AmazonSQS Transport</title>
+    <authors>John Moshakis</authors>
+    <owners>Moshine</owners>
+    <projectUrl>https://github.com/mosh/Moshine.MessagePipeline</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Moshine MessagePipeline AmazonSQS transport</description>
+    <releaseNotes></releaseNotes>
+    <copyright></copyright>
+    <tags></tags>
+    <dependencies>
+      <dependency id="awssdk.sqs" version="3.3.3"/>
+      <dependency id="Moshine.MessagePipeline.Core" version="1.0.0"/>
+    </dependencies>
+    <summary></summary>
+  </metadata>
+  <files>
+    <file src="bin/Debug/Moshine.MessagePipeline.Transports.AmazonSQS.dll" target="lib" />
+  </files>
+</package>

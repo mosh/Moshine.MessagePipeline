@@ -12,7 +12,7 @@
     <AllowLegacyCreate>False</AllowLegacyCreate>
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.Net,Version=4.6.2</TargetFramework>
+    <TargetFramework>.NETFramework4.6.2</TargetFramework>
     <Name>Moshine.MessagePipeline</Name>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
@@ -53,7 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
-    <NuGetReference Include="Newtonsoft.Json:8.0.3">
+    <NuGetReference Include="Newtonsoft.Json:[9.0.1]">
       <Private>True</Private>
     </NuGetReference>
     <Reference Include="System" />
@@ -102,11 +102,9 @@
     <Compile Include="Properties\Settings.Designer.pas" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config">
-      <SubType>Content</SubType>
-    </Content>
     <Compile Include="MethodCallHelpers.pas" />
     <Compile Include="ActionInvokerHelpers.pas" />
+    <None Include="Moshine.MessagePipeline.Nuspec" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Moshine.MessagePipeline.Core">

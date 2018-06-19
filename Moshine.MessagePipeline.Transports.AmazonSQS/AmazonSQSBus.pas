@@ -153,6 +153,12 @@ type
 
     end;
 
+    method CannotBeProcessed(message:IMessage);
+    begin
+      var clone := message.Clone;
+      clone.AsError;
+    end;
+
   end;
 
 end.

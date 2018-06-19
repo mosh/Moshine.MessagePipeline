@@ -94,8 +94,7 @@ type
             try
               HandleTrace('ProcessMessage');
 
-              var clone := parcel.Message.Clone;
-              var body := clone.GetBody;
+              var body := parcel.Message.GetBody;
               var savedAction := PipelineSerializer.Deserialize<SavedAction>(body);
               using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
               begin
@@ -124,10 +123,9 @@ type
 
               using scope := new TransactionScope() do
               begin
-                var copiedMessage := parcel.Message.Clone;
-                copiedMessage.AsError;
-                _bus.Send(copiedMessage);
-                parcel.Message.Complete;
+
+                _bus.CannotBeProcessed(parcel.Message);
+
                 scope.Complete;
               end;
 
@@ -219,6 +217,38 @@ type
           end;
         end, token);
 
+    end;
+
+    method Send<T>(methodCall: Expression<Func<T,Boolean>>): Response;
+    begin
+    end;
+
+    method Send<T>(methodCall: Expression<Func<T,Double>>): Response;
+    begin
+    end;
+
+    method Send<T>(methodCall: Expression<Func<T,Integer>>): Response;
+    begin
+    end;
+
+    method Send<T>(methodCall: Expression<Func<T,LongWord>>): Response;
+    begin
+    end;
+
+    method Send<T>(methodCall: Expression<Func<T,ShortInt>>): Response;
+    begin
+    end;
+
+    method Send<T>(methodCall: Expression<Func<T,Single>>): Response;
+    begin
+    end;
+
+    method Send<T>(methodCall: Expression<Func<T,SmallInt>>): Response;
+    begin
+    end;
+
+    method Send<T>(methodCall: Expression<Func<T,Word>>): Response;
+    begin
     end;
 
     method Send<T>(methodCall: Expression<System.Action<T>>):Response;

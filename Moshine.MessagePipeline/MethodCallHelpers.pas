@@ -134,7 +134,6 @@ type
       exit saved;
     end;
 
-
     method Save<T>(methodCall: Expression<System.Func<T,Object>>):SavedAction;
     begin
       exit SaveFunctionExpression(MethodCallExpression(methodCall.Body));
