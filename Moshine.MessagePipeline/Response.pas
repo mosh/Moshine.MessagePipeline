@@ -3,12 +3,12 @@
 uses
   System.Collections.Generic,
   System.Linq,
-  System.Text, 
-  System.Threading.Tasks, 
-  Moshine.MessagePipeline.Cache;
+  System.Text,
+  System.Threading.Tasks,
+  Moshine.MessagePipeline.Core;
 
 type
-  Response = public class
+  Response = public class(IResponse)
   private
   protected
   public
@@ -16,7 +16,7 @@ type
 
     method WaitForResultAsync(cache:ICache):Task<dynamic>;
     begin
-      var pollingTask := Task.Factory.StartNew(() -> 
+      var pollingTask := Task.Factory.StartNew(() ->
       begin
         var obj:Object := nil;
         var startTime:=DateTime.Now;
@@ -32,10 +32,10 @@ type
       exit pollingTask;
 
     end;
-    
+
     method WaitForResult(cache:ICache):dynamic;
     begin
-      var pollingTask := Task.Factory.StartNew(() -> 
+      var pollingTask := Task.Factory.StartNew(() ->
       begin
         var obj:Object := nil;
         var startTime:=DateTime.Now;
@@ -56,7 +56,7 @@ type
       end;
       exit nil;
     end;
-    
+
   end;
-  
+
 end.

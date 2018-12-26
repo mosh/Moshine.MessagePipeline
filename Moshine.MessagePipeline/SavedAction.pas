@@ -1,6 +1,7 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Moshine.MessagePipeline.Core,
   System.Runtime.Serialization,
   System.Collections.Generic,
   System.Linq,
@@ -16,7 +17,7 @@ type
     begin
       self.Id := Guid.NewGuid;
     end;
-    
+
     [DataMember]
     property &Type:String;
     [DataMember]

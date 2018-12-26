@@ -81,11 +81,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\Cache.pas" />
     <Compile Include="Cache\InMemoryCache.pas" />
     <Compile Include="Cache\RegionMemoryCache.pas" />
-    <Compile Include="DynamicDomainObject.pas" />
-    <Compile Include="IPipeline.pas" />
     <Compile Include="MessageParcel.pas" />
     <Compile Include="Pipeline.pas" />
     <Compile Include="PipelineSerializer.pas" />

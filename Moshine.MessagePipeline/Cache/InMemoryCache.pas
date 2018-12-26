@@ -1,8 +1,9 @@
 ﻿namespace Moshine.MessagePipeline.Cache;
 
-uses 
+uses
   System.Dynamic,
-  System.Runtime.Caching, 
+  System.Runtime.Caching,
+  Moshine.MessagePipeline.Core,
   Newtonsoft.Json;
 
 type

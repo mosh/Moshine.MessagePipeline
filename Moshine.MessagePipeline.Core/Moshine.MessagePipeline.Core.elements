@@ -78,6 +78,10 @@
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="IMessage.pas" />
     <None Include="Moshine.MessagePipeline.Core.Nuspec" />
+    <Compile Include="ICache.pas" />
+    <Compile Include="IPipeline.pas" />
+    <Compile Include="IResponse.pas" />
+    <Compile Include="DynamicDomainObject.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

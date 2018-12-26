@@ -1,4 +1,4 @@
-﻿namespace Moshine.MessagePipeline;
+﻿namespace Moshine.MessagePipeline.Core;
 
 uses
   System.Collections,
@@ -33,7 +33,7 @@ type
 
     method GetObjectData(info: SerializationInfo; context: StreamingContext);
     begin
-      for each kvp in _values do 
+      for each kvp in _values do
       begin
         info.AddValue(kvp.Key, kvp.Value);
       end
@@ -41,7 +41,7 @@ type
 
     constructor(info:SerializationInfo;context:StreamingContext);
     begin
-    
+
       for each entry in info do
       begin
         self._values.Add(entry.Name, entry.Value);
@@ -50,7 +50,7 @@ type
 
     constructor;
     begin
-    
+
     end;
 
     constructor(someValues:Dictionary<String, Object>);

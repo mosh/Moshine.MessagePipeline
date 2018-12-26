@@ -219,39 +219,39 @@ type
 
     end;
 
-    method Send<T>(methodCall: Expression<Func<T,Boolean>>): Response;
+    method Send<T>(methodCall: Expression<Func<T,Boolean>>): IResponse;
     begin
     end;
 
-    method Send<T>(methodCall: Expression<Func<T,Double>>): Response;
+    method Send<T>(methodCall: Expression<Func<T,Double>>): IResponse;
     begin
     end;
 
-    method Send<T>(methodCall: Expression<Func<T,Integer>>): Response;
+    method Send<T>(methodCall: Expression<Func<T,Integer>>): IResponse;
     begin
     end;
 
-    method Send<T>(methodCall: Expression<Func<T,LongWord>>): Response;
+    method Send<T>(methodCall: Expression<Func<T,LongWord>>): IResponse;
     begin
     end;
 
-    method Send<T>(methodCall: Expression<Func<T,ShortInt>>): Response;
+    method Send<T>(methodCall: Expression<Func<T,ShortInt>>): IResponse;
     begin
     end;
 
-    method Send<T>(methodCall: Expression<Func<T,Single>>): Response;
+    method Send<T>(methodCall: Expression<Func<T,Single>>): IResponse;
     begin
     end;
 
-    method Send<T>(methodCall: Expression<Func<T,SmallInt>>): Response;
+    method Send<T>(methodCall: Expression<Func<T,SmallInt>>): IResponse;
     begin
     end;
 
-    method Send<T>(methodCall: Expression<Func<T,Word>>): Response;
+    method Send<T>(methodCall: Expression<Func<T,Word>>): IResponse;
     begin
     end;
 
-    method Send<T>(methodCall: Expression<System.Action<T>>):Response;
+    method Send<T>(methodCall: Expression<System.Action<T>>):IResponse;
     begin
       if(assigned(methodCall))then
       begin
@@ -261,7 +261,7 @@ type
       end;
     end;
 
-    method Send<T>(methodCall: Expression<System.Func<T,Object>>):Response;
+    method Send<T>(methodCall: Expression<System.Func<T,Object>>):IResponse;
     begin
       if(assigned(methodCall))then
       begin
