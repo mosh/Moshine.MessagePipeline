@@ -1,6 +1,7 @@
 ﻿namespace Moshine.MessagePipeline.Transports.AmazonSQS;
 
 uses
+  System,
   Amazon.Runtime,
   Amazon.Runtime.CredentialManagement,
   Amazon.SQS,
