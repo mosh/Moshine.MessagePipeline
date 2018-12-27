@@ -1,6 +1,7 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Autofac,
   System.Collections.Generic,
   System.Data,
   System.IO,
@@ -28,6 +29,7 @@ type
     errorSubscription = 'error';
 
   private
+    _scope:ILifetimeScope;
     _maxRetries:Integer;
     tokenSource:CancellationTokenSource;
     token:CancellationToken;
@@ -39,8 +41,8 @@ type
     _cache:ICache;
     _bus:IBus;
 
-    _methodCallHelpers:MethodCallHelpers := new MethodCallHelpers;
-    _actionInvokerHelpers:ActionInvokerHelpers := new ActionInvokerHelpers;
+    _methodCallHelpers:MethodCallHelpers;
+    _actionInvokerHelpers:ActionInvokerHelpers;
 
 
     method Initialize;
@@ -162,11 +164,16 @@ type
 
   public
 
-    constructor(cache:ICache;bus:IBus);
+    constructor(scope:ILifetimeScope; cache:ICache;bus:IBus);
     begin
+      _scope:=scope;
       _maxRetries := 4;
       _cache:=cache;
       _bus:= bus;
+
+      _methodCallHelpers := new MethodCallHelpers;
+      _actionInvokerHelpers := new ActionInvokerHelpers(_scope);
+
 
       Initialize;
 

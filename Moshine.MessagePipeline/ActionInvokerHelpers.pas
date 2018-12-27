@@ -1,12 +1,14 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Autofac,
   System.Linq;
 
 type
 
   ActionInvokerHelpers = public class
   private
+    _scope:ILifetimeScope;
 
     method FindType(typeName:String):&Type;
     begin
@@ -20,11 +22,17 @@ type
 
   public
 
+    constructor(scope:ILifetimeScope);
+    begin
+      _scope := scope;
+    end;
+
     method InvokeAction(someAction:SavedAction):Object;
     begin
-      var someType := FindType(someAction.&Type);
 
-      var obj := Activator.CreateInstance(someType);
+      var someType := FindType(someAction.&Type);
+      var obj := _scope.Resolve(someType);
+
       var methodInfo := someType.GetMethod(someAction.&Method);
       if(someAction.Function)then
       begin
@@ -42,6 +50,7 @@ type
         end;
 
       end;
+
 
       exit nil;
 
