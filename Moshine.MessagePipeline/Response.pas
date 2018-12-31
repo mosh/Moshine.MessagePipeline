@@ -33,7 +33,7 @@ type
 
     end;
 
-    method WaitForResult(cache:ICache):dynamic;
+    method WaitForResult<T>(cache:ICache):T;
     begin
       var pollingTask := Task.Factory.StartNew(() ->
       begin
@@ -41,7 +41,7 @@ type
         var startTime:=DateTime.Now;
         var difference:TimeSpan;
         repeat
-          obj:=cache.Get(Id.ToString);
+          obj:=cache.Get<T>(Id.ToString);
           difference:=DateTime.Now.Subtract(startTime);
           until (assigned(obj)) or (difference.TotalSeconds > 30);
         exit obj;
@@ -52,9 +52,14 @@ type
 
       if(assigned(pollingTask.Result))then
       begin
-        exit pollingTask.Result;
+        exit pollingTask.Result as T;
       end;
       exit nil;
+    end;
+
+    method WaitForResult(cache:ICache):dynamic;
+    begin
+      exit WaitForResult<dynamic>(cache);
     end;
 
   end;

@@ -1,11 +1,15 @@
 ﻿namespace Moshine.MessagePipeline.Core;
 
 uses
+  System.Collections.Generic,
   System.Linq.Expressions;
 
 type
 
   IPipeline = public interface
+
+    method Initialize(parameterTypes:List<&Type>);
+
     method Start;
 
     method Send<T>(methodCall: Expression<System.Func<T,LongWord>>):IResponse;

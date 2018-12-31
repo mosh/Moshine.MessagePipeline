@@ -29,6 +29,7 @@ type
     errorSubscription = 'error';
 
   private
+    _actionSerializer:PipelineSerializer<SavedAction>;
     _scope:ILifetimeScope;
     _maxRetries:Integer;
     tokenSource:CancellationTokenSource;
@@ -45,9 +46,14 @@ type
     _actionInvokerHelpers:ActionInvokerHelpers;
 
 
-    method Initialize;
+    method Initialize(parameterTypes:List<&Type>);
     begin
       _bus.Initialize;
+
+      _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
+
+      SetupPipeline;
+
     end;
 
     method Load(someAction:SavedAction);
@@ -66,7 +72,7 @@ type
 
     method EnQueue(someAction:SavedAction);
     begin
-      var stringRepresentation := PipelineSerializer.Serialize(someAction);
+      var stringRepresentation := _actionSerializer.Serialize(someAction);
 
       _bus.Send(stringRepresentation, someAction.Id.ToString);
 
@@ -89,7 +95,7 @@ type
       end;
     end;
 
-    method Setup;
+    method SetupPipeline;
     begin
       processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel ->
           begin
@@ -97,7 +103,7 @@ type
               HandleTrace('ProcessMessage');
 
               var body := parcel.Message.GetBody;
-              var savedAction := PipelineSerializer.Deserialize<SavedAction>(body);
+              var savedAction := _actionSerializer.Deserialize<SavedAction>(body);
               using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
               begin
                 HandleTrace('LoadAction');
@@ -174,13 +180,10 @@ type
       _methodCallHelpers := new MethodCallHelpers;
       _actionInvokerHelpers := new ActionInvokerHelpers(_scope);
 
-
-      Initialize;
-
       tokenSource := new CancellationTokenSource();
       token := tokenSource.Token;
 
-      Setup;
+
     end;
 
     method Stop;
