@@ -25,10 +25,21 @@ type
       _cache.Add(key,JsonConvert.SerializeObject(value), policy);
     end;
 
+    method Get(key:String):dynamic;
+    begin
+      var obj:dynamic:=nil;
+
+      var value := _cache.Get(key);
+      if(assigned(value))then
+      begin
+        obj:=JsonConvert.DeserializeObject<ExpandoObject>(value.ToString);
+      end;
+      exit obj;
+    end;
+
     method Get<T>(key:String):T;
     begin
-      var obj:T:=nil;
-
+      var obj:T := nil;
       var value := _cache.Get(key);
       if(assigned(value))then
       begin
@@ -38,11 +49,6 @@ type
 
     end;
 
-
-    method Get(key:String):dynamic;
-    begin
-      exit Get<ExpandoObject>(key) as dynamic;
-    end;
 
   end;
 

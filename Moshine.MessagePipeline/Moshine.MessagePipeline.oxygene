@@ -12,7 +12,7 @@
     <AllowLegacyCreate>False</AllowLegacyCreate>
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NETFramework4.6.2</TargetFramework>
+    <TargetFramework>.NETStandard2.0</TargetFramework>
     <Name>Moshine.MessagePipeline</Name>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
@@ -52,33 +52,22 @@
     <WarnOnCaseMismatch>True</WarnOnCaseMismatch>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mscorlib" />
     <NuGetReference Include="Newtonsoft.Json:[9.0.1]">
       <Private>True</Private>
     </NuGetReference>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.Caching">
-      <HintPath>C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Caching.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
     <NuGetReference Include="System.Threading.Tasks.Dataflow:[4.6.0]">
       <Private>True</Private>
     </NuGetReference>
-    <Reference Include="System.Transactions">
-      <HintPath>C:\Program Files\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Transactions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <ProjectReference Include="Moshine.MessagePipeline.Core">
+      <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
+      <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
+      <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
+      <Private>True</Private>
+    </ProjectReference>
+    <NuGetReference Include="autofac:4.0.0">
+      <Private>True</Private>
+    </NuGetReference>
+    <NuGetReference Include="system.runtime.caching:[4.5.0]" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InMemoryCache.pas" />
@@ -97,22 +86,9 @@
       <Generator>SettingsSingleFileGenerator</Generator>
     </None>
     <Compile Include="Properties\Settings.Designer.pas" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="MethodCallHelpers.pas" />
     <Compile Include="ActionInvokerHelpers.pas" />
     <None Include="Moshine.MessagePipeline.Nuspec" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Moshine.MessagePipeline.Core">
-      <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
-      <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
-      <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
-      <Private>True</Private>
-    </ProjectReference>
-    <NuGetReference Include="autofac:4.0.0">
-      <Private>True</Private>
-    </NuGetReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>
