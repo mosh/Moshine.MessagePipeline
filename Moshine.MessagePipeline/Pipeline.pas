@@ -1,7 +1,6 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
-  Autofac,
   System.Collections.Generic,
   System.Data,
   System.IO,
@@ -30,7 +29,6 @@ type
 
   private
     _actionSerializer:PipelineSerializer<SavedAction>;
-    _scope:ILifetimeScope;
     _maxRetries:Integer;
     tokenSource:CancellationTokenSource;
     token:CancellationToken;
@@ -170,15 +168,14 @@ type
 
   public
 
-    constructor(scope:ILifetimeScope; cache:ICache;bus:IBus);
+    constructor(factory:IServiceFactory; cache:ICache;bus:IBus);
     begin
-      _scope:=scope;
       _maxRetries := 4;
       _cache:=cache;
       _bus:= bus;
 
       _methodCallHelpers := new MethodCallHelpers;
-      _actionInvokerHelpers := new ActionInvokerHelpers(_scope);
+      _actionInvokerHelpers := new ActionInvokerHelpers(factory);
 
       tokenSource := new CancellationTokenSource();
       token := tokenSource.Token;

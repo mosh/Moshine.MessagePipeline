@@ -1,14 +1,13 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
-  Autofac,
   System.Linq;
 
 type
 
   ActionInvokerHelpers = public class
   private
-    _scope:ILifetimeScope;
+    _factory:IServiceFactory;
 
     method FindType(typeName:String):&Type;
     begin
@@ -22,16 +21,21 @@ type
 
   public
 
-    constructor(scope:ILifetimeScope);
+    constructor(factory:IServiceFactory);
     begin
-      _scope := scope;
+      _factory := factory;
     end;
 
     method InvokeAction(someAction:SavedAction):Object;
     begin
 
       var someType := FindType(someAction.&Type);
-      var obj := _scope.Resolve(someType);
+      var obj := _factory.Create(someType);
+
+      if(not assigned(obj))then
+      begin
+        raise new Exception($'Service for Type {someType.Name} not implemented');
+      end;
 
       var methodInfo := someType.GetMethod(someAction.&Method);
       if(someAction.Function)then

@@ -64,9 +64,6 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="autofac:4.0.0">
-      <Private>True</Private>
-    </NuGetReference>
     <NuGetReference Include="system.runtime.caching:[4.5.0]" />
   </ItemGroup>
   <ItemGroup>
@@ -89,6 +86,7 @@
     <Compile Include="MethodCallHelpers.pas" />
     <Compile Include="ActionInvokerHelpers.pas" />
     <None Include="Moshine.MessagePipeline.Nuspec" />
+    <Compile Include="IServiceFactory.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>
