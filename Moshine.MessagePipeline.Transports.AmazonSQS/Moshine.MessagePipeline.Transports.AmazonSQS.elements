@@ -73,7 +73,7 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="awssdk.sqs:*">
+    <NuGetReference Include="awssdk.sqs:[3.3.3.59]">
       <Private>True</Private>
     </NuGetReference>
   </ItemGroup>

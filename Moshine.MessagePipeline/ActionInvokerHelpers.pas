@@ -1,6 +1,7 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Moshine.MessagePipeline.Core,
   System.Linq;
 
 type

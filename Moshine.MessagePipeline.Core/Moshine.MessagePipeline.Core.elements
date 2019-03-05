@@ -50,7 +50,6 @@
     <EnableUnmanagedDebugging>False</EnableUnmanagedDebugging>
     <WarnOnCaseMismatch>True</WarnOnCaseMismatch>
   </PropertyGroup>
-  <ItemGroup></ItemGroup>
   <ItemGroup>
     <Compile Include="IBus.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
@@ -68,6 +67,7 @@
     <Compile Include="IPipeline.pas" />
     <Compile Include="IResponse.pas" />
     <Compile Include="DynamicDomainObject.pas" />
+    <Compile Include="IServiceFactory.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

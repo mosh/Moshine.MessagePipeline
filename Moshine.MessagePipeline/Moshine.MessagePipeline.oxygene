@@ -52,7 +52,7 @@
     <WarnOnCaseMismatch>True</WarnOnCaseMismatch>
   </PropertyGroup>
   <ItemGroup>
-    <NuGetReference Include="Newtonsoft.Json:[9.0.1]">
+    <NuGetReference Include="Newtonsoft.Json:[12.0.1]">
       <Private>True</Private>
     </NuGetReference>
     <NuGetReference Include="System.Threading.Tasks.Dataflow:[4.6.0]">
@@ -86,7 +86,6 @@
     <Compile Include="MethodCallHelpers.pas" />
     <Compile Include="ActionInvokerHelpers.pas" />
     <None Include="Moshine.MessagePipeline.Nuspec" />
-    <Compile Include="IServiceFactory.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>
