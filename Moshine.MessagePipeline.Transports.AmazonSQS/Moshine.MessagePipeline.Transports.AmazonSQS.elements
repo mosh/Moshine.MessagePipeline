@@ -12,7 +12,7 @@
     <AllowLegacyCreate>False</AllowLegacyCreate>
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NETFramework4.6.2</TargetFramework>
+    <TargetFramework>.NETStandard2.0</TargetFramework>
     <DefaultUses>RemObjects.Elements.RTL</DefaultUses>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -51,29 +51,13 @@
     <WarnOnCaseMismatch>True</WarnOnCaseMismatch>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="Elements">
-      <Private>True</Private>
-    </Reference>
     <ProjectReference Include="Moshine.MessagePipeline.Core">
       <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="awssdk.sqs:[3.3.3.59]">
+    <NuGetReference Include="awssdk.sqs:[3.3.3.60]">
       <Private>True</Private>
     </NuGetReference>
   </ItemGroup>

@@ -2,6 +2,7 @@
 
 uses
   System,
+  System.Linq,
   Amazon.Runtime,
   Amazon.Runtime.CredentialManagement,
   Amazon.SQS,
@@ -40,7 +41,7 @@ type
         messageRequest.MessageDeduplicationId := id;
         messageRequest.MessageGroupId := id;
 
-        exit _client.SendMessage(messageRequest);
+        exit _client.SendMessageAsync(messageRequest).Result;
 
       except
         on E:Exception do
@@ -94,7 +95,7 @@ type
       request.QueueName := _queueName;
       request.QueueOwnerAWSAccountId := _accountId;
 
-      _url := _client.GetQueueUrl(request);
+      _url := _client.GetQueueUrlAsync(request).Result;
 
 
     end;
@@ -120,7 +121,7 @@ type
       deleteMessageRequest.QueueUrl := _url.QueueUrl;
       deleteMessageRequest.ReceiptHandle := message.ReceiptHandle;
 
-      _client.DeleteMessage(deleteMessageRequest);
+      _client.DeleteMessageAsync(deleteMessageRequest).Wait;
     end;
 
     method ReturnMessage(message:Message);
@@ -131,7 +132,7 @@ type
       request.ReceiptHandle := message.ReceiptHandle;
       request.VisibilityTimeout := 0;
 
-      _client.ChangeMessageVisibility(request);
+      _client.ChangeMessageVisibilityAsync(request).Wait;
 
     end;
 
@@ -145,7 +146,7 @@ type
       receiveMessageRequest.MaxNumberOfMessages := 1; // only return 1 message
       receiveMessageRequest.QueueUrl := _url.QueueUrl;
 
-      var receiveMessageResponse := _client.ReceiveMessage(receiveMessageRequest);
+      var receiveMessageResponse := _client.ReceiveMessageAsync(receiveMessageRequest).Result;
 
       var someMessage := receiveMessageResponse.Messages.FirstOrDefault;
 
