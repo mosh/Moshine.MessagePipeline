@@ -72,7 +72,7 @@ type
     begin
       var stringRepresentation := _actionSerializer.Serialize(someAction);
 
-      _bus.Send(stringRepresentation, someAction.Id.ToString);
+      _bus.SendAsync(stringRepresentation, someAction.Id.ToString).Wait;
 
     end;
 
@@ -127,10 +127,10 @@ type
             HandleTrace('Fault in processing');
             try
 
-              using scope := new TransactionScope() do
+              using scope := new TransactionScope do
               begin
 
-                _bus.CannotBeProcessed(parcel.Message);
+                _bus.CannotBeProcessedAsync(parcel.Message).Wait;
 
                 scope.Complete;
               end;
@@ -185,12 +185,23 @@ type
 
     method Stop;
     begin
-      tokenSource.Cancel();
+      HandleTrace('Token cancelled');
+      tokenSource.Cancel;
 
       processMessage.Complete();
-      finishProcessing.Completion.Wait();
+      HandleTrace('Stopped processing messages');
+      if(not finishProcessing.Completion.Wait(new TimeSpan(0,0,0,30))) then
+      begin
+        HandleTrace('Timed out waiting after 30 seconds for finish processing messages');
+      end
+      else
+      begin
+        HandleTrace('Stopped finish processing messages');
+      end;
 
+      HandleTrace('Waiting to stop');
       Task.WaitAll(t);
+      HandleTrace('Stopped');
 
     end;
 
@@ -205,7 +216,7 @@ type
             repeat
               var serverWaitTime := new TimeSpan(0,0,2);
 
-              var someMessage:=_bus.Receive(serverWaitTime);
+              var someMessage:=_bus.ReceiveAsync(serverWaitTime).Result;
 
               if(assigned(someMessage))then
               begin

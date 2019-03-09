@@ -55,7 +55,7 @@
     <NuGetReference Include="Newtonsoft.Json:[12.0.1]">
       <Private>True</Private>
     </NuGetReference>
-    <NuGetReference Include="System.Threading.Tasks.Dataflow:[4.6.0]">
+    <NuGetReference Include="System.Threading.Tasks.Dataflow:[4.9.0]">
       <Private>True</Private>
     </NuGetReference>
     <ProjectReference Include="Moshine.MessagePipeline.Core">

@@ -4,7 +4,7 @@ uses
   Microsoft.Azure,
   Moshine.MessagePipeline.Core,
   Microsoft.ServiceBus,
-  Microsoft.ServiceBus.Messaging;
+  Microsoft.ServiceBus.Messaging, System.Threading.Tasks;
 
 type
 
@@ -58,7 +58,7 @@ type
     end;
 
 
-    method Send(messageContent: String;id:String);
+    method SendAsync(messageContent: String;id:String):Task;
     begin
       var message := new BrokeredMessage(messageContent);
       message.Properties.Add('Id',id);
@@ -66,34 +66,38 @@ type
 
       var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_topic);
       topicClient.Send(message);
+      exit Task.CompletedTask;
 
     end;
 
-    method Send(message:IMessage);
+    method SendAsync(message:IMessage):Task;
     begin
       var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_topic);
       topicClient.Send((message as ServiceBusMessage).InternalMessage);
-
+      exit Task.CompletedTask;
     end;
 
-    method Receive(serverWaitTime:TimeSpan):IMessage;
+    method ReceiveAsync(serverWaitTime:TimeSpan):Task<IMessage>;
     begin
       var topicClient := TopicClient.CreateFromConnectionString(_connectionString,_topic);
       var processingClient:= SubscriptionClient.CreateFromConnectionString(_connectionString, topicClient.Path, workSubscription,ReceiveMode.PeekLock);
 
       var someMessage := processingClient.Receive(serverWaitTime);
 
-      exit iif(assigned(someMessage),new ServiceBusMessage(someMessage),nil);
+      var receivedMessage:IMessage := iif(assigned(someMessage),new ServiceBusMessage(someMessage),nil);
+
+      exit Task.FromResult(receivedMessage);
 
     end;
 
-    method CannotBeProcessed(message:IMessage);
+    method CannotBeProcessedAsync(message:IMessage):Task;
     begin
 
       var clone := message.Clone;
       clone.AsError;
-      self.Send(clone);
+      self.SendAsync(clone).Wait;
       message.Complete;
+      exit Task.CompletedTask;
     end;
 
 
