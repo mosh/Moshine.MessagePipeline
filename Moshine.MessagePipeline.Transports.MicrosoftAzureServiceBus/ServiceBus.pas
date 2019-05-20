@@ -4,6 +4,7 @@ uses
   Microsoft.Azure.ServiceBus,
   Microsoft.Azure.ServiceBus.Core,
   Moshine.MessagePipeline.Core,
+  System.Text,
   System.Threading.Tasks;
 
 type
@@ -36,7 +37,9 @@ type
 
     method SendAsync(messageContent: String; id: String): Task;
     begin
-
+      var message := new Message(Encoding.UTF8.GetBytes(messageContent));
+      message.UserProperties.Add('Id',id);
+      await _topicClient.SendAsync(message);
     end;
 
     method ReceiveAsync(serverWaitTime: TimeSpan): Task<IMessage>;
@@ -51,6 +54,11 @@ type
 
     method CannotBeProcessedAsync(message: IMessage): Task;
     begin
+      var clone := message.Clone;
+      clone.AsError;
+      self.SendAsync(clone).Wait;
+      message.Complete;
+      exit Task.CompletedTask;
 
     end;
 
