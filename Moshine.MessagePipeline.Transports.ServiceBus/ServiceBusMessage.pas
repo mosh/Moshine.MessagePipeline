@@ -1,7 +1,7 @@
 ﻿namespace Moshine.MessagePipeline.Transports.ServiceBus;
 
 uses
-  System, 
+  System,
   Moshine.MessagePipeline.Core,
   Microsoft.ServiceBus.Messaging;
 
@@ -9,19 +9,19 @@ type
   ServiceBusMessage = public class(IMessage)
 
   private
-    method get_InternalMessage: BrokeredMessage;
-    begin
-      exit _message;
-    end;
     _message:BrokeredMessage;
 
-  public 
+  public
     constructor(message:BrokeredMessage);
     begin
       _message := message;
     end;
 
-    property InternalMessage:BrokeredMessage read get_InternalMessage;
+    property InternalMessage:BrokeredMessage read
+      begin
+        exit _message;
+      end;
+
 
     method Clone: IMessage;
     begin

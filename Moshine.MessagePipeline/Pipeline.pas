@@ -40,8 +40,8 @@ type
     _cache:ICache;
     _bus:IBus;
 
-    _methodCallHelpers:MethodCallHelpers;
     _actionInvokerHelpers:ActionInvokerHelpers;
+    _client:IPipelineClient;
 
 
     method Initialize(parameterTypes:List<&Type>);
@@ -68,13 +68,6 @@ type
 
     end;
 
-    method EnQueue(someAction:SavedAction);
-    begin
-      var stringRepresentation := _actionSerializer.Serialize(someAction);
-
-      _bus.SendAsync(stringRepresentation, someAction.Id.ToString).Wait;
-
-    end;
 
     method HandleTrace(message:String);
     begin
@@ -174,12 +167,12 @@ type
       _cache:=cache;
       _bus:= bus;
 
-      _methodCallHelpers := new MethodCallHelpers;
       _actionInvokerHelpers := new ActionInvokerHelpers(factory);
 
       tokenSource := new CancellationTokenSource();
       token := tokenSource.Token;
 
+      _client := new PipelineClient(bus);
 
     end;
 
@@ -271,23 +264,12 @@ type
 
     method Send<T>(methodCall: Expression<System.Action<T>>):IResponse;
     begin
-      if(assigned(methodCall))then
-      begin
-        var saved := _methodCallHelpers.Save(methodCall);
-        EnQueue(saved);
-        exit new Response(Id:=saved.Id);
-      end;
+      exit _client.Send<T>(methodCall);
     end;
 
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):IResponse;
     begin
-      if(assigned(methodCall))then
-      begin
-        var saved := _methodCallHelpers.Save(methodCall);
-        EnQueue(saved);
-        exit new Response(Id:=saved.Id);
-      end;
-
+      exit _client.Send<T>(methodCall);
     end;
 
 

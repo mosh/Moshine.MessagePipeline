@@ -86,6 +86,7 @@
     <Compile Include="MethodCallHelpers.pas" />
     <Compile Include="ActionInvokerHelpers.pas" />
     <None Include="Moshine.MessagePipeline.Nuspec" />
+    <Compile Include="PipelineClient.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>
