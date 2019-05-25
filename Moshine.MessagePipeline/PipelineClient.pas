@@ -1,7 +1,7 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
-  Moshine.MessagePipeline.Core, System.Linq.Expressions;
+  Moshine.MessagePipeline.Core, System.Linq.Expressions, System.Collections.Generic;
 
 type
   PipelineClient = public class(IPipelineClient)
@@ -27,6 +27,15 @@ type
       _methodCallHelpers := new MethodCallHelpers;
 
     end;
+
+    method Initialize(parameterTypes:List<&Type>);
+    begin
+      _bus.Initialize;
+
+      _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
+
+    end;
+
 
     method Send<T>(methodCall: Expression<Func<T,Boolean>>): IResponse;
     begin

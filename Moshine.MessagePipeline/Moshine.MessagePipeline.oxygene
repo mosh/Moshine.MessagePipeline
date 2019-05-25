@@ -65,6 +65,9 @@
       <Private>True</Private>
     </ProjectReference>
     <NuGetReference Include="system.runtime.caching:[4.5.0]" />
+    <NuGetReference Include="nlog:[4.6.3]">
+      <Private>True</Private>
+    </NuGetReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InMemoryCache.pas" />
@@ -87,6 +90,7 @@
     <Compile Include="ActionInvokerHelpers.pas" />
     <None Include="Moshine.MessagePipeline.Nuspec" />
     <Compile Include="PipelineClient.pas" />
+    <Compile Include="ParcelProcessor.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>

@@ -18,6 +18,7 @@ uses
   System.Xml.Serialization,
   Moshine.MessagePipeline.Cache,
   Moshine.MessagePipeline.Core,
+  NLog,
   Newtonsoft.Json;
 
 type
@@ -42,6 +43,9 @@ type
 
     _actionInvokerHelpers:ActionInvokerHelpers;
     _client:IPipelineClient;
+    _parcelProcessor:ParcelProcessor;
+
+    _logger:ILogger;
 
 
     method Initialize(parameterTypes:List<&Type>);
@@ -49,63 +53,24 @@ type
       _bus.Initialize;
 
       _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
+      _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache,_logger);
 
       SetupPipeline;
-
-    end;
-
-    method Load(someAction:SavedAction);
-    begin
-      HandleTrace('Invoking action');
-
-      var returnValue := _actionInvokerHelpers.InvokeAction(someAction);
-
-      if(assigned(returnValue))then
-      begin
-        _cache.Add(someAction.Id.ToString,returnValue);
-
-      end;
-
-    end;
-
-
-    method HandleTrace(message:String);
-    begin
-      if(assigned(self.TraceCallback))then
-      begin
-        self.TraceCallback(message);
-      end;
-    end;
-
-
-    method HandleException(e:Exception);
-    begin
-      if(assigned(self.ErrorCallback))then
-      begin
-        self.ErrorCallback(e);
-      end;
     end;
 
     method SetupPipeline;
     begin
+      _logger.Trace('SetupPipeline');
+
       processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel ->
           begin
             try
-              HandleTrace('ProcessMessage');
-
-              var body := parcel.Message.GetBody;
-              var savedAction := _actionSerializer.Deserialize<SavedAction>(body);
-              using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
-              begin
-                HandleTrace('LoadAction');
-                Load(savedAction);
-                scope.Complete;
-              end;
-              parcel.State := MessageStateEnum.Processed;
+              _logger.Trace('ProcessMessage');
+              _parcelProcessor.ProcessMessage(parcel);
             except
-              on E:Exception do
+              on e:Exception do
               begin
-                HandleException(E);
+                _logger.Error(e,'processMessage Block');
                 parcel.State := MessageStateEnum.Faulted;
                 parcel.ReTryCount := parcel.ReTryCount+1;
               end;
@@ -117,21 +82,14 @@ type
 
       faultedInProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
-            HandleTrace('Fault in processing');
+            _logger.Trace('Fault in processing');
             try
-
-              using scope := new TransactionScope do
-              begin
-
-                _bus.CannotBeProcessedAsync(parcel.Message).Wait;
-
-                scope.Complete;
-              end;
+              _parcelProcessor.FaultedInProcessing(parcel);
 
             except
               on e:Exception do
               begin
-                HandleException(e);
+                _logger.Error(e,'faultedInProcessing Block');
                 raise;
               end;
             end;
@@ -139,13 +97,13 @@ type
 
       finishProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
-            HandleTrace('Finished processing');
+            _logger.Trace('Finished processing');
             try
-              parcel.Message.Complete;
+              _parcelProcessor.FinishProcessing(parcel);
             except
               on e:Exception do
               begin
-                HandleException(e);
+                _logger.Error(e,'finishProcessing block');
                 raise;
               end;
             end;
@@ -161,7 +119,10 @@ type
 
   public
 
-    constructor(factory:IServiceFactory; cache:ICache;bus:IBus);
+    property ServerWaitTime:TimeSpan := new TimeSpan(0,0,2);
+
+
+    constructor(factory:IServiceFactory; cache:ICache;bus:IBus;logger:ILogger);
     begin
       _maxRetries := 4;
       _cache:=cache;
@@ -173,56 +134,60 @@ type
       token := tokenSource.Token;
 
       _client := new PipelineClient(bus);
+      _logger := logger;
 
     end;
 
     method Stop;
     begin
-      HandleTrace('Token cancelled');
+      _logger.Trace('Token cancelled');
       tokenSource.Cancel;
 
       processMessage.Complete();
-      HandleTrace('Stopped processing messages');
+      _logger.Trace('Stopped processing messages');
       if(not finishProcessing.Completion.Wait(new TimeSpan(0,0,0,30))) then
       begin
-        HandleTrace('Timed out waiting after 30 seconds for finish processing messages');
+        _logger.Trace('Timed out waiting after 30 seconds for finish processing messages');
       end
       else
       begin
-        HandleTrace('Stopped finish processing messages');
+        _logger.Trace('Stopped finish processing messages');
       end;
 
-      HandleTrace('Waiting to stop');
+      _logger.Trace('Waiting to stop');
       Task.WaitAll(t);
-      HandleTrace('Stopped');
+      _logger.Trace('Stopped');
 
     end;
 
     method Start;
     begin
-      HandleTrace('Start');
+      _logger.Trace('Start');
 
       t := Task.Factory.StartNew( () ->
         begin
           try
-
+            _logger.Trace('Starting');
             repeat
-              var serverWaitTime := new TimeSpan(0,0,2);
 
-              var someMessage:=_bus.ReceiveAsync(serverWaitTime).Result;
+              var someMessage:=_bus.ReceiveAsync(ServerWaitTime).Result;
 
               if(assigned(someMessage))then
               begin
-                HandleTrace('Posting message');
+                _logger.Trace('Posting message');
                 var parcel := new MessageParcel(Message := someMessage);
                 processMessage.Post(parcel);
+              end
+              else
+              begin
+                _logger.Trace('No messages');
               end;
 
             until token.IsCancellationRequested;
           except
             on e:Exception do
             begin
-              HandleException(e);
+              _logger.Error(e,'Receiving messages');
               raise;
             end;
           end;
@@ -271,10 +236,6 @@ type
     begin
       exit _client.Send<T>(methodCall);
     end;
-
-
-    property ErrorCallback:Action<Exception>;
-    property TraceCallback:Action<String>;
 
   end;
 

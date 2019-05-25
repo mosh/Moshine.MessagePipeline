@@ -25,8 +25,6 @@ type
 
     method Stop;
 
-    property ErrorCallback:Action<Exception>;
-    property TraceCallback:Action<String>;
 
 
   end;
