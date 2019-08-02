@@ -29,6 +29,9 @@ type
     errorSubscription = 'error';
 
   private
+
+    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+
     _actionSerializer:PipelineSerializer<SavedAction>;
     _maxRetries:Integer;
     tokenSource:CancellationTokenSource;
@@ -44,33 +47,66 @@ type
     _actionInvokerHelpers:ActionInvokerHelpers;
     _client:IPipelineClient;
     _parcelProcessor:ParcelProcessor;
+    _scopeProvider:IScopeProvider;
 
-    _logger:ILogger;
+    method MessageReceiver;
+    begin
+      try
+        Logger.Trace('Starting to receive');
+        repeat
+
+          var someMessage:=_bus.ReceiveAsync(ServerWaitTime).Result;
+
+          if(assigned(someMessage))then
+          begin
+            Logger.Trace('Posting message');
+            var parcel := new MessageParcel(Message := someMessage);
+            processMessage.Post(parcel);
+          end
+          else
+          begin
+            Logger.Trace('No messages to post');
+          end;
+
+          until token.IsCancellationRequested;
+      except
+        on e:Exception do
+        begin
+          Logger.Error(e,'Error raeceiving messages');
+          raise;
+        end;
+      end;
+
+    end;
+
 
 
     method Initialize(parameterTypes:List<&Type>);
     begin
+      Logger.Trace('Initializing');
       _bus.Initialize;
+      _client.Initialize(parameterTypes);
 
       _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
-      _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache,_logger);
+      _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache, _scopeProvider);
 
       SetupPipeline;
+      Logger.Trace('Initialized');
     end;
 
     method SetupPipeline;
     begin
-      _logger.Trace('SetupPipeline');
+      Logger.Trace('SetupPipeline');
 
       processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel ->
           begin
             try
-              _logger.Trace('ProcessMessage');
+              Logger.Trace('ProcessMessage');
               _parcelProcessor.ProcessMessage(parcel);
             except
               on e:Exception do
               begin
-                _logger.Error(e,'processMessage Block');
+                Logger.Error(e,'Exception in processMessage Block');
                 parcel.State := MessageStateEnum.Faulted;
                 parcel.ReTryCount := parcel.ReTryCount+1;
               end;
@@ -82,14 +118,14 @@ type
 
       faultedInProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
-            _logger.Trace('Fault in processing');
+            Logger.Trace('Fault in processing');
             try
               _parcelProcessor.FaultedInProcessing(parcel);
 
             except
               on e:Exception do
               begin
-                _logger.Error(e,'faultedInProcessing Block');
+                Logger.Error(e,'Exception in faultedInProcessing Block');
                 raise;
               end;
             end;
@@ -97,13 +133,13 @@ type
 
       finishProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
-            _logger.Trace('Finished processing');
+            Logger.Trace('Finished processing');
             try
               _parcelProcessor.FinishProcessing(parcel);
             except
               on e:Exception do
               begin
-                _logger.Error(e,'finishProcessing block');
+                Logger.Error(e,'exception in finishProcessing block');
                 raise;
               end;
             end;
@@ -122,11 +158,12 @@ type
     property ServerWaitTime:TimeSpan := new TimeSpan(0,0,2);
 
 
-    constructor(factory:IServiceFactory; cache:ICache;bus:IBus;logger:ILogger);
+    constructor(factory:IServiceFactory; cache:ICache; bus:IBus; scopeProvider:IScopeProvider);
     begin
       _maxRetries := 4;
       _cache:=cache;
       _bus:= bus;
+      _scopeProvider := scopeProvider;
 
       _actionInvokerHelpers := new ActionInvokerHelpers(factory);
 
@@ -134,64 +171,39 @@ type
       token := tokenSource.Token;
 
       _client := new PipelineClient(bus);
-      _logger := logger;
+
+      Logger.Trace('constructed');
 
     end;
 
     method Stop;
     begin
-      _logger.Trace('Token cancelled');
+      Logger.Trace('Token cancelled');
       tokenSource.Cancel;
 
       processMessage.Complete();
-      _logger.Trace('Stopped processing messages');
+      Logger.Trace('Stopped processing messages');
       if(not finishProcessing.Completion.Wait(new TimeSpan(0,0,0,30))) then
       begin
-        _logger.Trace('Timed out waiting after 30 seconds for finish processing messages');
+        Logger.Trace('Timed out waiting after 30 seconds for finish processing messages');
       end
       else
       begin
-        _logger.Trace('Stopped finish processing messages');
+        Logger.Trace('Stopped finish processing messages');
       end;
 
-      _logger.Trace('Waiting to stop');
+      Logger.Trace('Waiting to stop');
       Task.WaitAll(t);
-      _logger.Trace('Stopped');
+      Logger.Trace('Stopped');
 
     end;
 
+
     method Start;
     begin
-      _logger.Trace('Start');
+      Logger.Trace('Start');
 
-      t := Task.Factory.StartNew( () ->
-        begin
-          try
-            _logger.Trace('Starting');
-            repeat
-
-              var someMessage:=_bus.ReceiveAsync(ServerWaitTime).Result;
-
-              if(assigned(someMessage))then
-              begin
-                _logger.Trace('Posting message');
-                var parcel := new MessageParcel(Message := someMessage);
-                processMessage.Post(parcel);
-              end
-              else
-              begin
-                _logger.Trace('No messages');
-              end;
-
-            until token.IsCancellationRequested;
-          except
-            on e:Exception do
-            begin
-              _logger.Error(e,'Receiving messages');
-              raise;
-            end;
-          end;
-        end, token);
+      t := Task.Factory.StartNew( () -> MessageReceiver, token);
 
     end;
 

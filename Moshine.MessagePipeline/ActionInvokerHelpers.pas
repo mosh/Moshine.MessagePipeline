@@ -2,12 +2,15 @@
 
 uses
   Moshine.MessagePipeline.Core,
+  NLog,
   System.Linq;
 
 type
 
   ActionInvokerHelpers = public class
   private
+    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+
     _factory:IServiceFactory;
 
     method FindType(typeName:String):&Type;
@@ -24,7 +27,7 @@ type
       except
         on E:Exception do
           begin
-            Console.WriteLine($'Failed to find type {E.Message}');
+            Logger.Error(E,'Failed to find type');
           end;
       end;
       exit nil;
@@ -42,6 +45,7 @@ type
 
       if(not assigned(someAction))then
       begin
+        Logger.Debug('unsigned someAction');
         raise new ApplicationException('unassigned someAction');
       end;
 
@@ -49,7 +53,13 @@ type
 
       if(not assigned(someType))then
       begin
-        raise new Exception($'Type {someType.Name} not found');
+        var message := $'Type {someType.Name} not found';
+        Logger.Debug(message);
+        raise new Exception(message);
+      end
+      else
+      begin
+
       end;
 
       var obj := _factory.Create(someType);
@@ -59,14 +69,16 @@ type
         raise new Exception($'Service for Type {someType.Name} not implemented');
       end;
 
-      Console.WriteLine('InvokeAction someType.GetMethod');
+      Logger.Trace('InvokeAction someType.GetMethod');
 
 
       var methodInfo := someType.GetMethod(someAction.&Method);
 
       if(not assigned(methodInfo))then
       begin
-        raise new Exception($'Method for Type {someType.Name} not found');
+        var message := $'Method for Type {someType.Name} not found';
+        Logger.Debug(message);
+        raise new Exception(message);
       end;
 
       if(someAction.Function)then

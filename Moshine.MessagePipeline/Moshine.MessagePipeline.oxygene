@@ -64,7 +64,9 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="system.runtime.caching:[4.5.0]" />
+    <NuGetReference Include="system.runtime.caching:[4.5.0]">
+      <Private>True</Private>
+    </NuGetReference>
     <NuGetReference Include="nlog:[4.6.3]">
       <Private>True</Private>
     </NuGetReference>
@@ -91,6 +93,10 @@
     <None Include="Moshine.MessagePipeline.Nuspec" />
     <Compile Include="PipelineClient.pas" />
     <Compile Include="ParcelProcessor.pas" />
+    <Compile Include="NonTransactionalScope.pas" />
+    <Compile Include="TransactionalScope.pas" />
+    <Compile Include="TransactionalScopeProvider.pas" />
+    <Compile Include="NonTransactionalScopeProvider.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>

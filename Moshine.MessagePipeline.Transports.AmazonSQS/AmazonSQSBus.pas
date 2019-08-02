@@ -1,18 +1,21 @@
 ﻿namespace Moshine.MessagePipeline.Transports.AmazonSQS;
 
 uses
-  System,
-  System.Linq,
   Amazon.Runtime,
   Amazon.Runtime.CredentialManagement,
   Amazon.SQS,
   Amazon.SQS.Model,
-  Moshine.MessagePipeline.Core, System.Threading.Tasks;
+  Moshine.MessagePipeline.Core,
+  NLog,
+  System,
+  System.Linq,
+  System.Threading.Tasks;
 
 type
 
   AmazonSQSBus = public class(IBus)
   private
+    class property Logger: Logger := LogManager.GetCurrentClassLogger;
 
     _config:AmazonSQSConfig;
     _credentials:AWSCredentials;

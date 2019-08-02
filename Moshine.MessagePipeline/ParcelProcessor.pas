@@ -2,23 +2,25 @@
 
 uses
   Moshine.MessagePipeline.Core,
-  NLog,
-  System.Transactions;
+  NLog;
 
 type
 
   ParcelProcessor = public class
 
   private
+    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+
+
     _actionSerializer:PipelineSerializer<SavedAction>;
     _cache:ICache;
     _actionInvokerHelpers:ActionInvokerHelpers;
-    _logger:ILogger;
     _bus:IBus;
+    _scopeProvider:IScopeProvider;
 
     method Load(someAction:SavedAction);
     begin
-      _logger.Trace('Invoking action');
+      Logger.Trace('Invoking action');
 
       var returnValue := _actionInvokerHelpers.InvokeAction(someAction);
 
@@ -32,41 +34,62 @@ type
 
   public
 
-    constructor(bus:IBus; actionSerializer:PipelineSerializer<SavedAction>;actionInvokerHelpers:ActionInvokerHelpers; cache:ICache; logger:ILogger);
+    constructor(bus:IBus; actionSerializer:PipelineSerializer<SavedAction>;actionInvokerHelpers:ActionInvokerHelpers;
+      cache:ICache; scopeProvider:IScopeProvider);
     begin
       _actionSerializer := actionSerializer;
       _actionInvokerHelpers := actionInvokerHelpers;
       _bus := bus;
       _cache := cache;
-      _logger := logger;
+      _scopeProvider := scopeProvider;
     end;
 
     method ProcessMessage(parcel:MessageParcel);
     begin
 
-      var body := parcel.Message.GetBody;
+      try
 
-      if(String.IsNullOrEmpty(body))then
-      begin
-        raise new ApplicationException('Message body is empty');
+        var body := parcel.Message.GetBody;
+
+        if(String.IsNullOrEmpty(body))then
+        begin
+          var message := 'Message body is empty';
+          Logger.Debug(message);
+          raise new ApplicationException(message);
+        end
+        else
+        begin
+          Logger.Trace('got body');
+        end;
+
+        var savedAction := _actionSerializer.Deserialize<SavedAction>(body);
+
+        using scope := _scopeProvider.Provide do
+        begin
+          Logger.Trace('LoadAction');
+          Load(savedAction);
+          Logger.Trace('Loaded Action');
+          scope.Complete;
+        end;
+
+        parcel.State := MessageStateEnum.Processed;
+      except
+        on E:Exception do
+        begin
+          var message := 'Failed to process message';
+          Logger.Error(E,message);
+          raise;
+        end;
+
       end;
-
-      var savedAction := _actionSerializer.Deserialize<SavedAction>(body);
-
-      using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
-      begin
-        _logger.Trace('LoadAction');
-        Load(savedAction);
-        scope.Complete;
-      end;
-
-      parcel.State := MessageStateEnum.Processed;
 
     end;
 
     method FaultedInProcessing(parcel:MessageParcel);
     begin
-      using scope := new TransactionScope do
+      Logger.Trace('FaultedInProcessing');
+
+      using scope := _scopeProvider.Provide do
       begin
 
         _bus.CannotBeProcessedAsync(parcel.Message).Wait;
@@ -78,6 +101,7 @@ type
 
     method FinishProcessing(parcel:MessageParcel);
     begin
+      Logger.Trace('FinishProcessing');
       parcel.Message.Complete;
     end;
 
