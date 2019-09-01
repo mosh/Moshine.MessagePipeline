@@ -1,6 +1,7 @@
 ﻿namespace Moshine.MessagePipeline.Cache;
 
 uses
+  NLog,
   System.Dynamic,
   System.Runtime.Caching,
   Moshine.MessagePipeline.Core,
@@ -11,6 +12,7 @@ type
   InMemoryCache = public class(ICache)
   private
     _cache:ObjectCache;
+    class property Logger: Logger := LogManager.GetCurrentClassLogger;
   public
     constructor;
     begin
@@ -19,6 +21,7 @@ type
 
     method Add(key:String;value:Object);
     begin
+      Logger.Trace('Adding key');
       var policy := new CacheItemPolicy();
       policy.AbsoluteExpiration := DateTimeOffset.Now.AddHours(1);
 
@@ -27,6 +30,7 @@ type
 
     method Get(key:String):dynamic;
     begin
+      Logger.Trace('Getting key');
       var obj:dynamic:=nil;
 
       var value := _cache.Get(key);
@@ -39,6 +43,7 @@ type
 
     method Get<T>(key:String):T;
     begin
+      Logger.Trace('Getting key');
       var obj:T := nil;
       var value := _cache.Get(key);
       if(assigned(value))then
