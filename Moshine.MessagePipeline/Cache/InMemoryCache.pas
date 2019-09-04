@@ -3,7 +3,7 @@
 uses
   NLog,
   System.Dynamic,
-  System.Runtime.Caching,
+  Microsoft.Extensions.Caching.Memory,
   Moshine.MessagePipeline.Core,
   Newtonsoft.Json;
 
@@ -11,21 +11,18 @@ type
 
   InMemoryCache = public class(ICache)
   private
-    _cache:ObjectCache;
+    _cache:IMemoryCache;
     class property Logger: Logger := LogManager.GetCurrentClassLogger;
   public
     constructor;
     begin
-       _cache := MemoryCache.Default;
+        _cache := new MemoryCache(new MemoryCacheOptions ( ));
     end;
 
     method Add(key:String;value:Object);
     begin
       Logger.Trace('Adding key');
-      var policy := new CacheItemPolicy();
-      policy.AbsoluteExpiration := DateTimeOffset.Now.AddHours(1);
-
-      _cache.Add(key,JsonConvert.SerializeObject(value), policy);
+      _cache.Set(key,JsonConvert.SerializeObject(value), DateTimeOffset.Now.AddHours(1));
     end;
 
     method Get(key:String):dynamic;

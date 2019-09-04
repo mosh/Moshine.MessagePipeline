@@ -64,16 +64,13 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="system.runtime.caching:[4.5.0]">
-      <Private>True</Private>
-    </NuGetReference>
     <NuGetReference Include="nlog:[4.6.3]">
       <Private>True</Private>
     </NuGetReference>
+    <NuGetReference Include="Microsoft.Extensions.Caching.Memory:[2.2.0]" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InMemoryCache.pas" />
-    <Compile Include="Cache\RegionMemoryCache.pas" />
     <Compile Include="MessageParcel.pas" />
     <Compile Include="Pipeline.pas" />
     <Compile Include="PipelineSerializer.pas" />
