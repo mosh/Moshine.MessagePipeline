@@ -12,7 +12,6 @@ type
   InMemoryCache = public class(ICache)
   private
     _cache:IMemoryCache;
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
   public
     constructor;
     begin
@@ -21,13 +20,12 @@ type
 
     method Add(key:String;value:Object);
     begin
-      Logger.Trace('Adding key');
       _cache.Set(key,JsonConvert.SerializeObject(value), DateTimeOffset.Now.AddHours(1));
     end;
 
+    [Obsolete('Use generic version instead')]
     method Get(key:String):dynamic;
     begin
-      Logger.Trace('Getting key');
       var obj:dynamic:=nil;
 
       var value := _cache.Get(key);
@@ -40,7 +38,6 @@ type
 
     method Get<T>(key:String):T;
     begin
-      Logger.Trace('Getting key');
       var obj:T := nil;
       var value := _cache.Get(key);
       if(assigned(value))then
