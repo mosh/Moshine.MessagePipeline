@@ -15,6 +15,7 @@ type
   public
     property Id:Guid;
 
+    [Obsolete('Use generic version instead')]
     method WaitForResultAsync(cache:ICache):Task<dynamic>;
     begin
       Logger.Trace('Started');
