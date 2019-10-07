@@ -72,7 +72,7 @@ type
       except
         on e:Exception do
         begin
-          Logger.Error(e,'Error raeceiving messages');
+          Logger.Error(e,'Error receiving messages');
           raise;
         end;
       end;
