@@ -75,9 +75,8 @@ type
 
       var clone := message.Clone;
       clone.AsError;
-      self.SendAsync(clone).Wait;
+      await self.SendAsync(clone);
       message.Complete;
-      exit Task.CompletedTask;
 
     end;
 
