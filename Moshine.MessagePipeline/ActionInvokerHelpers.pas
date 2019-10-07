@@ -16,6 +16,8 @@ type
     method FindType(typeName:String):&Type;
     begin
 
+      Logger.Trace($'FindType {typeName}');
+
       try
 
         var types :=
@@ -25,6 +27,14 @@ type
         select t;
         exit types:FirstOrDefault;
       except
+        on r:System.Reflection.ReflectionTypeLoadException do
+          begin
+            for le in r.LoaderExceptions do
+            begin
+              Logger.Error(le,'LoaderException');
+              raise;
+            end;
+          end;
         on E:Exception do
           begin
             Logger.Error(E,'Failed to find type');
