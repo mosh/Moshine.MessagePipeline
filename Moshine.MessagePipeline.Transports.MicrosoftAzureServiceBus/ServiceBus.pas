@@ -57,7 +57,6 @@ type
 
     method ReceiveAsync(serverWaitTime: TimeSpan): Task<IMessage>;
     begin
-      Logger.Info('Receive');
       var receivedMessage := await _subscriptionReceiver.ReceiveAsync(serverWaitTime);
 
       if(assigned(receivedMessage))then
@@ -65,7 +64,6 @@ type
         Logger.Info('Received message');
         exit new ServiceBusMessage(_subscriptionReceiver, receivedMessage)
       end;
-      Logger.Info('Received no message');
       exit nil;
     end;
 
