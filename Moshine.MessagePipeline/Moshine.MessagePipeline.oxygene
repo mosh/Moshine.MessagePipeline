@@ -55,14 +55,13 @@
     <NuGetReference Include="Newtonsoft.Json:[12.0.1]"></NuGetReference>
     <NuGetReference Include="System.Threading.Tasks.Dataflow:[4.9.0]"></NuGetReference>
     <NuGetReference Include="nlog:[4.6.3]"></NuGetReference>
-    <NuGetReference Include="Microsoft.Extensions.Caching.Memory:[2.2.0]" />
+    <NuGetReference Include="Microsoft.Extensions.Caching.Memory:[3.0.0]" />
     <ProjectReference Include="Moshine.MessagePipeline.Core">
       <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="Microsoft.Extensions.Options:[2.2.0]" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InMemoryCache.pas" />
