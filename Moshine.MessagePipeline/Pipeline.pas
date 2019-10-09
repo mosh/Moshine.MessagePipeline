@@ -62,13 +62,9 @@ type
             Logger.Trace('Posting message');
             var parcel := new MessageParcel(Message := someMessage);
             processMessage.Post(parcel);
-          end
-          else
-          begin
-            Logger.Trace('No messages to post');
           end;
 
-          until token.IsCancellationRequested;
+        until token.IsCancellationRequested;
       except
         on e:Exception do
         begin

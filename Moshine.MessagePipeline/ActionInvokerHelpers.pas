@@ -35,9 +35,9 @@ type
               raise;
             end;
           end;
-        on E:Exception do
+        on e:Exception do
           begin
-            Logger.Error(E,'Failed to find type');
+            Logger.Error(e,'Failed to find type');
           end;
       end;
       exit nil;
