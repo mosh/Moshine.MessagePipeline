@@ -4,6 +4,7 @@ uses
   Moshine.MessagePipeline.Core, Microsoft.Azure.ServiceBus, Microsoft.Azure.ServiceBus.Core, System.Text ;
 type
 
+  [Obsolete('Use Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus.ServiceBusMessage')]
   ServiceBusMessage = public class(IMessage)
   private
     _message:Message;

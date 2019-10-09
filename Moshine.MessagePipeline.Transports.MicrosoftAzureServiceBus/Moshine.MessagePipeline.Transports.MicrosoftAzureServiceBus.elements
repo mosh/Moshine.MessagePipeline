@@ -33,9 +33,7 @@
       <Private>True</Private>
     </ProjectReference>
     <NuGetReference Include="Microsoft.Azure.ServiceBus:[3.4.0]" />
-    <NuGetReference Include="nlog:[4.6.3]">
-      <Private>True</Private>
-    </NuGetReference>
+    <NuGetReference Include="nlog:[4.6.3]"></NuGetReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.pas" />

@@ -8,7 +8,7 @@ uses
 
 type
 
-
+  [Obsolete('Use Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus.ServiceBus')]
   ServiceBus = public class(IBus)
   const
     workSubscription = 'work';
