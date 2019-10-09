@@ -62,6 +62,7 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
+    <NuGetReference Include="Microsoft.Extensions.Options:[2.2.0]" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InMemoryCache.pas" />
