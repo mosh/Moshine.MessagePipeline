@@ -32,7 +32,7 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="Microsoft.Azure.ServiceBus:[3.4.0]" />
+    <NuGetReference Include="Microsoft.Azure.ServiceBus:[4.0.0]" />
     <NuGetReference Include="nlog:[4.6.3]"></NuGetReference>
   </ItemGroup>
   <ItemGroup>
