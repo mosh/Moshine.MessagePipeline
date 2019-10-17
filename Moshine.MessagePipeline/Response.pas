@@ -6,6 +6,7 @@ uses
   System.Collections.Generic,
   System.Linq,
   System.Text,
+  System.Threading,
   System.Threading.Tasks;
 
 type
@@ -15,25 +16,76 @@ type
   public
     property Id:Guid;
 
+    method WaitForResultAsync<T>(cache:ICache):Task<T>;
+    begin
+
+      var source := new CancellationTokenSource;
+      var token := source.Token;
+      var obj:T := nil;
+
+      var pollingTask := Task.Factory.StartNew(() ->
+        begin
+
+          repeat
+            token.ThrowIfCancellationRequested;
+            obj := cache.Get<T>(Id.ToString);
+          until (assigned(obj));
+        end,
+        token);
+
+      var cancelTask := Task.Factory.StartNew(() ->
+        begin
+          Thread.Sleep(new TimeSpan(0,0,30));
+          source.Cancel;
+        end,
+        token);
+
+        await Task.WhenAny(cancelTask,pollingTask);
+
+        if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
+        begin
+          exit obj;
+        end;
+
+        exit nil;
+    end;
+
+
+
     [Obsolete('Use generic version instead')]
     method WaitForResultAsync(cache:ICache):Task<dynamic>;
     begin
       Logger.Trace('Started');
-      var pollingTask := Task.Factory.StartNew(() ->
-      begin
-        var obj:Object := nil;
-        var startTime:=DateTime.Now;
-        var difference:TimeSpan;
-        repeat
-          obj:=cache.Get(Id.ToString);
-          difference:=DateTime.Now.Subtract(startTime);
-        until (assigned(obj)) or (difference.TotalSeconds > 30);
-        Logger.Trace($'Returning result assigned {assigned(obj)}');
-        exit obj;
-      end
-      );
 
-      exit pollingTask;
+      var source := new CancellationTokenSource;
+      var token := source.Token;
+      var obj:Object := nil;
+
+      var pollingTask := Task.Factory.StartNew(() ->
+        begin
+
+          repeat
+            token.ThrowIfCancellationRequested;
+            obj := cache.Get(Id.ToString);
+            until (assigned(obj));
+        end,
+        token);
+
+      var cancelTask := Task.Factory.StartNew(() ->
+        begin
+          Thread.Sleep(new TimeSpan(0,0,30));
+          source.Cancel;
+        end,
+        token);
+
+      await Task.WhenAny(cancelTask,pollingTask);
+
+      if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
+      begin
+        exit obj;
+      end;
+
+      exit nil;
 
     end;
 
@@ -68,6 +120,7 @@ type
 
     end;
 
+    [Obsolete('Use generic version instead')]
     method WaitForResult(cache:ICache):dynamic;
     begin
       Logger.Trace('Started waiting');
