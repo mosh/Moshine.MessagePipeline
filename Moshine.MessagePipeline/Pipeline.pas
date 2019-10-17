@@ -235,9 +235,19 @@ type
     begin
     end;
 
+    method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
+    begin
+      exit await _client.SendAsync<T>(methodCall);
+    end;
+
     method Send<T>(methodCall: Expression<System.Action<T>>):IResponse;
     begin
       exit _client.Send<T>(methodCall);
+    end;
+
+    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<IResponse>;
+    begin
+      exit _client.SendAsync<T>(methodCall);
     end;
 
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):IResponse;

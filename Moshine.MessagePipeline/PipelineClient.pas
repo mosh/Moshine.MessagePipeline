@@ -3,7 +3,9 @@
 uses
   Moshine.MessagePipeline.Core,
   NLog,
-  System.Linq.Expressions, System.Collections.Generic;
+  System.Linq.Expressions,
+  System.Collections.Generic,
+  System.Threading.Tasks;
 
 type
 
@@ -21,6 +23,16 @@ type
       var stringRepresentation := _actionSerializer.Serialize(someAction);
       Logger.Trace('SendAsync');
       _bus.SendAsync(stringRepresentation, someAction.Id.ToString).Wait;
+      Logger.Trace('SentAsync');
+
+    end;
+
+    method EnQueueAsync(someAction:SavedAction):Task;
+    begin
+      Logger.Trace('Entering');
+      var stringRepresentation := _actionSerializer.Serialize(someAction);
+      Logger.Trace('SendAsync');
+      await _bus.SendAsync(stringRepresentation, someAction.Id.ToString);
       Logger.Trace('SentAsync');
 
     end;
@@ -75,6 +87,31 @@ type
     begin
     end;
 
+    method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
+    begin
+      if(assigned(methodCall))then
+      begin
+        Logger.Trace('methodCall assigned');
+        if(assigned(_methodCallHelpers))then
+        begin
+          Logger.Trace('_methodCallHelpers assigned');
+        end
+        else
+        begin
+          Logger.Trace('_methodCallHelpers not assigned');
+        end;
+        var saved := _methodCallHelpers.Save(methodCall);
+        await EnQueueAsync(saved);
+        exit new Response(Id:=saved.Id);
+      end
+      else
+      begin
+        Logger.Trace('methodCall not assigned');
+      end;
+
+    end;
+
+
     method Send<T>(methodCall: Expression<System.Action<T>>):IResponse;
     begin
       if(assigned(methodCall))then
@@ -98,6 +135,23 @@ type
       end;
 
     end;
+
+    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<IResponse>;
+    begin
+      if(assigned(methodCall))then
+      begin
+        Logger.Trace('methodCall assigned');
+        var saved := _methodCallHelpers.Save(methodCall);
+        await EnQueueAsync(saved);
+        exit new Response(Id:=saved.Id);
+      end
+      else
+      begin
+        Logger.Trace('methodCall not assigned');
+      end;
+
+    end;
+
 
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):IResponse;
     begin
