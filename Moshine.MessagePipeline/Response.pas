@@ -18,6 +18,7 @@ type
 
     method WaitForResultAsync<T>(cache:ICache):Task<T>;
     begin
+      Logger.Trace('Started');
 
       var source := new CancellationTokenSource;
       var token := source.Token;
@@ -44,9 +45,10 @@ type
 
         if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
         begin
+          Logger.Trace('Returning value');
           exit obj;
         end;
-
+        Logger.Trace('Returning nil');
         exit nil;
     end;
 
@@ -82,9 +84,10 @@ type
 
       if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
       begin
+        Logger.Trace('Returning value');
         exit obj;
       end;
-
+      Logger.Trace('Returning nil');
       exit nil;
 
     end;
