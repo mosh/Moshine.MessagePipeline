@@ -49,13 +49,13 @@ type
     _parcelProcessor:ParcelProcessor;
     _scopeProvider:IScopeProvider;
 
-    method MessageReceiver;
+    method MessageReceiver:Task;
     begin
       try
         Logger.Trace('Starting to receive');
         repeat
 
-          var someMessage:=_bus.ReceiveAsync(ServerWaitTime).Result;
+          var someMessage := await _bus.ReceiveAsync(ServerWaitTime);
 
           if(assigned(someMessage))then
           begin
@@ -116,7 +116,7 @@ type
           begin
             Logger.Trace('Fault in processing');
             try
-              _parcelProcessor.FaultedInProcessing(parcel);
+              await _parcelProcessor.FaultedInProcessing(parcel);
 
             except
               on e:Exception do

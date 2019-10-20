@@ -2,7 +2,7 @@
 
 uses
   Moshine.MessagePipeline.Core,
-  NLog;
+  NLog, System.Threading.Tasks;
 
 type
 
@@ -85,14 +85,14 @@ type
 
     end;
 
-    method FaultedInProcessing(parcel:MessageParcel);
+    method FaultedInProcessing(parcel:MessageParcel):Task;
     begin
       Logger.Trace('FaultedInProcessing');
 
       using scope := _scopeProvider.Provide do
       begin
 
-        _bus.CannotBeProcessedAsync(parcel.Message).Wait;
+        await _bus.CannotBeProcessedAsync(parcel.Message);
 
         scope.Complete;
       end;
