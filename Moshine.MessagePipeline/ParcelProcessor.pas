@@ -78,6 +78,7 @@ type
         end;
 
         parcel.State := MessageStateEnum.Processed;
+        Logger.Trace('Processed message');
       except
         on E:Exception do
         begin
@@ -106,7 +107,7 @@ type
 
     method FinishProcessing(parcel:MessageParcel);
     begin
-      Logger.Trace('FinishProcessing');
+      Logger.Trace('Finish Processing');
       parcel.Message.Complete;
     end;
 

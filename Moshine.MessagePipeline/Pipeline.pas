@@ -24,9 +24,6 @@ uses
 type
 
   Pipeline = public class(IPipeline)
-  const
-    workSubscription = 'work';
-    errorSubscription = 'error';
 
   private
 
@@ -129,9 +126,9 @@ type
 
       finishProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
-            Logger.Trace('Finished processing');
             try
               _parcelProcessor.FinishProcessing(parcel);
+              Logger.Trace('Finished processing');
             except
               on e:Exception do
               begin
