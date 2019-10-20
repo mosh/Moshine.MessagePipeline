@@ -26,12 +26,12 @@ type
 
       if(assigned(returnValue))then
       begin
-        Logger.Trace('Value returned');
+        Logger.Trace('Setting value from invoked action');
         _cache.Add(someAction.Id.ToString,returnValue);
       end
       else
       begin
-        Logger.Trace('No value returned');
+        Logger.Trace('No value returned from invoked action');
       end;
 
     end;
