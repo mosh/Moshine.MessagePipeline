@@ -23,19 +23,6 @@ type
       _cache.Set(key,JsonConvert.SerializeObject(value), DateTimeOffset.Now.AddHours(1));
     end;
 
-    [Obsolete('Use generic version instead')]
-    method Get(key:String):dynamic;
-    begin
-      var obj:dynamic:=nil;
-
-      var value := _cache.Get(key);
-      if(assigned(value))then
-      begin
-        obj:=JsonConvert.DeserializeObject<ExpandoObject>(value.ToString);
-      end;
-      exit obj;
-    end;
-
     method Get<T>(key:String):T;
     begin
       var obj:T := nil;
