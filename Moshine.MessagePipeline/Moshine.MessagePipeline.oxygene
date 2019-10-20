@@ -15,6 +15,7 @@
     <TargetFramework>.NETStandard2.0</TargetFramework>
     <Name>Moshine.MessagePipeline</Name>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <AssemblyVersion>2.0</AssemblyVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>false</Optimize>

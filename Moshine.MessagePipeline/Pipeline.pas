@@ -200,6 +200,11 @@ type
 
     end;
 
+    method Version:String;
+    begin
+      exit typeOf(Pipeline).Assembly.GetName.Version.ToString;
+    end;
+
     method Send<T>(methodCall: Expression<Func<T,Boolean>>): IResponse;
     begin
     end;

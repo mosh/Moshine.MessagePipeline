@@ -25,6 +25,8 @@ type
     method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<IResponse>;
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):IResponse;
 
+    method Version:String;
+
     method Stop;
 
   end;
