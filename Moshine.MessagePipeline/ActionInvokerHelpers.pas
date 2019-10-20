@@ -66,10 +66,6 @@ type
         var message := $'Type {someType.Name} not found';
         Logger.Debug(message);
         raise new Exception(message);
-      end
-      else
-      begin
-
       end;
 
       var obj := _factory.Create(someType);
@@ -80,7 +76,6 @@ type
       end;
 
       Logger.Trace('InvokeAction someType.GetMethod');
-
 
       var methodInfo := someType.GetMethod(someAction.&Method);
 

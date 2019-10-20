@@ -26,7 +26,12 @@ type
 
       if(assigned(returnValue))then
       begin
+        Logger.Trace('Value returned');
         _cache.Add(someAction.Id.ToString,returnValue);
+      end
+      else
+      begin
+        Logger.Trace('No value returned');
       end;
 
     end;
