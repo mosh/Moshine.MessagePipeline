@@ -1,6 +1,7 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  NLog,
   System.Collections.Generic,
   System.Collections.ObjectModel,
   System.Linq.Expressions,
@@ -11,12 +12,15 @@ type
   MethodCallHelpers = public class
 
   private
+    class property Logger: Logger := LogManager.GetCurrentClassLogger;
 
     method SaveFunctionExpression(expression:MethodCallExpression):SavedAction;
     begin
       if not assigned(expression) then
       begin
-        raise new ApplicationException('Not a static or instance method');
+        var message := 'Not a static or instance method';
+        Logger.Debug(message);
+        raise new ApplicationException(message);
       end;
 
       var saved := new SavedAction;

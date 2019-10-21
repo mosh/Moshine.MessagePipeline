@@ -1,86 +1,65 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Moshine.MessagePipeline.Core,
+  NLog,
   System.Collections.Generic,
   System.Linq,
   System.Text,
-  System.Threading.Tasks,
-  Moshine.MessagePipeline.Core;
+  System.Threading,
+  System.Threading.Tasks;
 
 type
   Response = public class(IResponse)
   private
-  protected
+    class property Logger: Logger := LogManager.GetCurrentClassLogger;
   public
+    property MaximumWaitTimeInSeconds:Integer := 30;
+
     property Id:Guid;
 
-    method WaitForResultAsync(cache:ICache):Task<dynamic>;
+    method WaitForResultAsync<T>(cache:ICache):Task<T>;
     begin
+      Logger.Trace('Started');
+
+      var source := new CancellationTokenSource;
+      var token := source.Token;
+      var obj:T := nil;
+
       var pollingTask := Task.Factory.StartNew(() ->
-      begin
-        var obj:Object := nil;
-        var startTime:=DateTime.Now;
-        var difference:TimeSpan;
-        repeat
-          obj:=cache.Get(Id.ToString);
-          difference:=DateTime.Now.Subtract(startTime);
-          until (assigned(obj)) or (difference.TotalSeconds > 30);
-        exit obj;
-      end
-      );
+        begin
 
-      exit pollingTask;
+          repeat
+            token.ThrowIfCancellationRequested;
+            obj := cache.Get<T>(Id.ToString);
+          until (assigned(obj));
+        end,
+        token);
 
+      var cancelTask := Task.Factory.StartNew(() ->
+        begin
+          Thread.Sleep(new TimeSpan(0,0,MaximumWaitTimeInSeconds));
+          source.Cancel;
+        end,
+        token);
+
+        await Task.WhenAny(cancelTask,pollingTask);
+
+        if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
+        begin
+          Logger.Trace('Returning value');
+          exit obj;
+        end;
+        Logger.Trace('Returning nil');
+        exit nil;
     end;
+
 
     method WaitForResult<T>(cache:ICache):T;
     begin
-      var pollingTask := Task.Factory.StartNew(() ->
-      begin
-        var obj:T := nil;
-        var startTime:=DateTime.Now;
-        var difference:TimeSpan;
-        repeat
-          obj:=cache.Get<T>(Id.ToString);
-          difference:=DateTime.Now.Subtract(startTime);
-          until (assigned(obj)) or (difference.TotalSeconds > 30);
-        exit obj;
-      end
-      );
-
-      pollingTask.Wait;
-
-      if(assigned(pollingTask.Result))then
-      begin
-        exit pollingTask.Result;
-      end;
-      exit nil;
-
+      exit WaitForResultAsync<T>(cache).Result;
     end;
 
-    method WaitForResult(cache:ICache):dynamic;
-    begin
-      var pollingTask := Task.Factory.StartNew(() ->
-      begin
-        var obj:Object := nil;
-        var startTime:=DateTime.Now;
-        var difference:TimeSpan;
-        repeat
-          obj:=cache.Get(Id.ToString);
-          difference:=DateTime.Now.Subtract(startTime);
-          until (assigned(obj)) or (difference.TotalSeconds > 30);
-        exit obj;
-      end
-      );
-
-      pollingTask.Wait;
-
-      if(assigned(pollingTask.Result))then
-      begin
-        exit pollingTask.Result;
-      end;
-      exit nil;
-    end;
 
   end;
 

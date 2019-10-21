@@ -1,13 +1,16 @@
 ﻿namespace Moshine.MessagePipeline.Core;
 
+uses
+  System.Threading.Tasks;
+
 type
 
   IBus = public interface
     method Initialize;
-    method Send(messageContent:String;id:String);
-    method Send(message:IMessage);
-    method Receive(serverWaitTime:TimeSpan):IMessage;
-    method CannotBeProcessed(message:IMessage);
+    method SendAsync(messageContent:String;id:String):Task;
+    method SendAsync(message:IMessage):Task;
+    method ReceiveAsync(serverWaitTime:TimeSpan):Task<IMessage>;
+    method CannotBeProcessedAsync(message:IMessage):Task;
 
   end;
 

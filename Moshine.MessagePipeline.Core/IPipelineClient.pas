@@ -1,16 +1,15 @@
 ﻿namespace Moshine.MessagePipeline.Core;
 
 uses
+  Moshine.MessagePipeline.Core,
+  System.Linq.Expressions,
   System.Collections.Generic,
-  System.Linq.Expressions, System.Threading.Tasks;
+  System.Threading.Tasks;
 
 type
-
-  IPipeline = public interface
+  IPipelineClient = public interface
 
     method Initialize(parameterTypes:List<&Type>);
-
-    method Start;
 
     method Send<T>(methodCall: Expression<System.Func<T,LongWord>>):IResponse;
     method Send<T>(methodCall: Expression<System.Func<T,Word>>):IResponse;
@@ -25,10 +24,5 @@ type
     method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<IResponse>;
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):IResponse;
 
-    method Version:String;
-
-    method Stop;
-
   end;
-
 end.

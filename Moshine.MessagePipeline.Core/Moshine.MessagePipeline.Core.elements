@@ -68,6 +68,9 @@
     <Compile Include="IResponse.pas" />
     <Compile Include="DynamicDomainObject.pas" />
     <Compile Include="IServiceFactory.pas" />
+    <Compile Include="IPipelineClient.pas" />
+    <Compile Include="IScope.pas" />
+    <Compile Include="IScopeProvider.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

@@ -18,16 +18,17 @@ uses
   System.Xml.Serialization,
   Moshine.MessagePipeline.Cache,
   Moshine.MessagePipeline.Core,
+  NLog,
   Newtonsoft.Json;
 
 type
 
   Pipeline = public class(IPipeline)
-  const
-    workSubscription = 'work';
-    errorSubscription = 'error';
 
   private
+
+    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+
     _actionSerializer:PipelineSerializer<SavedAction>;
     _maxRetries:Integer;
     tokenSource:CancellationTokenSource;
@@ -40,79 +41,65 @@ type
     _cache:ICache;
     _bus:IBus;
 
-    _methodCallHelpers:MethodCallHelpers;
     _actionInvokerHelpers:ActionInvokerHelpers;
+    _client:IPipelineClient;
+    _parcelProcessor:ParcelProcessor;
+    _scopeProvider:IScopeProvider;
+
+    method MessageReceiver:Task;
+    begin
+      try
+        Logger.Trace('Starting to receive');
+        repeat
+
+          var someMessage := await _bus.ReceiveAsync(ServerWaitTime);
+
+          if(assigned(someMessage))then
+          begin
+            Logger.Trace('Posting message');
+            var parcel := new MessageParcel(Message := someMessage);
+            processMessage.Post(parcel);
+          end;
+
+        until token.IsCancellationRequested;
+      except
+        on e:Exception do
+        begin
+          Logger.Error(e,'Error receiving messages');
+          raise;
+        end;
+      end;
+
+    end;
+
 
 
     method Initialize(parameterTypes:List<&Type>);
     begin
+      Logger.Trace('Initializing');
       _bus.Initialize;
+      _client.Initialize(parameterTypes);
 
       _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
+      _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache, _scopeProvider);
 
       SetupPipeline;
-
-    end;
-
-    method Load(someAction:SavedAction);
-    begin
-      HandleTrace('Invoking action');
-
-      var returnValue := _actionInvokerHelpers.InvokeAction(someAction);
-
-      if(assigned(returnValue))then
-      begin
-        _cache.Add(someAction.Id.ToString,returnValue);
-
-      end;
-
-    end;
-
-    method EnQueue(someAction:SavedAction);
-    begin
-      var stringRepresentation := _actionSerializer.Serialize(someAction);
-
-      _bus.Send(stringRepresentation, someAction.Id.ToString);
-
-    end;
-
-    method HandleTrace(message:String);
-    begin
-      if(assigned(self.TraceCallback))then
-      begin
-        self.TraceCallback(message);
-      end;
-    end;
-
-
-    method HandleException(e:Exception);
-    begin
-      if(assigned(self.ErrorCallback))then
-      begin
-        self.ErrorCallback(e);
-      end;
+      Logger.Trace('Initialized');
     end;
 
     method SetupPipeline;
     begin
+      Logger.Trace('SetupPipeline');
+
       processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel ->
           begin
             try
-              HandleTrace('ProcessMessage');
-
-              var body := parcel.Message.GetBody;
-              var savedAction := _actionSerializer.Deserialize<SavedAction>(body);
-              using scope := new TransactionScope(TransactionScopeOption.RequiresNew) do
-              begin
-                HandleTrace('LoadAction');
-                Load(savedAction);
-                scope.Complete;
-              end;
-              parcel.State := MessageStateEnum.Processed;
+              Logger.Trace('ProcessMessage');
+              _parcelProcessor.ProcessMessage(parcel);
             except
-              on E:Exception do
+              on e:Exception do
               begin
-                HandleException(E);
+                Logger.Error(e,'Exception in processMessage Block');
                 parcel.State := MessageStateEnum.Faulted;
                 parcel.ReTryCount := parcel.ReTryCount+1;
               end;
@@ -124,21 +111,14 @@ type
 
       faultedInProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
-            HandleTrace('Fault in processing');
+            Logger.Trace('Fault in processing');
             try
-
-              using scope := new TransactionScope() do
-              begin
-
-                _bus.CannotBeProcessed(parcel.Message);
-
-                scope.Complete;
-              end;
+              await _parcelProcessor.FaultedInProcessing(parcel);
 
             except
               on e:Exception do
               begin
-                HandleException(e);
+                Logger.Error(e,'Exception in faultedInProcessing Block');
                 raise;
               end;
             end;
@@ -146,13 +126,13 @@ type
 
       finishProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
-            HandleTrace('Finished processing');
             try
-              parcel.Message.Complete;
+              _parcelProcessor.FinishProcessing(parcel);
+              Logger.Trace('Finished processing');
             except
               on e:Exception do
               begin
-                HandleException(e);
+                Logger.Error(e,'exception in finishProcessing block');
                 raise;
               end;
             end;
@@ -168,62 +148,61 @@ type
 
   public
 
-    constructor(factory:IServiceFactory; cache:ICache;bus:IBus);
+    property ServerWaitTime:TimeSpan := new TimeSpan(0,0,2);
+
+
+    constructor(factory:IServiceFactory; cache:ICache; bus:IBus; scopeProvider:IScopeProvider);
     begin
       _maxRetries := 4;
       _cache:=cache;
       _bus:= bus;
+      _scopeProvider := scopeProvider;
 
-      _methodCallHelpers := new MethodCallHelpers;
       _actionInvokerHelpers := new ActionInvokerHelpers(factory);
 
       tokenSource := new CancellationTokenSource();
       token := tokenSource.Token;
 
+      _client := new PipelineClient(bus);
+
+      Logger.Trace('constructed');
 
     end;
 
     method Stop;
     begin
-      tokenSource.Cancel();
+      Logger.Trace('Token cancelled');
+      tokenSource.Cancel;
 
       processMessage.Complete();
-      finishProcessing.Completion.Wait();
+      Logger.Trace('Stopped processing messages');
+      if(not finishProcessing.Completion.Wait(new TimeSpan(0,0,0,30))) then
+      begin
+        Logger.Trace('Timed out waiting after 30 seconds for finish processing messages');
+      end
+      else
+      begin
+        Logger.Trace('Stopped finish processing messages');
+      end;
 
+      Logger.Trace('Waiting to stop');
       Task.WaitAll(t);
+      Logger.Trace('Stopped');
 
     end;
 
+
     method Start;
     begin
-      HandleTrace('Start');
+      Logger.Trace('Start');
 
-      t := Task.Factory.StartNew( () ->
-        begin
-          try
+      t := Task.Factory.StartNew( () -> MessageReceiver, token);
 
-            repeat
-              var serverWaitTime := new TimeSpan(0,0,2);
+    end;
 
-              var someMessage:=_bus.Receive(serverWaitTime);
-
-              if(assigned(someMessage))then
-              begin
-                HandleTrace('Posting message');
-                var parcel := new MessageParcel(Message := someMessage);
-                processMessage.Post(parcel);
-              end;
-
-            until token.IsCancellationRequested;
-          except
-            on e:Exception do
-            begin
-              HandleException(e);
-              raise;
-            end;
-          end;
-        end, token);
-
+    method Version:String;
+    begin
+      exit typeOf(Pipeline).Assembly.GetName.Version.ToString;
     end;
 
     method Send<T>(methodCall: Expression<Func<T,Boolean>>): IResponse;
@@ -258,30 +237,25 @@ type
     begin
     end;
 
+    method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
+    begin
+      exit await _client.SendAsync<T>(methodCall);
+    end;
+
     method Send<T>(methodCall: Expression<System.Action<T>>):IResponse;
     begin
-      if(assigned(methodCall))then
-      begin
-        var saved := _methodCallHelpers.Save(methodCall);
-        EnQueue(saved);
-        exit new Response(Id:=saved.Id);
-      end;
+      exit _client.Send<T>(methodCall);
+    end;
+
+    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<IResponse>;
+    begin
+      exit _client.SendAsync<T>(methodCall);
     end;
 
     method Send<T>(methodCall: Expression<System.Func<T,Object>>):IResponse;
     begin
-      if(assigned(methodCall))then
-      begin
-        var saved := _methodCallHelpers.Save(methodCall);
-        EnQueue(saved);
-        exit new Response(Id:=saved.Id);
-      end;
-
+      exit _client.Send<T>(methodCall);
     end;
-
-
-    property ErrorCallback:Action<Exception>;
-    property TraceCallback:Action<String>;
 
   end;
 

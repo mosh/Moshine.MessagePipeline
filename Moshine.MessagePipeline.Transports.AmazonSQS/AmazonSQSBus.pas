@@ -1,18 +1,21 @@
 ﻿namespace Moshine.MessagePipeline.Transports.AmazonSQS;
 
 uses
-  System,
-  System.Linq,
   Amazon.Runtime,
   Amazon.Runtime.CredentialManagement,
   Amazon.SQS,
   Amazon.SQS.Model,
-  Moshine.MessagePipeline.Core;
+  Moshine.MessagePipeline.Core,
+  NLog,
+  System,
+  System.Linq,
+  System.Threading.Tasks;
 
 type
 
   AmazonSQSBus = public class(IBus)
   private
+    class property Logger: Logger := LogManager.GetCurrentClassLogger;
 
     _config:AmazonSQSConfig;
     _credentials:AWSCredentials;
@@ -30,7 +33,8 @@ type
       end;
     end;
 
-    method SendMessage(id:String; messageBody:String):SendMessageResponse;
+
+    method SendMessageAsync(id:String; messageBody:String):Task<SendMessageResponse>;
     begin
       Guard;
 
@@ -41,7 +45,7 @@ type
         messageRequest.MessageDeduplicationId := id;
         messageRequest.MessageGroupId := id;
 
-        exit _client.SendMessageAsync(messageRequest).Result;
+        exit await _client.SendMessageAsync(messageRequest);
 
       except
         on E:Exception do
@@ -52,6 +56,7 @@ type
       end;
 
     end;
+
 
 
   protected
@@ -100,17 +105,15 @@ type
 
     end;
 
-    method Send(messageContent:String;id:String);
+    method SendAsync(messageContent:String;id:String):Task;
     begin
-      SendMessage(id, messageContent);
+      await SendMessageAsync(id, messageContent);
     end;
 
-    method Send(message:IMessage);
+    method SendAsync(message:IMessage):Task;
     begin
       var amazonMessage := message as AmazonSQSMessage;
-
-      SendMessage(amazonMessage.GetBody, amazonMessage.Id);
-
+      await SendMessageAsync(amazonMessage.GetBody, amazonMessage.Id);
     end;
 
     method DeleteMessage(message:Message);
@@ -136,7 +139,7 @@ type
 
     end;
 
-    method Receive(serverWaitTime:TimeSpan):IMessage;
+    method ReceiveAsync(serverWaitTime:TimeSpan):Task<IMessage>;
     begin
       Guard;
 
@@ -146,19 +149,19 @@ type
       receiveMessageRequest.MaxNumberOfMessages := 1; // only return 1 message
       receiveMessageRequest.QueueUrl := _url.QueueUrl;
 
-      var receiveMessageResponse := _client.ReceiveMessageAsync(receiveMessageRequest).Result;
+      var receiveMessageResponse := await _client.ReceiveMessageAsync(receiveMessageRequest);
 
       var someMessage := receiveMessageResponse.Messages.FirstOrDefault;
-
 
       exit iif(assigned(someMessage),new AmazonSQSMessage(self,someMessage),nil);
 
     end;
 
-    method CannotBeProcessed(message:IMessage);
+    method CannotBeProcessedAsync(message:IMessage):Task;
     begin
       var clone := message.Clone;
       clone.AsError;
+      exit Task.CompletedTask;
     end;
 
   end;
