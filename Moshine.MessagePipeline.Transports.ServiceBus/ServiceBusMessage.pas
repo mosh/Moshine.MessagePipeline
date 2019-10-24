@@ -6,6 +6,7 @@ uses
   Microsoft.ServiceBus.Messaging;
 
 type
+  [Obsolete('Use Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus.ServiceBusMessage')]
   ServiceBusMessage = public class(IMessage)
 
   private
