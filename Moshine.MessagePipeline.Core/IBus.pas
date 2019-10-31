@@ -6,7 +6,7 @@ uses
 type
 
   IBus = public interface
-    method Initialize;
+    method InitializeAsync:Task;
     method SendAsync(messageContent:String;id:String):Task;
     method SendAsync(message:IMessage):Task;
     method ReceiveAsync(serverWaitTime:TimeSpan):Task<IMessage>;

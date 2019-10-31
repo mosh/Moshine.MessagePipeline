@@ -86,7 +86,7 @@ type
     property VisibilityTimeout:Integer := 60*15; // 15 minutes;
 
 
-    method Initialize;
+    method InitializeAsync:Task;
     begin
       if(not(assigned(_credentials)))then
       begin
@@ -102,7 +102,7 @@ type
 
       _url := _client.GetQueueUrlAsync(request).Result;
 
-
+      exit Task.CompletedTask;
     end;
 
     method SendAsync(messageContent:String;id:String):Task;

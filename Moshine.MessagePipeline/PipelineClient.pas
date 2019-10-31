@@ -49,7 +49,7 @@ type
     method Initialize(parameterTypes:List<&Type>);
     begin
       Logger.Trace('Entering');
-      _bus.Initialize;
+      _bus.InitializeAsync.Wait;
       _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
       Logger.Trace('Exiting');
     end;

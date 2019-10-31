@@ -4,6 +4,7 @@ uses
   NLog,
   Microsoft.Azure.ServiceBus,
   Microsoft.Azure.ServiceBus.Core,
+  Microsoft.Azure.ServiceBus.Management,
   Moshine.MessagePipeline.Core,
   System.Text,
   System.Threading.Tasks;
@@ -18,7 +19,6 @@ type
     _subscriptionName:String;
     _connectionString:String;
     _topicClient:TopicClient;
-    _subscriptionClient:SubscriptionClient;
     _subscriptionReceiver:IMessageReceiver;
   public
     constructor(connectionString:String; topicName:String; subscriptionName:String);
@@ -28,11 +28,27 @@ type
       _subscriptionName := subscriptionName;
     end;
 
-    method Initialize;
+    method InitializeAsync:Task;
     begin
       Logger.Info('Initialize');
+
+      var client := new ManagementClient(_connectionString);
+
+      if (not await client.SubscriptionExistsAsync(_topicName,_subscriptionName)) then
+      begin
+        raise new ApplicationException($'Topic {_topicName} Subscription {_subscriptionName} does not exist');
+      end;
+
+      var subscription := await client.GetSubscriptionAsync(_topicName, _subscriptionName);
+
+      Logger.Info($'MaxDeliveryCount is {subscription.MaxDeliveryCount} EnableDeadLetteringOnMessageExpiration {subscription.EnableDeadLetteringOnMessageExpiration}');
+
+      if(not subscription.EnableDeadLetteringOnMessageExpiration)then
+      begin
+        raise new ApplicationException($'Topic {_topicName} Subscription {_subscriptionName} EnableDeadLetteringOnMessageExpiration must be enabled');
+      end;
+
       _topicClient := new TopicClient(_connectionString, _topicName);
-      _subscriptionClient := new SubscriptionClient(_connectionString, _topicName, _subscriptionName);
       var subscriptionPath: String := EntityNameHelper.FormatSubscriptionPath(_topicName, _subscriptionName);
       _subscriptionReceiver := new MessageReceiver(_connectionString, subscriptionPath, ReceiveMode.PeekLock);
 

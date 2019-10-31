@@ -77,7 +77,7 @@ type
     method Initialize(parameterTypes:List<&Type>);
     begin
       Logger.Trace('Initializing');
-      _bus.Initialize;
+      _bus.InitializeAsync.Wait;
       _client.Initialize(parameterTypes);
 
       _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
