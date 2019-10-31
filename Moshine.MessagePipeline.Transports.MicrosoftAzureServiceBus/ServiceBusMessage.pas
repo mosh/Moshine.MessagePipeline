@@ -4,12 +4,15 @@ uses
   Moshine.MessagePipeline.Core,
   Microsoft.Azure.ServiceBus,
   Microsoft.Azure.ServiceBus.Core,
+  Nlog,
   System.Text,
   System.Threading.Tasks;
 type
 
   ServiceBusMessage = public class(IMessage)
   private
+    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+
     _message:Message;
     _receiver:IMessageReceiver;
   public
@@ -23,6 +26,8 @@ type
     constructor(message:Message);
     begin
       _message := message;
+      Logger.Trace($'DeliveryCoint {_message.SystemProperties.DeliveryCount}');
+
     end;
 
 

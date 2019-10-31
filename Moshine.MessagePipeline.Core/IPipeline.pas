@@ -8,7 +8,7 @@ type
 
   IPipeline = public interface
 
-    method Initialize(parameterTypes:List<&Type>);
+    method InitializeAsync(parameterTypes:List<&Type>):Task;
 
     method Start;
 

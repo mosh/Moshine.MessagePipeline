@@ -46,10 +46,10 @@ type
       Logger.Trace('Exiting');
     end;
 
-    method Initialize(parameterTypes:List<&Type>);
+    method InitializeAsync(parameterTypes:List<&Type>):Task;
     begin
       Logger.Trace('Entering');
-      _bus.InitializeAsync.Wait;
+      await _bus.InitializeAsync;
       _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
       Logger.Trace('Exiting');
     end;

@@ -74,11 +74,11 @@ type
 
 
 
-    method Initialize(parameterTypes:List<&Type>);
+    method InitializeAsync(parameterTypes:List<&Type>):Task;
     begin
       Logger.Trace('Initializing');
-      _bus.InitializeAsync.Wait;
-      _client.Initialize(parameterTypes);
+      await _bus.InitializeAsync;
+      await _client.InitializeAsync(parameterTypes);
 
       _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
       _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache, _scopeProvider);
