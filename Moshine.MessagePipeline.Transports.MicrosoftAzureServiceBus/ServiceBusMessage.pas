@@ -1,7 +1,11 @@
 ﻿namespace Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus;
 
 uses
-  Moshine.MessagePipeline.Core, Microsoft.Azure.ServiceBus, Microsoft.Azure.ServiceBus.Core, System.Text ;
+  Moshine.MessagePipeline.Core,
+  Microsoft.Azure.ServiceBus,
+  Microsoft.Azure.ServiceBus.Core,
+  System.Text,
+  System.Threading.Tasks;
 type
 
   ServiceBusMessage = public class(IMessage)
@@ -32,23 +36,23 @@ type
       exit Encoding.UTF8.GetString(_message.Body);
     end;
 
-    method AsError;
+    method AsErrorAsync:Task;
     begin
       if(not assigned(_receiver))then
       begin
         raise new ApplicationException('Cannot AsError receiver not assigned');
       end;
-      _receiver.AbandonAsync(_message.SystemProperties.LockToken);
+      await _receiver.AbandonAsync(_message.SystemProperties.LockToken);
       Console.WriteLine('AsError');
     end;
 
-    method Complete;
+    method CompleteAsync:Task;
     begin
       if(not assigned(_receiver))then
       begin
         raise new ApplicationException('Cannot complete receiver not assigned');
       end;
-      _receiver.CompleteAsync(_message.SystemProperties.LockToken);
+      await _receiver.CompleteAsync(_message.SystemProperties.LockToken);
       Console.WriteLine('Completed');
     end;
 

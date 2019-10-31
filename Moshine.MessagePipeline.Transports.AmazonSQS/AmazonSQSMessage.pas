@@ -3,7 +3,8 @@
 uses
   Amazon.SQS.Model,
   Moshine.MessagePipeline.Core,
-  System;
+  System,
+  System.Threading.Tasks;
 
 type
 
@@ -58,7 +59,7 @@ type
       exit iif(assigned(_message), _message.Body, _sendMessageRequest.MessageBody);
     end;
 
-    method AsError;
+    method AsErrorAsync:Task;
     begin
       // assuming we have setup a dead-letter queue this shouldnt be required
       // also
@@ -68,13 +69,13 @@ type
       end;
 
       self._bus.ReturnMessage(_message);
-
+      exit Task.CompletedTask;
     end;
 
-    method Complete;
+    method CompleteAsync:Task;
     begin
       _bus.DeleteMessage(_message);
-
+      exit Task.CompletedTask;
     end;
 
   end;

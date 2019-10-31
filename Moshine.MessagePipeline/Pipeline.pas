@@ -113,7 +113,7 @@ type
           begin
             Logger.Trace('Fault in processing');
             try
-              await _parcelProcessor.FaultedInProcessing(parcel);
+              await _parcelProcessor.FaultedInProcessingAsync(parcel);
 
             except
               on e:Exception do
@@ -127,7 +127,7 @@ type
       finishProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
             try
-              _parcelProcessor.FinishProcessing(parcel);
+              await _parcelProcessor.FinishProcessingAsync(parcel);
               Logger.Trace('Finished processing');
             except
               on e:Exception do

@@ -160,8 +160,7 @@ type
     method CannotBeProcessedAsync(message:IMessage):Task;
     begin
       var clone := message.Clone;
-      clone.AsError;
-      exit Task.CompletedTask;
+      await clone.AsErrorAsync;
     end;
 
   end;

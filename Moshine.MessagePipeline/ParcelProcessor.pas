@@ -91,7 +91,7 @@ type
 
     end;
 
-    method FaultedInProcessing(parcel:MessageParcel):Task;
+    method FaultedInProcessingAsync(parcel:MessageParcel):Task;
     begin
       Logger.Trace('FaultedInProcessing');
 
@@ -105,10 +105,15 @@ type
 
     end;
 
-    method FinishProcessing(parcel:MessageParcel);
+    method FinishProcessingAsync(parcel:MessageParcel):Task;
     begin
       Logger.Trace('Finish Processing');
-      parcel.Message.Complete;
+      using scope := _scopeProvider.Provide do
+      begin
+        await parcel.Message.CompleteAsync;
+        scope.Complete;
+      end;
+
     end;
 
   end;

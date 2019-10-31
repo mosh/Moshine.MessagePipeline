@@ -34,7 +34,7 @@ type
       _topicClient := new TopicClient(_connectionString, _topicName);
       _subscriptionClient := new SubscriptionClient(_connectionString, _topicName, _subscriptionName);
       var subscriptionPath: String := EntityNameHelper.FormatSubscriptionPath(_topicName, _subscriptionName);
-      _subscriptionReceiver := new MessageReceiver(_connectionString, subscriptionPath, ReceiveMode.ReceiveAndDelete);
+      _subscriptionReceiver := new MessageReceiver(_connectionString, subscriptionPath, ReceiveMode.PeekLock);
 
     end;
 
@@ -72,9 +72,7 @@ type
       Logger.Info('CannotBeProcessed');
 
       var clone := message.Clone;
-      clone.AsError;
-      await self.SendAsync(clone);
-      message.Complete;
+      await clone.AsErrorAsync;
 
     end;
 
