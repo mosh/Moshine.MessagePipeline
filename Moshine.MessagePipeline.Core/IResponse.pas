@@ -6,8 +6,8 @@ uses
 type
 
   IResponse = public interface
-    method WaitForResultAsync<T>(cache:ICache):Task<T>;
-    method WaitForResult<T>(cache:ICache):T;
+    method WaitForResultAsync<T>:Task<T>;
+    method WaitForResult<T>:T;
   end;
 
 end.

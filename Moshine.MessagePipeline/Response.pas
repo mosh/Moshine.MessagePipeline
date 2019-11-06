@@ -13,12 +13,19 @@ type
   Response = public class(IResponse)
   private
     class property Logger: Logger := LogManager.GetCurrentClassLogger;
+
+    property cache:ICache;
   public
     property MaximumWaitTimeInSeconds:Integer := 30;
 
     property Id:Guid;
 
-    method WaitForResultAsync<T>(cache:ICache):Task<T>;
+    constructor(cacheImpl:ICache);
+    begin
+      cache := cacheImpl;
+    end;
+
+    method WaitForResultAsync<T>:Task<T>;
     begin
       Logger.Trace('Started');
 
@@ -55,9 +62,9 @@ type
     end;
 
 
-    method WaitForResult<T>(cache:ICache):T;
+    method WaitForResult<T>:T;
     begin
-      exit WaitForResultAsync<T>(cache).Result;
+      exit WaitForResultAsync<T>.Result;
     end;
 
 

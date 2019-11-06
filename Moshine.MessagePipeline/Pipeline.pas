@@ -163,7 +163,7 @@ type
       tokenSource := new CancellationTokenSource();
       token := tokenSource.Token;
 
-      _client := new PipelineClient(bus);
+      _client := new PipelineClient(bus, _cache);
 
       Logger.Trace('constructed');
 

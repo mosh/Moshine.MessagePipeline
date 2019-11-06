@@ -16,6 +16,7 @@ type
     _actionSerializer:PipelineSerializer<SavedAction>;
     _bus:IBus;
     _methodCallHelpers:MethodCallHelpers;
+    cache:ICache;
 
     method EnQueue(someAction:SavedAction);
     begin
@@ -39,9 +40,10 @@ type
 
   public
 
-    constructor(bus:IBus);
+    constructor(bus:IBus;cacheImpl:ICache);
     begin
       _bus := bus;
+      cache := cacheImpl;
       _methodCallHelpers := new MethodCallHelpers;
       Logger.Trace('Exiting');
     end;
@@ -102,7 +104,9 @@ type
         end;
         var saved := _methodCallHelpers.Save(methodCall);
         await EnQueueAsync(saved);
-        exit new Response(Id:=saved.Id);
+        var r := new Response(cache);
+        r.Id := saved.Id;
+        exit r;
       end
       else
       begin
@@ -127,7 +131,9 @@ type
         end;
         var saved := _methodCallHelpers.Save(methodCall);
         EnQueue(saved);
-        exit new Response(Id:=saved.Id);
+        var r := new Response(cache);
+        r.Id := saved.Id;
+        exit r;
       end
       else
       begin
@@ -143,7 +149,9 @@ type
         Logger.Trace('methodCall assigned');
         var saved := _methodCallHelpers.Save(methodCall);
         await EnQueueAsync(saved);
-        exit new Response(Id:=saved.Id);
+        var r := new Response(cache);
+        r.Id := saved.Id;
+        exit r;
       end
       else
       begin
@@ -160,7 +168,9 @@ type
         Logger.Trace('methodCall assigned');
         var saved := _methodCallHelpers.Save(methodCall);
         EnQueue(saved);
-        exit new Response(Id:=saved.Id);
+        var r := new Response(cache);
+        r.Id := saved.Id;
+        exit r;
       end
       else
       begin
