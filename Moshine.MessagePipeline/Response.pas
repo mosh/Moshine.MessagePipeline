@@ -50,7 +50,14 @@ type
         end,
         token);
 
-        await Task.WhenAny(cancelTask,pollingTask);
+        try
+          await Task.WhenAny(cancelTask,pollingTask);
+        except
+          on E:Exception do
+            begin
+              Logger.Trace('Caught exception in WhenAny');
+            end;
+        end;
 
         if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
         begin
