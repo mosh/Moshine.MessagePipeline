@@ -174,7 +174,7 @@ type
       Logger.Trace('Token cancelled');
       tokenSource.Cancel;
 
-      processMessage.Complete();
+      processMessage.Complete;
       Logger.Trace('Stopped processing messages');
       if(not finishProcessing.Completion.Wait(new TimeSpan(0,0,0,30))) then
       begin
