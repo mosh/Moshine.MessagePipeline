@@ -12,10 +12,12 @@ type
     class property Logger: Logger := LogManager.GetCurrentClassLogger;
 
     _factory:IServiceFactory;
+    _typeFinder:ITypeFinder;
 
     method FindType(typeName:String):&Type;
     begin
-
+      exit _typeFinder.FindType(typeName);
+      /*
       Logger.Trace($'FindType {typeName}');
 
       try
@@ -41,13 +43,15 @@ type
           end;
       end;
       exit nil;
+      */
     end;
 
   public
 
-    constructor(factory:IServiceFactory);
+    constructor(factory:IServiceFactory; typeFinder:ITypeFinder);
     begin
       _factory := factory;
+      _typeFinder := typeFinder;
     end;
 
     method InvokeActionAsync(someAction:SavedAction):Task<Object>;
@@ -63,7 +67,7 @@ type
 
       if(not assigned(someType))then
       begin
-        var message := $'Type {someType.Name} not found';
+        var message := $'Type {someAction.&Type} not found';
         Logger.Debug(message);
         raise new Exception(message);
       end;

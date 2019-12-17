@@ -71,6 +71,7 @@
     <Compile Include="IPipelineClient.pas" />
     <Compile Include="IScope.pas" />
     <Compile Include="IScopeProvider.pas" />
+    <Compile Include="ITypeFinder.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>
