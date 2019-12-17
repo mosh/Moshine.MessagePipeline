@@ -2,6 +2,7 @@
 
 uses
   Moshine.MessagePipeline.Core,
+  Moshine.MessagePipeline.Models,
   NLog, System.Threading.Tasks;
 
 type
@@ -18,11 +19,11 @@ type
     _bus:IBus;
     _scopeProvider:IScopeProvider;
 
-    method Load(someAction:SavedAction);
+    method LoadAsync(someAction:SavedAction):Task;
     begin
       Logger.Trace('Invoking action');
 
-      var returnValue := _actionInvokerHelpers.InvokeAction(someAction);
+      var returnValue := await _actionInvokerHelpers.InvokeActionAsync(someAction);
 
       if(assigned(returnValue))then
       begin
@@ -49,7 +50,7 @@ type
       _scopeProvider := scopeProvider;
     end;
 
-    method ProcessMessage(parcel:MessageParcel);
+    method ProcessMessageAsync(parcel:MessageParcel):Task;
     begin
 
       try
@@ -72,7 +73,7 @@ type
         using scope := _scopeProvider.Provide do
         begin
           Logger.Trace('LoadAction');
-          Load(savedAction);
+          await LoadAsync(savedAction);
           Logger.Trace('Loaded Action');
           scope.Complete;
         end;

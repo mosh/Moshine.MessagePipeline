@@ -18,6 +18,7 @@ uses
   System.Xml.Serialization,
   Moshine.MessagePipeline.Cache,
   Moshine.MessagePipeline.Core,
+  Moshine.MessagePipeline.Models,
   NLog,
   Newtonsoft.Json;
 
@@ -40,6 +41,7 @@ type
 
     _cache:ICache;
     _bus:IBus;
+    _typeFinder:ITypeFinder;
 
     _actionInvokerHelpers:ActionInvokerHelpers;
     _client:IPipelineClient;
@@ -74,13 +76,13 @@ type
 
 
 
-    method InitializeAsync(parameterTypes:List<&Type>):Task;
+    method InitializeAsync:Task;
     begin
       Logger.Trace('Initializing');
       await _bus.InitializeAsync;
-      await _client.InitializeAsync(parameterTypes);
+      await _client.InitializeAsync(_typeFinder.SerializationTypes.ToList);
 
-      _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
+      _actionSerializer := new PipelineSerializer<SavedAction>(_typeFinder.SerializationTypes.ToList);
       _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache, _scopeProvider);
 
       SetupPipeline;
@@ -95,7 +97,7 @@ type
           begin
             try
               Logger.Trace('ProcessMessage');
-              _parcelProcessor.ProcessMessage(parcel);
+              await _parcelProcessor.ProcessMessageAsync(parcel);
             except
               on e:Exception do
               begin
@@ -151,16 +153,17 @@ type
     property ServerWaitTime:TimeSpan := new TimeSpan(0,0,2);
 
 
-    constructor(factory:IServiceFactory; cache:ICache; bus:IBus; scopeProvider:IScopeProvider);
+    constructor(factory:IServiceFactory; cache:ICache; bus:IBus; scopeProvider:IScopeProvider;typeFinder:ITypeFinder);
     begin
       _maxRetries := 4;
       _cache:=cache;
       _bus:= bus;
       _scopeProvider := scopeProvider;
+      _typeFinder := typeFinder;
 
-      _actionInvokerHelpers := new ActionInvokerHelpers(factory);
+      _actionInvokerHelpers := new ActionInvokerHelpers(factory, typeFinder);
 
-      tokenSource := new CancellationTokenSource();
+      tokenSource := new CancellationTokenSource;
       token := tokenSource.Token;
 
       _client := new PipelineClient(bus, _cache);

@@ -3,7 +3,7 @@
 uses
   Moshine.MessagePipeline.Core,
   NLog,
-  System.Linq;
+  System.Linq, System.Threading.Tasks;
 
 type
 
@@ -12,45 +12,22 @@ type
     class property Logger: Logger := LogManager.GetCurrentClassLogger;
 
     _factory:IServiceFactory;
+    _typeFinder:ITypeFinder;
 
     method FindType(typeName:String):&Type;
     begin
-
-      Logger.Trace($'FindType {typeName}');
-
-      try
-
-        var types :=
-        from a in AppDomain.CurrentDomain.GetAssemblies
-        from t in a.GetTypes()
-        where t.FullName = typeName
-        select t;
-        exit types:FirstOrDefault;
-      except
-        on r:System.Reflection.ReflectionTypeLoadException do
-          begin
-            for le in r.LoaderExceptions do
-            begin
-              Logger.Error(le,'LoaderException');
-              raise;
-            end;
-          end;
-        on e:Exception do
-          begin
-            Logger.Error(e,'Failed to find type');
-          end;
-      end;
-      exit nil;
+      exit _typeFinder.FindServiceType(typeName);
     end;
 
   public
 
-    constructor(factory:IServiceFactory);
+    constructor(factory:IServiceFactory; typeFinder:ITypeFinder);
     begin
       _factory := factory;
+      _typeFinder := typeFinder;
     end;
 
-    method InvokeAction(someAction:SavedAction):Object;
+    method InvokeActionAsync(someAction:SavedAction):Task<Object>;
     begin
 
       if(not assigned(someAction))then
@@ -63,7 +40,7 @@ type
 
       if(not assigned(someType))then
       begin
-        var message := $'Type {someType.Name} not found';
+        var message := $'Type {someAction.&Type} not found';
         Logger.Debug(message);
         raise new Exception(message);
       end;
@@ -88,7 +65,25 @@ type
 
       if(someAction.Function)then
       begin
-        exit methodInfo.Invoke(obj,someAction.Parameters.ToArray);
+
+        var invokeObj := methodInfo.Invoke(obj,someAction.Parameters.ToArray);
+
+        if((methodInfo.ReturnType.BaseType = typeOf(Task)) or (methodInfo.ReturnType = typeOf(Task)))then
+        begin
+          var aTask:Task := Task(invokeObj);
+          await aTask;
+
+          var resultProperty := aTask.GetType.GetProperty('Result');
+
+          if(assigned(resultProperty) and methodInfo.ReturnType.IsGenericType)then
+          begin
+            exit resultProperty.GetValue(aTask);
+          end;
+          exit nil;
+        end;
+
+        exit invokeObj;
+
       end
       else
       begin

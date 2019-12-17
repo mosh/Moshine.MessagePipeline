@@ -65,12 +65,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\InMemoryCache.pas" />
-    <Compile Include="MessageParcel.pas" />
     <Compile Include="Pipeline.pas" />
     <Compile Include="PipelineSerializer.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
     <Compile Include="Response.pas" />
-    <Compile Include="SavedAction.pas" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
@@ -84,10 +82,12 @@
     <None Include="Moshine.MessagePipeline.Nuspec" />
     <Compile Include="PipelineClient.pas" />
     <Compile Include="ParcelProcessor.pas" />
-    <Compile Include="NonTransactionalScope.pas" />
-    <Compile Include="TransactionalScope.pas" />
-    <Compile Include="TransactionalScopeProvider.pas" />
-    <Compile Include="NonTransactionalScopeProvider.pas" />
+    <Compile Include="Models\MessageParcel.pas" />
+    <Compile Include="Models\SavedAction.pas" />
+    <Compile Include="Scope\NonTransactionalScope.pas" />
+    <Compile Include="Scope\TransactionalScope.pas" />
+    <Compile Include="Scope\NonTransactionalScopeProvider.pas" />
+    <Compile Include="Scope\TransactionalScopeProvider.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>
