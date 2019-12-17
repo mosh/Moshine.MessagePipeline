@@ -41,6 +41,7 @@ type
 
     _cache:ICache;
     _bus:IBus;
+    _typeFinder:ITypeFinder;
 
     _actionInvokerHelpers:ActionInvokerHelpers;
     _client:IPipelineClient;
@@ -75,13 +76,13 @@ type
 
 
 
-    method InitializeAsync(parameterTypes:List<&Type>):Task;
+    method InitializeAsync:Task;
     begin
       Logger.Trace('Initializing');
       await _bus.InitializeAsync;
-      await _client.InitializeAsync(parameterTypes);
+      await _client.InitializeAsync(_typeFinder.SerializationTypes.ToList);
 
-      _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
+      _actionSerializer := new PipelineSerializer<SavedAction>(_typeFinder.SerializationTypes.ToList);
       _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache, _scopeProvider);
 
       SetupPipeline;
@@ -158,6 +159,7 @@ type
       _cache:=cache;
       _bus:= bus;
       _scopeProvider := scopeProvider;
+      _typeFinder := typeFinder;
 
       _actionInvokerHelpers := new ActionInvokerHelpers(factory, typeFinder);
 

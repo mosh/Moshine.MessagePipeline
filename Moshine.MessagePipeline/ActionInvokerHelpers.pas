@@ -16,34 +16,7 @@ type
 
     method FindType(typeName:String):&Type;
     begin
-      exit _typeFinder.FindType(typeName);
-      /*
-      Logger.Trace($'FindType {typeName}');
-
-      try
-
-        var types :=
-        from a in AppDomain.CurrentDomain.GetAssemblies
-        from t in a.GetTypes()
-        where t.FullName = typeName
-        select t;
-        exit types:FirstOrDefault;
-      except
-        on r:System.Reflection.ReflectionTypeLoadException do
-          begin
-            for le in r.LoaderExceptions do
-            begin
-              Logger.Error(le,'LoaderException');
-              raise;
-            end;
-          end;
-        on e:Exception do
-          begin
-            Logger.Error(e,'Failed to find type');
-          end;
-      end;
-      exit nil;
-      */
+      exit _typeFinder.FindServiceType(typeName);
     end;
 
   public

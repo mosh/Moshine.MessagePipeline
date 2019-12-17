@@ -2,7 +2,8 @@
 
 type
   ITypeFinder = public interface
-    method FindType(typeName:String):&Type;
+    method FindServiceType(typeName:String):&Type;
+    method SerializationTypes:sequence of &Type;
   end;
 
 end.
