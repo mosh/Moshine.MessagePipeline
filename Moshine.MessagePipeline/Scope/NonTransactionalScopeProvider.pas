@@ -1,4 +1,4 @@
-﻿namespace Moshine.MessagePipeline;
+﻿namespace Moshine.MessagePipeline.Scope;
 
 uses
   Moshine.MessagePipeline.Core;

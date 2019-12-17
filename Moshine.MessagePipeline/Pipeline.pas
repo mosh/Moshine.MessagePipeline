@@ -18,6 +18,7 @@ uses
   System.Xml.Serialization,
   Moshine.MessagePipeline.Cache,
   Moshine.MessagePipeline.Core,
+  Moshine.MessagePipeline.Models,
   NLog,
   Newtonsoft.Json;
 
@@ -95,7 +96,7 @@ type
           begin
             try
               Logger.Trace('ProcessMessage');
-              _parcelProcessor.ProcessMessage(parcel);
+              await _parcelProcessor.ProcessMessageAsync(parcel);
             except
               on e:Exception do
               begin

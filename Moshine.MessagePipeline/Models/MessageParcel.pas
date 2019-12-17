@@ -1,4 +1,4 @@
-﻿namespace Moshine.MessagePipeline;
+﻿namespace Moshine.MessagePipeline.Models;
 
 uses
   Moshine.MessagePipeline.Core,

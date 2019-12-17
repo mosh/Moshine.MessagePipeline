@@ -3,7 +3,7 @@
 uses
   Moshine.MessagePipeline.Core,
   NLog,
-  System.Linq;
+  System.Linq, System.Threading.Tasks;
 
 type
 
@@ -50,7 +50,7 @@ type
       _factory := factory;
     end;
 
-    method InvokeAction(someAction:SavedAction):Object;
+    method InvokeActionAsync(someAction:SavedAction):Task<Object>;
     begin
 
       if(not assigned(someAction))then
@@ -88,7 +88,25 @@ type
 
       if(someAction.Function)then
       begin
-        exit methodInfo.Invoke(obj,someAction.Parameters.ToArray);
+
+        var invokeObj := methodInfo.Invoke(obj,someAction.Parameters.ToArray);
+
+        if((methodInfo.ReturnType.BaseType = typeOf(Task)) or (methodInfo.ReturnType = typeOf(Task)))then
+        begin
+          var aTask:Task := Task(invokeObj);
+          await aTask;
+
+          var resultProperty := aTask.GetType.GetProperty('Result');
+
+          if(assigned(resultProperty) and methodInfo.ReturnType.IsGenericType)then
+          begin
+            exit resultProperty.GetValue(aTask);
+          end;
+          exit nil;
+        end;
+
+        exit invokeObj;
+
       end
       else
       begin
