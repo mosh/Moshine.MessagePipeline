@@ -3,8 +3,9 @@
 uses
   Moshine.MessagePipeline.Core,
   NLog,
-  System.Linq.Expressions,
   System.Collections.Generic,
+  System.Linq,
+  System.Linq.Expressions,
   System.Threading.Tasks;
 
 type
@@ -16,6 +17,7 @@ type
     _actionSerializer:PipelineSerializer<SavedAction>;
     _bus:IBus;
     _methodCallHelpers:MethodCallHelpers;
+    _typeFinder:ITypeFinder;
     cache:ICache;
 
     method EnQueue(someAction:SavedAction);
@@ -40,19 +42,20 @@ type
 
   public
 
-    constructor(bus:IBus;cacheImpl:ICache);
+    constructor(bus:IBus;cacheImpl:ICache; typeFinder:ITypeFinder);
     begin
       _bus := bus;
       cache := cacheImpl;
       _methodCallHelpers := new MethodCallHelpers;
+      _typeFinder := typeFinder;
       Logger.Trace('Exiting');
     end;
 
-    method InitializeAsync(parameterTypes:List<&Type>):Task;
+    method InitializeAsync:Task;
     begin
       Logger.Trace('Entering');
       await _bus.InitializeAsync;
-      _actionSerializer := new PipelineSerializer<SavedAction>(parameterTypes);
+      _actionSerializer := new PipelineSerializer<SavedAction>(_typeFinder.SerializationTypes.ToList);
       Logger.Trace('Exiting');
     end;
 
@@ -111,20 +114,17 @@ type
 
     method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<IResponse>;
     begin
-      if(assigned(methodCall))then
-      begin
-        Logger.Trace('methodCall assigned');
-        var saved := _methodCallHelpers.Save(methodCall);
-        await EnQueueAsync(saved);
-        var r := new Response(cache);
-        r.Id := saved.Id;
-        exit r;
-      end
-      else
+      if(not assigned(methodCall))then
       begin
         Logger.Trace('methodCall not assigned');
+        raise new ArgumentNullException('methodcall not assigned');
       end;
 
+      var saved := _methodCallHelpers.Save(methodCall);
+      await EnQueueAsync(saved);
+      var r := new Response(cache);
+      r.Id := saved.Id;
+      exit r;
     end;
 
 
@@ -132,17 +132,15 @@ type
     begin
       if(assigned(methodCall))then
       begin
-        Logger.Trace('methodCall assigned');
-        var saved := _methodCallHelpers.Save(methodCall);
-        EnQueue(saved);
-        var r := new Response(cache);
-        r.Id := saved.Id;
-        exit r;
-      end
-      else
-      begin
         Logger.Trace('methodCall not assigned');
+        raise new ArgumentNullException('methodcall not assigned');
       end;
+
+      var saved := _methodCallHelpers.Save(methodCall);
+      EnQueue(saved);
+      var r := new Response(cache);
+      r.Id := saved.Id;
+      exit r;
 
     end;
 

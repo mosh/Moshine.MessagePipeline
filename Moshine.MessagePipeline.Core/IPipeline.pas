@@ -8,9 +8,7 @@ type
 
   IPipeline = public interface
 
-    method InitializeAsync:Task;
-
-    method Start;
+    method StartAsync:Task;
 
     method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
     method Send<T>(methodCall: Expression<System.Action<T>>):IResponse;
@@ -19,7 +17,7 @@ type
 
     method Version:String;
 
-    method Stop;
+    method StopAsync:Task;
 
   end;
 

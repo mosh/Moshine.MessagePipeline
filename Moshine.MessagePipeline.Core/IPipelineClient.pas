@@ -9,7 +9,7 @@ uses
 type
   IPipelineClient = public interface
 
-    method InitializeAsync(parameterTypes:List<&Type>):Task;
+    method InitializeAsync:Task;
 
     method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
     method Send<T>(methodCall: Expression<System.Action<T>>):IResponse;

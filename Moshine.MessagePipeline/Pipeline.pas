@@ -48,6 +48,20 @@ type
     _parcelProcessor:ParcelProcessor;
     _scopeProvider:IScopeProvider;
 
+    method InitializeAsync:Task;
+    begin
+      Logger.Trace('Initializing');
+      await _bus.InitializeAsync;
+      await _client.InitializeAsync;
+
+      _actionSerializer := new PipelineSerializer<SavedAction>(_typeFinder.SerializationTypes.ToList);
+      _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache, _scopeProvider);
+
+      SetupPipeline;
+      Logger.Trace('Initialized');
+    end;
+
+
     method MessageReceiver:Task;
     begin
       try
@@ -72,21 +86,6 @@ type
         end;
       end;
 
-    end;
-
-
-
-    method InitializeAsync:Task;
-    begin
-      Logger.Trace('Initializing');
-      await _bus.InitializeAsync;
-      await _client.InitializeAsync(_typeFinder.SerializationTypes.ToList);
-
-      _actionSerializer := new PipelineSerializer<SavedAction>(_typeFinder.SerializationTypes.ToList);
-      _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache, _scopeProvider);
-
-      SetupPipeline;
-      Logger.Trace('Initialized');
     end;
 
     method SetupPipeline;
@@ -166,13 +165,13 @@ type
       tokenSource := new CancellationTokenSource;
       token := tokenSource.Token;
 
-      _client := new PipelineClient(bus, _cache);
+      _client := new PipelineClient(bus, _cache, typeFinder);
 
       Logger.Trace('constructed');
 
     end;
 
-    method Stop;
+    method StopAsync:Task;
     begin
       Logger.Trace('Token cancelled');
       tokenSource.Cancel;
@@ -189,15 +188,17 @@ type
       end;
 
       Logger.Trace('Waiting to stop');
-      Task.WaitAll(t);
+      await Task.WhenAll(t);
       Logger.Trace('Stopped');
 
     end;
 
 
-    method Start;
+    method StartAsync:Task;
     begin
       Logger.Trace('Start');
+
+      await InitializeAsync;
 
       t := Task.Factory.StartNew( () -> MessageReceiver, token);
 

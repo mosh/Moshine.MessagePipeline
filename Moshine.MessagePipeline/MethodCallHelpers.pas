@@ -20,7 +20,7 @@ type
       begin
         var message := 'Not a static or instance method';
         Logger.Debug(message);
-        raise new ApplicationException(message);
+        raise new ArgumentException(message);
       end;
 
       var saved := new SavedAction;
