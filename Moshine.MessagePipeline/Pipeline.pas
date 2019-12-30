@@ -208,38 +208,6 @@ type
       exit typeOf(Pipeline).Assembly.GetName.Version.ToString;
     end;
 
-    method Send<T>(methodCall: Expression<Func<T,Boolean>>): IResponse;
-    begin
-    end;
-
-    method Send<T>(methodCall: Expression<Func<T,Double>>): IResponse;
-    begin
-    end;
-
-    method Send<T>(methodCall: Expression<Func<T,Integer>>): IResponse;
-    begin
-    end;
-
-    method Send<T>(methodCall: Expression<Func<T,LongWord>>): IResponse;
-    begin
-    end;
-
-    method Send<T>(methodCall: Expression<Func<T,ShortInt>>): IResponse;
-    begin
-    end;
-
-    method Send<T>(methodCall: Expression<Func<T,Single>>): IResponse;
-    begin
-    end;
-
-    method Send<T>(methodCall: Expression<Func<T,SmallInt>>): IResponse;
-    begin
-    end;
-
-    method Send<T>(methodCall: Expression<Func<T,Word>>): IResponse;
-    begin
-    end;
-
     method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
     begin
       exit await _client.SendAsync<T>(methodCall);
