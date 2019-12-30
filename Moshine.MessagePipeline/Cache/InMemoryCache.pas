@@ -2,7 +2,6 @@
 
 uses
   NLog,
-  System.Dynamic,
   Microsoft.Extensions.Caching.Memory,
   Moshine.MessagePipeline.Core,
   Newtonsoft.Json;
