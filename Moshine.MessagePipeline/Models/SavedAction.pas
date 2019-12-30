@@ -9,7 +9,6 @@ uses
 
 type
 
-  [KnownType(typeOf(DynamicDomainObject))]
   [DataContract]
   SavedAction = public class
   public
