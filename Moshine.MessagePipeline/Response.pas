@@ -31,7 +31,7 @@ type
 
       var source := new CancellationTokenSource;
       var token := source.Token;
-      var obj:T := nil;
+      var obj:T := default(T);
 
       var pollingTask := Task.Factory.StartNew(() ->
         begin

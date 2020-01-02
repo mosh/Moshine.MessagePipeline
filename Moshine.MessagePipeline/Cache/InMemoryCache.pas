@@ -24,7 +24,7 @@ type
 
     method Get<T>(key:String):T;
     begin
-      var obj:T := nil;
+      var obj:T := default(T);
       var value := _cache.Get(key);
       if(assigned(value))then
       begin
