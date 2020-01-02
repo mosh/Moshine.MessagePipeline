@@ -31,41 +31,52 @@ type
 
       var source := new CancellationTokenSource;
       var token := source.Token;
-      var obj:T := default(T);
 
-      var pollingTask := Task.Factory.StartNew(() ->
+      var pollingTask := Task.Run(() ->
+
         begin
+
+          var cacheResult : tuple of (Boolean,T);
+          var obj:T := default(T);
 
           repeat
             token.ThrowIfCancellationRequested;
-            obj := cache.Get<T>(Id.ToString);
-          until (assigned(obj));
+            cacheResult := cache.Get<T>(Id.ToString);
+            if(cacheResult.Item1)then
+            begin
+              obj := cacheResult.Item2;
+            end;
+          until (cacheResult.Item1);
+
+          exit obj;
+
         end,
         token);
 
       var cancelTask := Task.Factory.StartNew(() ->
         begin
-          Thread.Sleep(new TimeSpan(0,0,MaximumWaitTimeInSeconds));
+          Thread.Sleep(TimeSpan.FromSeconds(MaximumWaitTimeInSeconds));
           source.Cancel;
         end,
         token);
 
-        try
-          await Task.WhenAny(cancelTask,pollingTask);
-        except
-          on E:Exception do
-            begin
-              Logger.Trace('Caught exception in WhenAny');
-            end;
-        end;
+      try
+        await Task.WhenAny(cancelTask,pollingTask);
+      except
+        on E:Exception do
+          begin
+            Logger.Trace('Caught exception in WhenAny');
+          end;
+      end;
 
-        if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
-        begin
-          Logger.Trace('Returning value');
-          exit obj;
-        end;
-        Logger.Trace('Returning nil');
-        exit nil;
+      if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
+      begin
+        Logger.Trace('Returning value');
+        exit pollingTask.Result;
+      end;
+      Logger.Trace('Returning default');
+      exit default(T);
+
     end;
 
 

@@ -4,7 +4,7 @@ type
 
   ICache = public interface
     method &Add(key:String;value:Object);
-    method Get<T>(key:String):T;
+    method Get<T>(key:String):tuple of (Boolean, T);
   end;
 
 end.
