@@ -177,8 +177,10 @@ type
       tokenSource.Cancel;
 
       processMessage.Complete;
+
       Logger.Trace('Stopped processing messages');
-      if(not finishProcessing.Completion.Wait(new TimeSpan(0,0,0,30))) then
+
+      if(not finishProcessing.Completion.Wait(TimeSpan.FromSeconds(30))) then
       begin
         Logger.Trace('Timed out waiting after 30 seconds for finish processing messages');
       end
