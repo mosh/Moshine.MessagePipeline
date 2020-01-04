@@ -74,8 +74,7 @@ type
 
     method CompleteAsync:Task;
     begin
-      _bus.DeleteMessage(_message);
-      exit Task.CompletedTask;
+      await _bus.DeleteMessageAsync(_message);
     end;
 
   end;

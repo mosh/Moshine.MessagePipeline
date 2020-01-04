@@ -116,7 +116,7 @@ type
       await SendMessageAsync(amazonMessage.GetBody, amazonMessage.Id);
     end;
 
-    method DeleteMessage(message:Message);
+    method DeleteMessageAsync(message:Message):Task;
     begin
       Guard;
       var deleteMessageRequest := new DeleteMessageRequest();
@@ -124,7 +124,7 @@ type
       deleteMessageRequest.QueueUrl := _url.QueueUrl;
       deleteMessageRequest.ReceiptHandle := message.ReceiptHandle;
 
-      _client.DeleteMessageAsync(deleteMessageRequest).Wait;
+      await _client.DeleteMessageAsync(deleteMessageRequest);
     end;
 
     method ReturnMessage(message:Message);
