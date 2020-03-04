@@ -32,6 +32,21 @@ type
     begin
       Logger.Info('Initialize');
 
+      if(String.IsNullOrEmpty(_topicName))then
+      begin
+        raise new ArgumentException('topicName has not been set');
+      end;
+
+      if(String.IsNullOrEmpty(_connectionString))then
+      begin
+        raise new ArgumentException('connectionString has not been set');
+      end;
+
+      if(String.IsNullOrEmpty(_subscriptionName))then
+      begin
+        raise new ArgumentException('subscriptionName has not been set');
+      end;
+
       var client := new ManagementClient(_connectionString);
 
       if (not await client.SubscriptionExistsAsync(_topicName,_subscriptionName)) then
