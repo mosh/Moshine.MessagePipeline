@@ -1,8 +1,8 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
-  NLog,
   System.Collections.Generic,
   System.Linq,
   System.Linq.Expressions,
@@ -12,7 +12,7 @@ type
 
   PipelineClient = public class(IPipelineClient)
   private
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+    property Logger: ILogger;
 
     _actionSerializer:PipelineSerializer<SavedAction>;
     _bus:IBus;
@@ -22,55 +22,56 @@ type
 
     method EnQueue(someAction:SavedAction);
     begin
-      Logger.Trace('Entering');
+      Logger.LogTrace('Entering');
       var stringRepresentation := _actionSerializer.Serialize(someAction);
-      Logger.Trace('SendAsync');
+      Logger.LogTrace('SendAsync');
       _bus.SendAsync(stringRepresentation, someAction.Id.ToString).Wait;
-      Logger.Trace('SentAsync');
+      Logger.LogTrace('SentAsync');
 
     end;
 
     method EnQueueAsync(someAction:SavedAction):Task;
     begin
-      Logger.Trace('Entering');
+      Logger.LogTrace('Entering');
       var stringRepresentation := _actionSerializer.Serialize(someAction);
-      Logger.Trace('SendAsync');
+      Logger.LogTrace('SendAsync');
       await _bus.SendAsync(stringRepresentation, someAction.Id.ToString);
-      Logger.Trace('SentAsync');
+      Logger.LogTrace('SentAsync');
 
     end;
 
   public
 
-    constructor(bus:IBus;cacheImpl:ICache; typeFinder:ITypeFinder);
+    constructor(bus:IBus;cacheImpl:ICache; typeFinder:ITypeFinder; loggerImpl:ILogger);
     begin
+      Logger := loggerImpl;
       _bus := bus;
       cache := cacheImpl;
-      _methodCallHelpers := new MethodCallHelpers;
+      _methodCallHelpers := new MethodCallHelpers(Logger);
       _typeFinder := typeFinder;
-      Logger.Trace('Exiting');
+      Logger.LogTrace('Exiting');
     end;
 
     method InitializeAsync:Task;
     begin
-      Logger.Trace('Entering');
+      Logger.LogTrace('Entering');
       await _bus.InitializeAsync;
       _actionSerializer := new PipelineSerializer<SavedAction>(_typeFinder.SerializationTypes.ToList);
-      Logger.Trace('Exiting');
+      Logger.LogTrace('Exiting');
     end;
 
     method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
     begin
       if(assigned(methodCall))then
       begin
-        Logger.Trace('methodCall assigned');
+        Logger.LogTrace('methodCall assigned');
         if(assigned(_methodCallHelpers))then
         begin
-          Logger.Trace('_methodCallHelpers assigned');
+          Logger.LogTrace('_methodCallHelpers assigned');
         end
         else
         begin
-          Logger.Trace('_methodCallHelpers not assigned');
+          Logger.LogTrace('_methodCallHelpers not assigned');
         end;
         var saved := _methodCallHelpers.Save(methodCall);
         await EnQueueAsync(saved);
@@ -80,7 +81,7 @@ type
       end
       else
       begin
-        Logger.Trace('methodCall not assigned');
+        Logger.LogTrace('methodCall not assigned');
       end;
 
     end;
@@ -90,14 +91,14 @@ type
     begin
       if(assigned(methodCall))then
       begin
-        Logger.Trace('methodCall assigned');
+        Logger.LogTrace('methodCall assigned');
         if(assigned(_methodCallHelpers))then
         begin
-          Logger.Trace('_methodCallHelpers assigned');
+          Logger.LogTrace('_methodCallHelpers assigned');
         end
         else
         begin
-          Logger.Trace('_methodCallHelpers not assigned');
+          Logger.LogTrace('_methodCallHelpers not assigned');
         end;
         var saved := _methodCallHelpers.Save(methodCall);
         EnQueue(saved);
@@ -107,7 +108,7 @@ type
       end
       else
       begin
-        Logger.Trace('methodCall not assigned');
+        Logger.LogTrace('methodCall not assigned');
       end;
 
     end;
@@ -116,7 +117,7 @@ type
     begin
       if(not assigned(methodCall))then
       begin
-        Logger.Trace('methodCall not assigned');
+        Logger.LogTrace('methodCall not assigned');
         raise new ArgumentNullException('methodcall not assigned');
       end;
 
@@ -132,7 +133,7 @@ type
     begin
       if(assigned(methodCall))then
       begin
-        Logger.Trace('methodCall not assigned');
+        Logger.LogTrace('methodCall not assigned');
         raise new ArgumentNullException('methodcall not assigned');
       end;
 

@@ -1,8 +1,8 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
-  NLog,
   System.Collections.Generic,
   System.Linq,
   System.Text,
@@ -12,7 +12,7 @@ uses
 type
   Response = public class(IResponse)
   private
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+    property Logger: ILogger;
 
     property cache:ICache;
   public
@@ -27,7 +27,7 @@ type
 
     method WaitForResultAsync<T>:Task<T>;
     begin
-      Logger.Trace('Started');
+      Logger.LogTrace('Started');
 
       var source := new CancellationTokenSource;
       var token := source.Token;
@@ -65,16 +65,16 @@ type
       except
         on E:Exception do
           begin
-            Logger.Trace('Caught exception in WhenAny');
+            Logger.LogTrace('Caught exception in WhenAny');
           end;
       end;
 
       if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
       begin
-        Logger.Trace('Returning value');
+        Logger.LogTrace('Returning value');
         exit pollingTask.Result;
       end;
-      Logger.Trace('Returning default');
+      Logger.LogTrace('Returning default');
       exit default(T);
 
     end;
