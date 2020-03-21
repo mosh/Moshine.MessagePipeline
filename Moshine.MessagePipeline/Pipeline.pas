@@ -152,15 +152,15 @@ type
     property ServerWaitTime:TimeSpan := new TimeSpan(0,0,2);
 
 
-    constructor(factory:IServiceFactory; cache:ICache; bus:IBus; scopeProvider:IScopeProvider;typeFinder:ITypeFinder);
+    constructor(factory:IServiceFactory; cacheImpl:ICache; bus:IBus; scopeProvider:IScopeProvider;typeFinder:ITypeFinder; loggerImpl:ILogger);
     begin
       _maxRetries := 4;
-      _cache:=cache;
-      _bus:= bus;
+      _cache := cacheImpl;
+      _bus := bus;
       _scopeProvider := scopeProvider;
       _typeFinder := typeFinder;
 
-      _actionInvokerHelpers := new ActionInvokerHelpers(factory, typeFinder);
+      _actionInvokerHelpers := new ActionInvokerHelpers(factory, typeFinder, Logger);
 
       tokenSource := new CancellationTokenSource;
       token := tokenSource.Token;
