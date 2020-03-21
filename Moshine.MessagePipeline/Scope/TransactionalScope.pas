@@ -1,7 +1,8 @@
 ﻿namespace Moshine.MessagePipeline.Scope;
 
 uses
-  Moshine.MessagePipeline.Core, System.Transactions;
+  Moshine.MessagePipeline.Core,
+  System.Transactions;
 
 type
 

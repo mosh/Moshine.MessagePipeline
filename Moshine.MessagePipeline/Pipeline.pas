@@ -1,6 +1,7 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Microsoft.Extensions.Logging,
   System.Collections.Generic,
   System.Data,
   System.IO,
@@ -19,7 +20,6 @@ uses
   Moshine.MessagePipeline.Cache,
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Models,
-  NLog,
   Newtonsoft.Json;
 
 type
@@ -28,7 +28,7 @@ type
 
   private
 
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+    property Logger: ILogger;
 
     _actionSerializer:PipelineSerializer<SavedAction>;
     _maxRetries:Integer;
@@ -50,29 +50,29 @@ type
 
     method InitializeAsync:Task;
     begin
-      Logger.Trace('Initializing');
+      Logger.LogTrace('Initializing');
       await _bus.InitializeAsync;
       await _client.InitializeAsync;
 
       _actionSerializer := new PipelineSerializer<SavedAction>(_typeFinder.SerializationTypes.ToList);
-      _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache, _scopeProvider);
+      _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache, _scopeProvider, Logger);
 
       SetupPipeline;
-      Logger.Trace('Initialized');
+      Logger.LogTrace('Initialized');
     end;
 
 
     method MessageReceiver:Task;
     begin
       try
-        Logger.Trace('Starting to receive');
+        Logger.LogTrace('Starting to receive');
         repeat
 
           var someMessage := await _bus.ReceiveAsync(ServerWaitTime);
 
           if(assigned(someMessage))then
           begin
-            Logger.Trace('Posting message');
+            Logger.LogTrace('Posting message');
             var parcel := new MessageParcel(Message := someMessage);
             processMessage.Post(parcel);
           end;
@@ -81,7 +81,7 @@ type
       except
         on e:Exception do
         begin
-          Logger.Error(e,'Error receiving messages');
+          Logger.LogError(e,'Error receiving messages');
           raise;
         end;
       end;
@@ -90,17 +90,17 @@ type
 
     method SetupPipeline;
     begin
-      Logger.Trace('SetupPipeline');
+      Logger.LogTrace('SetupPipeline');
 
       processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel ->
           begin
             try
-              Logger.Trace('ProcessMessage');
+              Logger.LogTrace('ProcessMessage');
               await _parcelProcessor.ProcessMessageAsync(parcel);
             except
               on e:Exception do
               begin
-                Logger.Error(e,'Exception in processMessage Block');
+                Logger.LogError(e,'Exception in processMessage Block');
                 parcel.State := MessageStateEnum.Faulted;
                 parcel.ReTryCount := parcel.ReTryCount+1;
               end;
@@ -112,14 +112,14 @@ type
 
       faultedInProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
-            Logger.Trace('Fault in processing');
+            Logger.LogTrace('Fault in processing');
             try
               await _parcelProcessor.FaultedInProcessingAsync(parcel);
 
             except
               on e:Exception do
               begin
-                Logger.Error(e,'Exception in faultedInProcessing Block');
+                Logger.LogError(e,'Exception in faultedInProcessing Block');
                 raise;
               end;
             end;
@@ -129,11 +129,11 @@ type
           begin
             try
               await _parcelProcessor.FinishProcessingAsync(parcel);
-              Logger.Trace('Finished processing');
+              Logger.LogTrace('Finished processing');
             except
               on e:Exception do
               begin
-                Logger.Error(e,'exception in finishProcessing block');
+                Logger.LogError(e,'exception in finishProcessing block');
                 raise;
               end;
             end;
@@ -154,6 +154,8 @@ type
 
     constructor(factory:IServiceFactory; cacheImpl:ICache; bus:IBus; scopeProvider:IScopeProvider;typeFinder:ITypeFinder; loggerImpl:ILogger);
     begin
+
+      Logger := loggerImpl;
       _maxRetries := 4;
       _cache := cacheImpl;
       _bus := bus;
@@ -165,40 +167,40 @@ type
       tokenSource := new CancellationTokenSource;
       token := tokenSource.Token;
 
-      _client := new PipelineClient(bus, _cache, typeFinder);
+      _client := new PipelineClient(bus, _cache, typeFinder, Logger);
 
-      Logger.Trace('constructed');
+      Logger.LogTrace('constructed');
 
     end;
 
     method StopAsync:Task;
     begin
-      Logger.Trace('Token cancelled');
+      Logger.LogTrace('Token cancelled');
       tokenSource.Cancel;
 
       processMessage.Complete;
 
-      Logger.Trace('Stopped processing messages');
+      Logger.LogTrace('Stopped processing messages');
 
       if(not finishProcessing.Completion.Wait(TimeSpan.FromSeconds(30))) then
       begin
-        Logger.Trace('Timed out waiting after 30 seconds for finish processing messages');
+        Logger.LogTrace('Timed out waiting after 30 seconds for finish processing messages');
       end
       else
       begin
-        Logger.Trace('Stopped finish processing messages');
+        Logger.LogTrace('Stopped finish processing messages');
       end;
 
-      Logger.Trace('Waiting to stop');
+      Logger.LogTrace('Waiting to stop');
       await Task.WhenAll(t);
-      Logger.Trace('Stopped');
+      Logger.LogTrace('Stopped');
 
     end;
 
 
     method StartAsync:Task;
     begin
-      Logger.Trace('Start');
+      Logger.LogTrace('Start');
 
       await InitializeAsync;
 
