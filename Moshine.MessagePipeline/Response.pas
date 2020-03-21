@@ -1,8 +1,8 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
-  NLog,
   System.Collections.Generic,
   System.Linq,
   System.Text,
@@ -10,24 +10,26 @@ uses
   System.Threading.Tasks;
 
 type
+
   Response = public class(IResponse)
   private
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+    property Logger: ILogger;
+    property Cache:ICache;
 
-    property cache:ICache;
   public
     property MaximumWaitTimeInSeconds:Integer := 30;
 
     property Id:Guid;
 
-    constructor(cacheImpl:ICache);
+    constructor(cacheImpl:ICache; loggerImpl:ILogger);
     begin
-      cache := cacheImpl;
+      Cache := cacheImpl;
+      Logger := loggerImpl;
     end;
 
     method WaitForResultAsync<T>:Task<T>;
     begin
-      Logger.Trace('Started');
+      Logger.LogTrace('Started');
 
       var source := new CancellationTokenSource;
       var token := source.Token;
@@ -41,7 +43,7 @@ type
 
           repeat
             token.ThrowIfCancellationRequested;
-            cacheResult := cache.Get<T>(Id.ToString);
+            cacheResult := Cache.Get<T>(Id.ToString);
             if(cacheResult.Item1)then
             begin
               obj := cacheResult.Item2;
@@ -65,16 +67,16 @@ type
       except
         on E:Exception do
           begin
-            Logger.Trace('Caught exception in WhenAny');
+            Logger.LogTrace('Caught exception in WhenAny');
           end;
       end;
 
       if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
       begin
-        Logger.Trace('Returning value');
+        Logger.LogTrace('Returning value');
         exit pollingTask.Result;
       end;
-      Logger.Trace('Returning default');
+      Logger.LogTrace('Returning default');
       exit default(T);
 
     end;

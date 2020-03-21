@@ -1,14 +1,15 @@
 ﻿namespace Moshine.MessagePipeline.Scope;
 
 uses
-  Moshine.MessagePipeline.Core, NLog;
+  Microsoft.Extensions.Logging,
+  Moshine.MessagePipeline.Core;
 
 type
 
   NonTransactionalScope = public class(IScope)
   private
     disposed:Boolean := false;
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+    property Logger: ILogger;
   protected
 
     method Dispose(disposing:Boolean);
@@ -24,9 +25,9 @@ type
 
   public
 
-    constructor;
+    constructor(loggerImpl:ILogger);
     begin
-
+      Logger := loggerImpl;
     end;
 
     method Dispose;
@@ -37,7 +38,7 @@ type
 
     method Complete;
     begin
-      Logger.Info('Complete called');
+      Logger.LogInformation('Complete called');
     end;
 
   end;

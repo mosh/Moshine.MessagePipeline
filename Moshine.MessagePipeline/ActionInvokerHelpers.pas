@@ -1,15 +1,16 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
-  NLog,
-  System.Linq, System.Threading.Tasks;
+  System.Linq,
+  System.Threading.Tasks;
 
 type
 
   ActionInvokerHelpers = public class
   private
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+    property Logger: ILogger;
 
     _factory:IServiceFactory;
     _typeFinder:ITypeFinder;
@@ -21,10 +22,11 @@ type
 
   public
 
-    constructor(factory:IServiceFactory; typeFinder:ITypeFinder);
+    constructor(factory:IServiceFactory; typeFinder:ITypeFinder; loggerImpl:ILogger);
     begin
       _factory := factory;
       _typeFinder := typeFinder;
+      Logger := loggerImpl;
     end;
 
     method InvokeActionAsync(someAction:SavedAction):Task<Object>;
@@ -32,7 +34,7 @@ type
 
       if(not assigned(someAction))then
       begin
-        Logger.Debug('unsigned someAction');
+        Logger.LogDebug('unsigned someAction');
         raise new ApplicationException('unassigned someAction');
       end;
 
@@ -41,7 +43,7 @@ type
       if(not assigned(someType))then
       begin
         var message := $'Type {someAction.&Type} not found';
-        Logger.Debug(message);
+        Logger.LogDebug(message);
         raise new Exception(message);
       end;
 
@@ -52,14 +54,14 @@ type
         raise new Exception($'Service for Type {someType.Name} not implemented');
       end;
 
-      Logger.Trace('InvokeAction someType.GetMethod');
+      Logger.LogTrace('InvokeAction someType.GetMethod');
 
       var methodInfo := someType.GetMethod(someAction.&Method);
 
       if(not assigned(methodInfo))then
       begin
         var message := $'Method for Type {someType.Name} not found';
-        Logger.Debug(message);
+        Logger.LogDebug(message);
         raise new Exception(message);
       end;
 

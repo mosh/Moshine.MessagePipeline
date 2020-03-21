@@ -1,16 +1,17 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
+  Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Models,
-  NLog, System.Threading.Tasks;
+  System.Threading.Tasks;
 
 type
 
   ParcelProcessor = public class
 
   private
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+    property Logger: ILogger;
 
 
     _actionSerializer:PipelineSerializer<SavedAction>;
@@ -21,18 +22,18 @@ type
 
     method LoadAsync(someAction:SavedAction):Task;
     begin
-      Logger.Trace('Invoking action');
+      Logger.LogTrace('Invoking action');
 
       var returnValue := await _actionInvokerHelpers.InvokeActionAsync(someAction);
 
       if(assigned(returnValue))then
       begin
-        Logger.Trace('Setting value from invoked action');
+        Logger.LogTrace('Setting value from invoked action');
         _cache.Add(someAction.Id.ToString,returnValue);
       end
       else
       begin
-        Logger.Trace('No value returned from invoked action');
+        Logger.LogTrace('No value returned from invoked action');
       end;
 
     end;
@@ -41,13 +42,14 @@ type
   public
 
     constructor(bus:IBus; actionSerializer:PipelineSerializer<SavedAction>;actionInvokerHelpers:ActionInvokerHelpers;
-      cache:ICache; scopeProvider:IScopeProvider);
+      cache:ICache; scopeProvider:IScopeProvider;loggerImpl:ILogger);
     begin
       _actionSerializer := actionSerializer;
       _actionInvokerHelpers := actionInvokerHelpers;
       _bus := bus;
       _cache := cache;
       _scopeProvider := scopeProvider;
+      Logger := loggerImpl;
     end;
 
     method ProcessMessageAsync(parcel:MessageParcel):Task;
@@ -60,31 +62,31 @@ type
         if(String.IsNullOrEmpty(body))then
         begin
           var message := 'Message body is empty';
-          Logger.Debug(message);
+          Logger.LogDebug(message);
           raise new ApplicationException(message);
         end
         else
         begin
-          Logger.Trace('got body');
+          Logger.LogTrace('got body');
         end;
 
         var savedAction := _actionSerializer.Deserialize<SavedAction>(body);
 
         using scope := _scopeProvider.Provide do
         begin
-          Logger.Trace('LoadAction');
+          Logger.LogTrace('LoadAction');
           await LoadAsync(savedAction);
-          Logger.Trace('Loaded Action');
+          Logger.LogTrace('Loaded Action');
           scope.Complete;
         end;
 
         parcel.State := MessageStateEnum.Processed;
-        Logger.Trace('Processed message');
+        Logger.LogTrace('Processed message');
       except
         on E:Exception do
         begin
           var message := 'Failed to process message';
-          Logger.Error(E,message);
+          Logger.LogError(E,message);
           raise;
         end;
 
@@ -94,7 +96,7 @@ type
 
     method FaultedInProcessingAsync(parcel:MessageParcel):Task;
     begin
-      Logger.Trace('FaultedInProcessing');
+      Logger.LogTrace('FaultedInProcessing');
 
       using scope := _scopeProvider.Provide do
       begin
@@ -108,7 +110,7 @@ type
 
     method FinishProcessingAsync(parcel:MessageParcel):Task;
     begin
-      Logger.Trace('Finish Processing');
+      Logger.LogTrace('Finish Processing');
       using scope := _scopeProvider.Provide do
       begin
         await parcel.Message.CompleteAsync;
