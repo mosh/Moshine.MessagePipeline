@@ -5,8 +5,8 @@ uses
   Amazon.Runtime.CredentialManagement,
   Amazon.SQS,
   Amazon.SQS.Model,
+  Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
-  NLog,
   System,
   System.Linq,
   System.Threading.Tasks;
@@ -15,7 +15,7 @@ type
 
   AmazonSQSBus = public class(IBus)
   private
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+    property Logger: ILogger;
 
     _config:AmazonSQSConfig;
     _credentials:AWSCredentials;
@@ -57,12 +57,9 @@ type
 
     end;
 
-
-
-  protected
   public
 
-    constructor (credentialsFilename:String;profileName:String; serviceUrl:String;queueName:String;accountId:String);
+    constructor (credentialsFilename:String;profileName:String; serviceUrl:String;queueName:String;accountId:String;loggerImpl:ILogger);
     begin
 
       _serviceUrl := serviceUrl;
@@ -74,6 +71,8 @@ type
 
       var chain := new CredentialProfileStoreChain(credentialsFilename);
       chain.TryGetAWSCredentials(profileName, out _credentials);
+
+      Logger := loggerImpl;
 
 
     end;

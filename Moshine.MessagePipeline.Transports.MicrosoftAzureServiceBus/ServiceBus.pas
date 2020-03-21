@@ -1,7 +1,7 @@
 ﻿namespace Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus;
 
 uses
-  NLog,
+  Microsoft.Extensions.Logging,
   Microsoft.Azure.ServiceBus,
   Microsoft.Azure.ServiceBus.Core,
   Microsoft.Azure.ServiceBus.Management,
@@ -13,7 +13,7 @@ type
 
   ServiceBus = public class(IBus)
   private
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+    property Logger: ILogger;
 
     _topicName:String;
     _subscriptionName:String;
@@ -21,16 +21,17 @@ type
     _topicClient:TopicClient;
     _subscriptionReceiver:IMessageReceiver;
   public
-    constructor(connectionString:String; topicName:String; subscriptionName:String);
+    constructor(connectionString:String; topicName:String; subscriptionName:String; loggerImpl:ILogger);
     begin
       _topicName := topicName;
       _connectionString := connectionString;
       _subscriptionName := subscriptionName;
+      Logger := loggerImpl;
     end;
 
     method InitializeAsync:Task;
     begin
-      Logger.Info('Initialize');
+      Logger.LogInformation('Initialize');
 
       if(String.IsNullOrEmpty(_topicName))then
       begin
@@ -56,7 +57,7 @@ type
 
       var subscription := await client.GetSubscriptionAsync(_topicName, _subscriptionName);
 
-      Logger.Info($'MaxDeliveryCount is {subscription.MaxDeliveryCount} EnableDeadLetteringOnMessageExpiration {subscription.EnableDeadLetteringOnMessageExpiration}');
+      Logger.LogInformation($'MaxDeliveryCount is {subscription.MaxDeliveryCount} EnableDeadLetteringOnMessageExpiration {subscription.EnableDeadLetteringOnMessageExpiration}');
 
       if(not subscription.EnableDeadLetteringOnMessageExpiration)then
       begin
@@ -72,18 +73,18 @@ type
     method SendAsync(message: IMessage): Task;
     begin
       var internalMessage := (message as ServiceBusMessage).InternalMessage;
-      Logger.Info('Send');
+      Logger.LogInformation('Send');
       await _topicClient.SendAsync(internalMessage);
-      Logger.Info('Sent');
+      Logger.LogInformation('Sent');
     end;
 
     method SendAsync(messageContent: String; id: String): Task;
     begin
       var message := new Message(Encoding.UTF8.GetBytes(messageContent));
       message.UserProperties.Add('Id',id);
-      Logger.Info('Send');
+      Logger.LogInformation('Send');
       await _topicClient.SendAsync(message);
-      Logger.Info('Sent');
+      Logger.LogInformation('Sent');
     end;
 
     method ReceiveAsync(serverWaitTime: TimeSpan): Task<IMessage>;
@@ -92,15 +93,15 @@ type
 
       if(assigned(receivedMessage))then
       begin
-        Logger.Info('Received message');
-        exit new ServiceBusMessage(_subscriptionReceiver, receivedMessage)
+        Logger.LogInformation('Received message');
+        exit new ServiceBusMessage(_subscriptionReceiver, receivedMessage, Logger)
       end;
       exit nil;
     end;
 
     method CannotBeProcessedAsync(message: IMessage): Task;
     begin
-      Logger.Info('CannotBeProcessed');
+      Logger.LogInformation('CannotBeProcessed');
 
       var clone := message.Clone;
       await clone.AsErrorAsync;

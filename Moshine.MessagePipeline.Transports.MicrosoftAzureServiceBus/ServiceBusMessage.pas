@@ -1,39 +1,40 @@
 ﻿namespace Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus;
 
 uses
+  Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
   Microsoft.Azure.ServiceBus,
   Microsoft.Azure.ServiceBus.Core,
-  Nlog,
   System.Text,
   System.Threading.Tasks;
 type
 
   ServiceBusMessage = public class(IMessage)
   private
-    class property Logger: Logger := LogManager.GetCurrentClassLogger;
+    property Logger: ILogger;
 
     _message:Message;
     _receiver:IMessageReceiver;
   public
 
-    constructor(receiver:IMessageReceiver; message:Message);
+    constructor(receiver:IMessageReceiver; message:Message; loggerImpl:ILogger);
     begin
       _message := message;
       _receiver := receiver;
+      Logger := loggerImpl;
     end;
 
     constructor(message:Message);
     begin
       _message := message;
-      Logger.Trace($'DeliveryCoint {_message.SystemProperties.DeliveryCount}');
+      Logger.LogTrace($'DeliveryCoint {_message.SystemProperties.DeliveryCount}');
 
     end;
 
 
     method Clone: IMessage;
     begin
-      exit new ServiceBusMessage(_receiver, _message.Clone);
+      exit new ServiceBusMessage(_receiver, _message.Clone, Logger);
     end;
 
     method GetBody: String;
@@ -48,7 +49,7 @@ type
         raise new ApplicationException('Cannot AsError receiver not assigned');
       end;
       await _receiver.AbandonAsync(_message.SystemProperties.LockToken);
-      Console.WriteLine('AsError');
+      Logger.LogInformation('AsError');
     end;
 
     method CompleteAsync:Task;
@@ -58,7 +59,7 @@ type
         raise new ApplicationException('Cannot complete receiver not assigned');
       end;
       await _receiver.CompleteAsync(_message.SystemProperties.LockToken);
-      Console.WriteLine('Completed');
+      Logger.LogInformation('Completed');
     end;
 
     property InternalMessage:Message read
