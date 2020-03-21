@@ -75,7 +75,7 @@ type
         end;
         var saved := _methodCallHelpers.Save(methodCall);
         await EnQueueAsync(saved);
-        var r := new Response(cache);
+        var r := new Response(cache,Logger);
         r.Id := saved.Id;
         exit r;
       end
@@ -102,7 +102,7 @@ type
         end;
         var saved := _methodCallHelpers.Save(methodCall);
         EnQueue(saved);
-        var r := new Response(cache);
+        var r := new Response(cache, Logger);
         r.Id := saved.Id;
         exit r;
       end
@@ -123,7 +123,7 @@ type
 
       var saved := _methodCallHelpers.Save(methodCall);
       await EnQueueAsync(saved);
-      var r := new Response(cache);
+      var r := new Response(cache, Logger);
       r.Id := saved.Id;
       exit r;
     end;
@@ -139,7 +139,7 @@ type
 
       var saved := _methodCallHelpers.Save(methodCall);
       EnQueue(saved);
-      var r := new Response(cache);
+      var r := new Response(cache, Logger);
       r.Id := saved.Id;
       exit r;
 

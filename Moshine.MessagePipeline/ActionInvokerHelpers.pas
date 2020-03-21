@@ -22,10 +22,11 @@ type
 
   public
 
-    constructor(factory:IServiceFactory; typeFinder:ITypeFinder);
+    constructor(factory:IServiceFactory; typeFinder:ITypeFinder; loggerImpl:ILogger);
     begin
       _factory := factory;
       _typeFinder := typeFinder;
+      Logger := loggerImpl;
     end;
 
     method InvokeActionAsync(someAction:SavedAction):Task<Object>;

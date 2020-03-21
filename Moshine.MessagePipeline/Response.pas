@@ -10,19 +10,21 @@ uses
   System.Threading.Tasks;
 
 type
+
   Response = public class(IResponse)
   private
     property Logger: ILogger;
+    property Cache:ICache;
 
-    property cache:ICache;
   public
     property MaximumWaitTimeInSeconds:Integer := 30;
 
     property Id:Guid;
 
-    constructor(cacheImpl:ICache);
+    constructor(cacheImpl:ICache; loggerImpl:ILogger);
     begin
-      cache := cacheImpl;
+      Cache := cacheImpl;
+      Logger := loggerImpl;
     end;
 
     method WaitForResultAsync<T>:Task<T>;
@@ -41,7 +43,7 @@ type
 
           repeat
             token.ThrowIfCancellationRequested;
-            cacheResult := cache.Get<T>(Id.ToString);
+            cacheResult := Cache.Get<T>(Id.ToString);
             if(cacheResult.Item1)then
             begin
               obj := cacheResult.Item2;
