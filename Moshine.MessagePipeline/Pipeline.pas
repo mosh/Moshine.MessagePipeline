@@ -19,8 +19,7 @@ uses
   System.Xml.Serialization,
   Moshine.MessagePipeline.Cache,
   Moshine.MessagePipeline.Core,
-  Moshine.MessagePipeline.Models,
-  Newtonsoft.Json;
+  Moshine.MessagePipeline.Models;
 
 type
 
@@ -152,7 +151,7 @@ type
     property ServerWaitTime:TimeSpan := new TimeSpan(0,0,2);
 
 
-    constructor(factory:IServiceFactory; cacheImpl:ICache; bus:IBus; scopeProvider:IScopeProvider;typeFinder:ITypeFinder; loggerImpl:ILogger);
+    constructor(pipelineClientImpl:IPipelineClient; factory:IServiceFactory; cacheImpl:ICache; bus:IBus; scopeProvider:IScopeProvider;typeFinder:ITypeFinder; loggerImpl:ILogger);
     begin
 
       Logger := loggerImpl;
@@ -167,7 +166,7 @@ type
       tokenSource := new CancellationTokenSource;
       token := tokenSource.Token;
 
-      _client := new PipelineClient(bus, _cache, typeFinder, Logger);
+      _client := pipelineClientImpl;
 
       Logger.LogTrace('constructed');
 
