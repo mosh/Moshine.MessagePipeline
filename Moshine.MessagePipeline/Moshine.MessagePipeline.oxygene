@@ -82,8 +82,6 @@
     <None Include="Moshine.MessagePipeline.Nuspec" />
     <Compile Include="PipelineClient.pas" />
     <Compile Include="ParcelProcessor.pas" />
-    <Compile Include="Models\MessageParcel.pas" />
-    <Compile Include="Models\SavedAction.pas" />
     <Compile Include="Scope\NonTransactionalScope.pas" />
     <Compile Include="Scope\TransactionalScope.pas" />
     <Compile Include="Scope\NonTransactionalScopeProvider.pas" />

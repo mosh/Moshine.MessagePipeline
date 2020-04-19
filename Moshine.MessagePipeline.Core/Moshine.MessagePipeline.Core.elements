@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ProductVersion>3.5</ProductVersion>
     <RootNamespace>Moshine.MessagePipeline.Core</RootNamespace>
-    <ProjectGuid>{d6fddd36-602c-49c1-b399-30852f6f8b98}</ProjectGuid>
+    <ProjectGuid>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</ProjectGuid>
     <OutputType>library</OutputType>
     <AssemblyName>Moshine.MessagePipeline.Core</AssemblyName>
     <AllowGlobals>False</AllowGlobals>
@@ -71,6 +71,9 @@
     <Compile Include="IScope.pas" />
     <Compile Include="IScopeProvider.pas" />
     <Compile Include="ITypeFinder.pas" />
+    <Compile Include="IActionInvokerHelpers.pas" />
+    <Compile Include="Models\SavedAction.pas" />
+    <Compile Include="Models\MessageParcel.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

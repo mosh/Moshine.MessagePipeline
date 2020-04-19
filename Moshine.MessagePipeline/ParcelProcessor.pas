@@ -3,7 +3,7 @@
 uses
   Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
-  Moshine.MessagePipeline.Models,
+  Moshine.MessagePipeline.Core.Models,
   System.Threading.Tasks;
 
 type
@@ -16,7 +16,7 @@ type
 
     _actionSerializer:PipelineSerializer<SavedAction>;
     _cache:ICache;
-    _actionInvokerHelpers:ActionInvokerHelpers;
+    _actionInvokerHelpers:IActionInvokerHelpers;
     _bus:IBus;
     _scopeProvider:IScopeProvider;
 
@@ -41,7 +41,7 @@ type
 
   public
 
-    constructor(bus:IBus; actionSerializer:PipelineSerializer<SavedAction>;actionInvokerHelpers:ActionInvokerHelpers;
+    constructor(bus:IBus; actionSerializer:PipelineSerializer<SavedAction>;actionInvokerHelpers:IActionInvokerHelpers;
       cache:ICache; scopeProvider:IScopeProvider;loggerImpl:ILogger);
     begin
       _actionSerializer := actionSerializer;

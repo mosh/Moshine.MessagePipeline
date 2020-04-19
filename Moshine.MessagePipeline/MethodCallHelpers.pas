@@ -2,6 +2,7 @@
 
 uses
   Microsoft.Extensions.Logging,
+  Moshine.MessagePipeline.Core.Models,
   System.Collections.Generic,
   System.Collections.ObjectModel,
   System.Linq.Expressions,

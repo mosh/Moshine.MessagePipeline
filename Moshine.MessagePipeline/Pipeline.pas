@@ -19,7 +19,7 @@ uses
   System.Xml.Serialization,
   Moshine.MessagePipeline.Cache,
   Moshine.MessagePipeline.Core,
-  Moshine.MessagePipeline.Models;
+  Moshine.MessagePipeline.Core.Models;
 
 type
 
@@ -42,7 +42,7 @@ type
     _bus:IBus;
     _typeFinder:ITypeFinder;
 
-    _actionInvokerHelpers:ActionInvokerHelpers;
+    _actionInvokerHelpers:IActionInvokerHelpers;
     _client:IPipelineClient;
     _parcelProcessor:ParcelProcessor;
     _scopeProvider:IScopeProvider;
@@ -151,7 +151,9 @@ type
     property ServerWaitTime:TimeSpan := new TimeSpan(0,0,2);
 
 
-    constructor(pipelineClientImpl:IPipelineClient; factory:IServiceFactory; cacheImpl:ICache; bus:IBus; scopeProvider:IScopeProvider;typeFinder:ITypeFinder; loggerImpl:ILogger);
+    constructor(pipelineClientImpl:IPipelineClient; factory:IServiceFactory; cacheImpl:ICache; bus:IBus; scopeProvider:IScopeProvider;typeFinder:ITypeFinder;
+      actionInvokeHelpersImpl : IActionInvokerHelpers;
+      loggerImpl:ILogger);
     begin
 
       Logger := loggerImpl;

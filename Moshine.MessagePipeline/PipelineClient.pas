@@ -3,6 +3,7 @@
 uses
   Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
+  Moshine.MessagePipeline.Core.Models,
   System.Collections.Generic,
   System.Linq,
   System.Linq.Expressions,

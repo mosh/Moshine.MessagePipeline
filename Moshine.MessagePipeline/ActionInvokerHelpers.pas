@@ -3,12 +3,13 @@
 uses
   Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
+  Moshine.MessagePipeline.Core.Models,
   System.Linq,
   System.Threading.Tasks;
 
 type
 
-  ActionInvokerHelpers = public class
+  ActionInvokerHelpers = public class(IActionInvokerHelpers)
   private
     property Logger: ILogger;
 
