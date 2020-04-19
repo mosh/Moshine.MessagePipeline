@@ -5,6 +5,7 @@ uses
   Microsoft.Azure.ServiceBus,
   Microsoft.Azure.ServiceBus.Core,
   Microsoft.Azure.ServiceBus.Management,
+  Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus.Models,
   Moshine.MessagePipeline.Core,
   System.Text,
   System.Threading.Tasks;
@@ -21,6 +22,12 @@ type
     _topicClient:TopicClient;
     _subscriptionReceiver:IMessageReceiver;
   public
+
+    constructor (connectionInformation:IServiceBusConnectionInformation; loggerImpl:ILogger);
+    begin
+      constructor(connectionInformation.ConnectionString, connectionInformation.TopicName, connectionInformation.subscriptionName, loggerImpl);
+    end;
+
     constructor(connectionString:String; topicName:String; subscriptionName:String; loggerImpl:ILogger);
     begin
       _topicName := topicName;

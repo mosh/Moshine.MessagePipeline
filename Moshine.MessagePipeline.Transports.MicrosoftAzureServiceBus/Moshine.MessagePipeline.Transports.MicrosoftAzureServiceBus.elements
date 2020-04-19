@@ -46,6 +46,8 @@
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="ServiceBus.pas" />
     <Compile Include="ServiceBusMessage.pas" />
+    <Compile Include="Models\ServiceBusConnectionInformation.pas" />
+    <Compile Include="Models\IServiceBusConnectionInformation.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.targets" />
 </Project>
