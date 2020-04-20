@@ -17,7 +17,7 @@ type
     _actionSerializer:PipelineSerializer<SavedAction>;
     _cache:ICache;
     _actionInvokerHelpers:IActionInvokerHelpers;
-    _bus:IBus;
+    _client:IPipelineClient;
     _scopeProvider:IScopeProvider;
 
     method LoadAsync(someAction:SavedAction):Task;
@@ -41,12 +41,12 @@ type
 
   public
 
-    constructor(bus:IBus; actionSerializer:PipelineSerializer<SavedAction>;actionInvokerHelpers:IActionInvokerHelpers;
+    constructor(clientImpl:IPipelineClient; actionSerializer:PipelineSerializer<SavedAction>;actionInvokerHelpers:IActionInvokerHelpers;
       cache:ICache; scopeProvider:IScopeProvider;loggerImpl:ILogger);
     begin
       _actionSerializer := actionSerializer;
       _actionInvokerHelpers := actionInvokerHelpers;
-      _bus := bus;
+      _client := clientImpl;
       _cache := cache;
       _scopeProvider := scopeProvider;
       Logger := loggerImpl;
@@ -101,7 +101,7 @@ type
       using scope := _scopeProvider.Provide do
       begin
 
-        await _bus.CannotBeProcessedAsync(parcel.Message);
+        await _client.CannotBeProcessedAsync(parcel);
 
         scope.Complete;
       end;
