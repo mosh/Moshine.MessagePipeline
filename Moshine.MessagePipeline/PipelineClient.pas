@@ -146,5 +146,24 @@ type
 
     end;
 
+    method ReceiveAsync(serverWaitTime:TimeSpan):Task<MessageParcel>;
+    begin
+      var someMessage := await _bus.ReceiveAsync(serverWaitTime);
+
+      if(assigned(someMessage))then
+      begin
+        exit new MessageParcel(Message := someMessage);
+      end;
+      exit nil;
+    end;
+
+    method CannotBeProcessedAsync(parcel:MessageParcel):Task;
+    begin
+      await _bus.CannotBeProcessedAsync(parcel.Message);
+
+    end;
+
+
+
   end;
 end.

@@ -29,7 +29,6 @@ type
 
     property Logger: ILogger;
 
-    _actionSerializer:PipelineSerializer<SavedAction>;
     _maxRetries:Integer;
     tokenSource:CancellationTokenSource;
     token:CancellationToken;
@@ -38,24 +37,14 @@ type
     faultedInProcessing:ActionBlock<MessageParcel>;
     t:Task;
 
-    _cache:ICache;
-    _bus:IBus;
-    _typeFinder:ITypeFinder;
-
-    _actionInvokerHelpers:IActionInvokerHelpers;
     _client:IPipelineClient;
-    _parcelProcessor:ParcelProcessor;
-    _scopeProvider:IScopeProvider;
+    _parcelProcessor:IParcelProcessor;
 
     method InitializeAsync:Task;
     begin
       Logger.LogTrace('Initializing');
 
-      await _bus.InitializeAsync;
       await _client.InitializeAsync;
-
-      _actionSerializer := new PipelineSerializer<SavedAction>(_typeFinder.SerializationTypes.ToList);
-      _parcelProcessor := new ParcelProcessor(_bus,_actionSerializer,_actionInvokerHelpers, _cache, _scopeProvider, Logger);
 
       SetupPipeline;
       Logger.LogTrace('Initialized');
@@ -66,14 +55,13 @@ type
     begin
       try
         Logger.LogTrace('Starting to receive');
+
         repeat
+          var parcel := await _client.ReceiveAsync(ServerWaitTime);
 
-          var someMessage := await _bus.ReceiveAsync(ServerWaitTime);
-
-          if(assigned(someMessage))then
+          if(assigned(parcel))then
           begin
-            Logger.LogTrace('Posting message');
-            var parcel := new MessageParcel(Message := someMessage);
+            Logger.LogTrace('Posting parcel');
             processMessage.Post(parcel);
           end;
 
@@ -152,24 +140,17 @@ type
     property ServerWaitTime:TimeSpan := new TimeSpan(0,0,2);
 
 
-    constructor(pipelineClientImpl:IPipelineClient; factory:IServiceFactory; cacheImpl:ICache; bus:IBus; scopeProvider:IScopeProvider;typeFinder:ITypeFinder;
-      actionInvokeHelpersImpl : IActionInvokerHelpers;
-      loggerImpl:ILogger);
+    constructor(clientImpl:IPipelineClient; parcelProcessorImpl:IParcelProcessor; loggerImpl:ILogger);
     begin
 
       Logger := loggerImpl;
       _maxRetries := 4;
-      _cache := cacheImpl;
-      _bus := bus;
-      _scopeProvider := scopeProvider;
-      _typeFinder := typeFinder;
-
-      _actionInvokerHelpers := actionInvokeHelpersImpl;
 
       tokenSource := new CancellationTokenSource;
       token := tokenSource.Token;
 
-      _client := pipelineClientImpl;
+      _client := clientImpl;
+      _parcelProcessor := parcelProcessorImpl;
 
       Logger.LogTrace('constructed');
 
