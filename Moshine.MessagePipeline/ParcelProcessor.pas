@@ -8,7 +8,7 @@ uses
 
 type
 
-  ParcelProcessor = public class
+  ParcelProcessor = public class(IParcelProcessor)
 
   private
     property Logger: ILogger;

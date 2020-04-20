@@ -74,6 +74,7 @@
     <Compile Include="IActionInvokerHelpers.pas" />
     <Compile Include="Models\SavedAction.pas" />
     <Compile Include="Models\MessageParcel.pas" />
+    <Compile Include="IParcelProcessor.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

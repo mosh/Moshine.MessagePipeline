@@ -50,6 +50,7 @@ type
     method InitializeAsync:Task;
     begin
       Logger.LogTrace('Initializing');
+
       await _bus.InitializeAsync;
       await _client.InitializeAsync;
 
