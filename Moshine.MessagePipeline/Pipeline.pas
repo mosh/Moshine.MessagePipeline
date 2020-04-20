@@ -163,7 +163,7 @@ type
       _scopeProvider := scopeProvider;
       _typeFinder := typeFinder;
 
-      _actionInvokerHelpers := new ActionInvokerHelpers(factory, typeFinder, Logger);
+      _actionInvokerHelpers := actionInvokeHelpersImpl;
 
       tokenSource := new CancellationTokenSource;
       token := tokenSource.Token;
