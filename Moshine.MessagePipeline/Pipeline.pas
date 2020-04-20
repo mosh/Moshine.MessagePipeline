@@ -47,6 +47,7 @@ type
       await _client.InitializeAsync;
 
       SetupPipeline;
+
       Logger.LogTrace('Initialized');
     end;
 

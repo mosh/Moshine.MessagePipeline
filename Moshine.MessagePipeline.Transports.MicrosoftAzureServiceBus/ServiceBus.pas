@@ -25,7 +25,7 @@ type
 
     constructor (connectionInformation:IServiceBusConnectionInformation; loggerImpl:ILogger);
     begin
-      constructor(connectionInformation.ConnectionString, connectionInformation.TopicName, connectionInformation.subscriptionName, loggerImpl);
+      constructor(connectionInformation.ConnectionString, connectionInformation.TopicName, connectionInformation.SubscriptionName, loggerImpl);
     end;
 
     constructor(connectionString:String; topicName:String; subscriptionName:String; loggerImpl:ILogger);

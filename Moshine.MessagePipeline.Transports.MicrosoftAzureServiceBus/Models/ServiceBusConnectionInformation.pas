@@ -5,7 +5,7 @@ type
   public
     property ConnectionString:String;
     property TopicName:String;
-    property subscriptionName:String;
+    property SubscriptionName:String;
 
   end;
 
