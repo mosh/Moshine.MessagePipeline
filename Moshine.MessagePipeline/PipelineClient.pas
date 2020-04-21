@@ -18,7 +18,6 @@ type
     _actionSerializer:PipelineSerializer<SavedAction>;
     _bus:IBus;
     _methodCallHelpers:MethodCallHelpers;
-    _typeFinder:ITypeFinder;
     cache:ICache;
 
     method EnQueue(someAction:SavedAction);
@@ -43,13 +42,13 @@ type
 
   public
 
-    constructor(bus:IBus;cacheImpl:ICache; typeFinder:ITypeFinder; loggerImpl:ILogger);
+    constructor(bus:IBus;cacheImpl:ICache; actionSerializerImpl:PipelineSerializer<SavedAction>; loggerImpl:ILogger);
     begin
       Logger := loggerImpl;
       _bus := bus;
       cache := cacheImpl;
       _methodCallHelpers := new MethodCallHelpers(Logger);
-      _typeFinder := typeFinder;
+      _actionSerializer := actionSerializerImpl;
       Logger.LogTrace('Exiting');
     end;
 
@@ -57,7 +56,6 @@ type
     begin
       Logger.LogTrace('Entering');
       await _bus.InitializeAsync;
-      _actionSerializer := new PipelineSerializer<SavedAction>(_typeFinder.SerializationTypes.ToList);
       Logger.LogTrace('Exiting');
     end;
 
