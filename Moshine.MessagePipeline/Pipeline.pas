@@ -64,6 +64,7 @@ type
           begin
             Logger.LogTrace('Posting parcel');
             processMessage.Post(parcel);
+            Logger.LogTrace('Posted parcel');
           end;
 
         until token.IsCancellationRequested;
@@ -84,8 +85,9 @@ type
       processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel ->
           begin
             try
-              Logger.LogTrace('ProcessMessage');
+              Logger.LogTrace('Process Message');
               await _parcelProcessor.ProcessMessageAsync(parcel);
+              Logger.LogTrace('Processed Message');
             except
               on e:Exception do
               begin
@@ -94,6 +96,7 @@ type
                 parcel.ReTryCount := parcel.ReTryCount+1;
               end;
             end;
+
             exit parcel;
           end,
           new ExecutionDataflowBlockOptions(MaxDegreeOfParallelism := 5)
@@ -101,10 +104,10 @@ type
 
       faultedInProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
-            Logger.LogTrace('Fault in processing');
             try
+              Logger.LogTrace('Faulting in processing');
               await _parcelProcessor.FaultedInProcessingAsync(parcel);
-
+              Logger.LogTrace('Faulted in processing');
             except
               on e:Exception do
               begin
@@ -117,6 +120,7 @@ type
       finishProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
             try
+              Logger.LogTrace('Finishing processing');
               await _parcelProcessor.FinishProcessingAsync(parcel);
               Logger.LogTrace('Finished processing');
             except

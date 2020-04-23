@@ -67,7 +67,7 @@ type
         end
         else
         begin
-          Logger.LogTrace('got body');
+          Logger.LogTrace('Got body');
         end;
 
         var savedAction := _actionSerializer.Deserialize<SavedAction>(body);
@@ -96,26 +96,25 @@ type
 
     method FaultedInProcessingAsync(parcel:MessageParcel):Task;
     begin
-      Logger.LogTrace('FaultedInProcessing');
+      Logger.LogTrace('Faulting In Processing');
 
       using scope := _scopeProvider.Provide do
       begin
-
         await _client.CannotBeProcessedAsync(parcel);
-
         scope.Complete;
       end;
-
+      Logger.LogTrace('Faulted In Processing');
     end;
 
     method FinishProcessingAsync(parcel:MessageParcel):Task;
     begin
-      Logger.LogTrace('Finish Processing');
+      Logger.LogTrace('Finishing Processing');
       using scope := _scopeProvider.Provide do
       begin
         await parcel.Message.CompleteAsync;
         scope.Complete;
       end;
+      Logger.LogTrace('Finished Processing');
 
     end;
 
