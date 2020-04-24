@@ -38,28 +38,36 @@ type
 
     method InitializeAsync:Task;
     begin
-      Logger.LogInformation('Initialize');
+      Logger.LogTrace('Initialize');
 
       if(String.IsNullOrEmpty(_topicName))then
       begin
-        raise new ArgumentException('topicName has not been set');
+        var message := 'topicName has not been set';
+        Logger.LogError(message);
+        raise new ArgumentException(message);
       end;
 
       if(String.IsNullOrEmpty(_connectionString))then
       begin
-        raise new ArgumentException('connectionString has not been set');
+        var message := 'connectionString has not been set';
+        Logger.LogError(message);
+        raise new ArgumentException(message);
       end;
 
       if(String.IsNullOrEmpty(_subscriptionName))then
       begin
-        raise new ArgumentException('subscriptionName has not been set');
+        var message := 'subscriptionName has not been set';
+        Logger.LogError(nessage);
+        raise new ArgumentException(message);
       end;
 
       var client := new ManagementClient(_connectionString);
 
       if (not await client.SubscriptionExistsAsync(_topicName,_subscriptionName)) then
       begin
-        raise new ApplicationException($'Topic {_topicName} Subscription {_subscriptionName} does not exist');
+        var message := $'Topic {_topicName} Subscription {_subscriptionName} does not exist';
+        Logger.LogError(message);
+        raise new ApplicationException(message);
       end;
 
       var subscription := await client.GetSubscriptionAsync(_topicName, _subscriptionName);
@@ -68,7 +76,9 @@ type
 
       if(not subscription.EnableDeadLetteringOnMessageExpiration)then
       begin
-        raise new ApplicationException($'Topic {_topicName} Subscription {_subscriptionName} EnableDeadLetteringOnMessageExpiration must be enabled');
+        var message := $'Topic {_topicName} Subscription {_subscriptionName} EnableDeadLetteringOnMessageExpiration must be enabled';
+        Logger.LogError(message);
+        raise new ApplicationException(message);
       end;
 
       _topicClient := new TopicClient(_connectionString, _topicName);
@@ -80,18 +90,18 @@ type
     method SendAsync(message: IMessage): Task;
     begin
       var internalMessage := (message as ServiceBusMessage).InternalMessage;
-      Logger.LogInformation('Send');
+      Logger.LogTrace('Send');
       await _topicClient.SendAsync(internalMessage);
-      Logger.LogInformation('Sent');
+      Logger.LogTrace('Sent');
     end;
 
     method SendAsync(messageContent: String; id: String): Task;
     begin
       var message := new Message(Encoding.UTF8.GetBytes(messageContent));
       message.UserProperties.Add('Id',id);
-      Logger.LogInformation('Send');
+      Logger.LogTrace('Send');
       await _topicClient.SendAsync(message);
-      Logger.LogInformation('Sent');
+      Logger.LogTrace('Sent');
     end;
 
     method ReceiveAsync(serverWaitTime: TimeSpan): Task<IMessage>;
@@ -100,7 +110,7 @@ type
 
       if(assigned(receivedMessage))then
       begin
-        Logger.LogInformation('Received message');
+        Logger.LogTrace('Received message');
         exit new ServiceBusMessage(_subscriptionReceiver, receivedMessage, Logger)
       end;
       exit nil;
@@ -108,7 +118,7 @@ type
 
     method CannotBeProcessedAsync(message: IMessage): Task;
     begin
-      Logger.LogInformation('CannotBeProcessed');
+      Logger.LogTrace('CannotBeProcessed');
 
       var clone := message.Clone;
       await clone.AsErrorAsync;

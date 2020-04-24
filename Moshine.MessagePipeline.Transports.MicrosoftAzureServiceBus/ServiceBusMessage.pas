@@ -46,20 +46,24 @@ type
     begin
       if(not assigned(_receiver))then
       begin
-        raise new ApplicationException('Cannot AsError receiver not assigned');
+        var message := 'Cannot AsError receiver not assigned';
+        Logger.LogError(message);
+        raise new ApplicationException(message);
       end;
       await _receiver.AbandonAsync(_message.SystemProperties.LockToken);
-      Logger.LogInformation('AsError');
+      Logger.LogTrace('AsError');
     end;
 
     method CompleteAsync:Task;
     begin
       if(not assigned(_receiver))then
       begin
-        raise new ApplicationException('Cannot complete receiver not assigned');
+        var message := 'Cannot complete receiver not assigned';
+        Logger.LogError(message);
+        raise new ApplicationException(message);
       end;
       await _receiver.CompleteAsync(_message.SystemProperties.LockToken);
-      Logger.LogInformation('Completed');
+      Logger.LogTrace('Completed');
     end;
 
     property InternalMessage:Message read

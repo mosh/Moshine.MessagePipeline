@@ -18,6 +18,7 @@ type
 
     method FindType(typeName:String):&Type;
     begin
+      Logger.LogInformation($'Finding type {typeName}');
       exit _typeFinder.FindServiceType(typeName);
     end;
 
@@ -39,6 +40,8 @@ type
         raise new ApplicationException('unassigned someAction');
       end;
 
+      Logger.LogInformation($'Invoking Method {someAction.Method} on Type {someAction.Type}');
+
       var someType := FindType(someAction.&Type);
 
       if(not assigned(someType))then
@@ -48,14 +51,14 @@ type
         raise new Exception(message);
       end;
 
+      Logger.Trace($'Found type {someAction.&Type}');
+
       var obj := _factory.Create(someType);
 
       if(not assigned(obj))then
       begin
         raise new Exception($'Service for Type {someType.Name} not implemented');
       end;
-
-      Logger.LogTrace('InvokeAction someType.GetMethod');
 
       var methodInfo := someType.GetMethod(someAction.&Method);
 
@@ -66,13 +69,18 @@ type
         raise new Exception(message);
       end;
 
+      Logger.Trace($'Found method {someType.Name} on Type {someType.Type}');
+
       if(someAction.Function)then
       begin
+        Logger.LogTrace($'Method {someType.Name} on Type {someType.Type} returns value');
 
         var invokeObj := methodInfo.Invoke(obj,someAction.Parameters.ToArray);
 
         if((methodInfo.ReturnType.BaseType = typeOf(Task)) or (methodInfo.ReturnType = typeOf(Task)))then
         begin
+          Logger.LogTrace($'Method {someType.Name} on Type {someType.Type} returns Task'
+
           var aTask:Task := Task(invokeObj);
           await aTask;
 
@@ -90,6 +98,8 @@ type
       end
       else
       begin
+        Logger.LogTrace($'Method {someType.Name} on Type {someType.Type} has no return value');
+
         if(someAction.Parameters.Count > 0 )then
         begin
           methodInfo.Invoke(obj,someAction.Parameters.ToArray);

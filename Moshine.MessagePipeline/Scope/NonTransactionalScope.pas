@@ -38,7 +38,7 @@ type
 
     method Complete;
     begin
-      Logger.LogInformation('Complete called');
+      Logger.LogTrace('Complete called');
     end;
 
   end;
