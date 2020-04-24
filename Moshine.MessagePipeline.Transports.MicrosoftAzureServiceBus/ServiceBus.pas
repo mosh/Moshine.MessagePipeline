@@ -57,7 +57,7 @@ type
       if(String.IsNullOrEmpty(_subscriptionName))then
       begin
         var message := 'subscriptionName has not been set';
-        Logger.LogError(nessage);
+        Logger.LogError(message);
         raise new ArgumentException(message);
       end;
 
