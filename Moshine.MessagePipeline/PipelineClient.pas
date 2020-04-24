@@ -54,9 +54,9 @@ type
 
     method InitializeAsync:Task;
     begin
-      Logger.LogTrace('Entering');
+      Logger.LogTrace('Initializing');
       await _bus.InitializeAsync;
-      Logger.LogTrace('Exiting');
+      Logger.LogTrace('Initialized');
     end;
 
     method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
@@ -66,11 +66,11 @@ type
         Logger.LogTrace('methodCall assigned');
         if(assigned(_methodCallHelpers))then
         begin
-          Logger.LogTrace('_methodCallHelpers assigned');
+          Logger.LogTrace('methodCallHelpers assigned');
         end
         else
         begin
-          Logger.LogTrace('_methodCallHelpers not assigned');
+          Logger.LogTrace('methodCallHelpers not assigned');
         end;
         var saved := _methodCallHelpers.Save(methodCall);
         await EnQueueAsync(saved);
