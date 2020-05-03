@@ -31,7 +31,7 @@
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
     </ProjectReference>
-    <NuGetReference Include="Microsoft.Azure.ServiceBus:[4.0.0]" />
+    <NuGetReference Include="Microsoft.Azure.ServiceBus:[4.1.3]" />
     <NuGetReference Include="Microsoft.Extensions.Logging:[3.0.0]" />
   </ItemGroup>
   <ItemGroup>
