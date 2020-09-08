@@ -116,14 +116,5 @@ type
       exit nil;
     end;
 
-    method CannotBeProcessedAsync(message: IMessage): Task;
-    begin
-      Logger.LogTrace('CannotBeProcessed');
-
-      var clone := message.Clone;
-      await clone.AsErrorAsync;
-
-    end;
-
   end;
 end.

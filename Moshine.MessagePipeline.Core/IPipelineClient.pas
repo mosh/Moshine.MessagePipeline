@@ -8,6 +8,7 @@ uses
   System.Threading.Tasks;
 
 type
+
   IPipelineClient = public interface
 
     method InitializeAsync:Task;
@@ -19,7 +20,6 @@ type
 
     method ReceiveAsync(serverWaitTime:TimeSpan):Task<MessageParcel>;
 
-    method CannotBeProcessedAsync(parcel:MessageParcel):Task;
 
   end;
 end.

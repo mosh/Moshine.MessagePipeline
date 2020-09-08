@@ -7,6 +7,8 @@ Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Cor
 EndProject
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Transports.AmazonSQS", "Moshine.MessagePipeline.Transports.AmazonSQS\Moshine.MessagePipeline.Transports.AmazonSQS.elements", "{9F703BFC-4459-43B8-A46C-6741901E9ACC}"
 EndProject
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Transports.BodyTransport", "Moshine.MessagePipeline.Transports.BodyTransport\Moshine.MessagePipeline.Transports.BodyTransport.elements", "{0FED9848-04B7-436E-8C0D-220A96B27AD0}"
+EndProject
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus", "Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus\Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus.elements", "{901EBB44-DB4C-475F-975B-614503CEF002}"
 EndProject
 Global
@@ -27,6 +29,10 @@ Global
 		{9F703BFC-4459-43B8-A46C-6741901E9ACC}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
 		{9F703BFC-4459-43B8-A46C-6741901E9ACC}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
 		{9F703BFC-4459-43B8-A46C-6741901E9ACC}.Release|AnyCPU.Build.0 = Release|AnyCPU
+		{0FED9848-04B7-436E-8C0D-220A96B27AD0}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
+		{0FED9848-04B7-436E-8C0D-220A96B27AD0}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
+		{0FED9848-04B7-436E-8C0D-220A96B27AD0}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
+		{0FED9848-04B7-436E-8C0D-220A96B27AD0}.Release|AnyCPU.Build.0 = Release|AnyCPU
 		{901EBB44-DB4C-475F-975B-614503CEF002}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
 		{901EBB44-DB4C-475F-975B-614503CEF002}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
 		{901EBB44-DB4C-475F-975B-614503CEF002}.Release|AnyCPU.ActiveCfg = Release|AnyCPU

@@ -155,13 +155,5 @@ type
       exit nil;
     end;
 
-    method CannotBeProcessedAsync(parcel:MessageParcel):Task;
-    begin
-      await _bus.CannotBeProcessedAsync(parcel.Message);
-
-    end;
-
-
-
   end;
 end.
