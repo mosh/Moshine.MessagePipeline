@@ -25,6 +25,7 @@ type
         on E:Exception do
         begin
           await parcelProcessor.FaultedInProcessingAsync(parcel);
+          raise;
         end;
       end;
 
