@@ -53,8 +53,8 @@
     <WarnOnCaseMismatch>True</WarnOnCaseMismatch>
   </PropertyGroup>
   <ItemGroup>
-    <NuGetReference Include="Newtonsoft.Json:[12.0.1]"></NuGetReference>
-    <NuGetReference Include="System.Threading.Tasks.Dataflow:[4.9.0]"></NuGetReference>
+    <NuGetReference Include="Newtonsoft.Json:[12.0.1]" />
+    <NuGetReference Include="System.Threading.Tasks.Dataflow:[4.9.0]" />
     <NuGetReference Include="Microsoft.Extensions.Caching.Memory:[3.1.3]" />
     <ProjectReference Include="Moshine.MessagePipeline.Core">
       <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
@@ -86,6 +86,7 @@
     <Compile Include="Scope\TransactionalScope.pas" />
     <Compile Include="Scope\NonTransactionalScopeProvider.pas" />
     <Compile Include="Scope\TransactionalScopeProvider.pas" />
+    <Compile Include="Receiver.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>
@@ -94,6 +95,6 @@
 REM If you see this in Visual Studio's Error List window, check the Output window's Build tab for the actual error.
 ECHO Creating NuGet package in Post-Build event...
 PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -BuildConfiguration '$(ConfigurationName)' -BuildPlatform 'Any CPU'"</PostBuildEvent>
-    <PostBuildEvent></PostBuildEvent>
+    <PostBuildEvent />
   </PropertyGroup>
 </Project>
