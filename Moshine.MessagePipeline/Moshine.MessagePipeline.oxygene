@@ -86,7 +86,7 @@
     <Compile Include="Scope\TransactionalScope.pas" />
     <Compile Include="Scope\NonTransactionalScopeProvider.pas" />
     <Compile Include="Scope\TransactionalScopeProvider.pas" />
-    <Compile Include="Receiver.pas" />
+    <Compile Include="ParcelReceiver.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>

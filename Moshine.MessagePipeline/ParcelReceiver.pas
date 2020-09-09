@@ -6,7 +6,7 @@ uses
 
 type
 
-  Receiver = public class
+  ParcelReceiver = public class
   private
     parcelProcessor:IParcelProcessor;
   public
