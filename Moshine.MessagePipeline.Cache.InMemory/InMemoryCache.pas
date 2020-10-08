@@ -1,4 +1,4 @@
-﻿namespace Moshine.MessagePipeline.Cache;
+﻿namespace Moshine.MessagePipeline.Cache.InMemory;
 
 uses
   Microsoft.Extensions.Caching.Memory,

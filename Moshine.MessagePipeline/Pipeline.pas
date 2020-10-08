@@ -17,7 +17,6 @@ uses
   System.Transactions,
   System.Xml,
   System.Xml.Serialization,
-  Moshine.MessagePipeline.Cache,
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Core.Models;
 

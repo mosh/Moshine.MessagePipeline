@@ -55,7 +55,6 @@
   <ItemGroup>
     <NuGetReference Include="Newtonsoft.Json:[12.0.1]" />
     <NuGetReference Include="System.Threading.Tasks.Dataflow:[4.9.0]" />
-    <NuGetReference Include="Microsoft.Extensions.Caching.Memory:[3.1.3]" />
     <ProjectReference Include="Moshine.MessagePipeline.Core">
       <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
@@ -64,7 +63,6 @@
     <NuGetReference Include="Microsoft.Extensions.Logging:[3.1.3]" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\InMemoryCache.pas" />
     <Compile Include="Pipeline.pas" />
     <Compile Include="PipelineSerializer.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />

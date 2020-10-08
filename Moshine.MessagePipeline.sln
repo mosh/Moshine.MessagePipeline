@@ -3,6 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # RemObjects Fire
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline", "Moshine.MessagePipeline\Moshine.MessagePipeline.oxygene", "{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}"
 EndProject
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Cache.InMemory", "Moshine.MessagePipeline.Cache.InMemory\Moshine.MessagePipeline.Cache.InMemory.elements", "{CA3D4265-D27A-47CF-860C-E3941B436FF7}"
+EndProject
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Cache.Redis", "Moshine.MessagePipeline.Cache.Redis\Moshine.MessagePipeline.Cache.Redis.elements", "{FD67FE7B-B8F6-4616-A56D-8927DBD51166}"
+EndProject
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Core", "Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements", "{D6FDDD36-602C-49C1-B399-30852F6F8B98}"
 EndProject
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Transports.AmazonSQS", "Moshine.MessagePipeline.Transports.AmazonSQS\Moshine.MessagePipeline.Transports.AmazonSQS.elements", "{9F703BFC-4459-43B8-A46C-6741901E9ACC}"
@@ -21,6 +25,14 @@ Global
 		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
 		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
 		{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}.Release|AnyCPU.Build.0 = Release|AnyCPU
+		{CA3D4265-D27A-47CF-860C-E3941B436FF7}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
+		{CA3D4265-D27A-47CF-860C-E3941B436FF7}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
+		{CA3D4265-D27A-47CF-860C-E3941B436FF7}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
+		{CA3D4265-D27A-47CF-860C-E3941B436FF7}.Release|AnyCPU.Build.0 = Release|AnyCPU
+		{FD67FE7B-B8F6-4616-A56D-8927DBD51166}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
+		{FD67FE7B-B8F6-4616-A56D-8927DBD51166}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
+		{FD67FE7B-B8F6-4616-A56D-8927DBD51166}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
+		{FD67FE7B-B8F6-4616-A56D-8927DBD51166}.Release|AnyCPU.Build.0 = Release|AnyCPU
 		{D6FDDD36-602C-49C1-B399-30852F6F8B98}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
 		{D6FDDD36-602C-49C1-B399-30852F6F8B98}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
 		{D6FDDD36-602C-49C1-B399-30852F6F8B98}.Release|AnyCPU.ActiveCfg = Release|AnyCPU

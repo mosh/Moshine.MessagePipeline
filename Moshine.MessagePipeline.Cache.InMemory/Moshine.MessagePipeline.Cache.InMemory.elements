@@ -2,10 +2,10 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <ProductVersion>3.5</ProductVersion>
-    <RootNamespace>Moshine.MessagePipeline.Transports.BodyTransport</RootNamespace>
-    <ProjectGuid>{0FED9848-04B7-436E-8C0D-220A96B27AD0}</ProjectGuid>
+    <RootNamespace>Moshine.MessagePipeline.Cache.InMemory</RootNamespace>
+    <ProjectGuid>{CA3D4265-D27A-47CF-860C-E3941B436FF7}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Moshine.MessagePipeline.Transports.BodyTransport</AssemblyName>
+    <AssemblyName>Moshine.MessagePipeline.Cache.InMemory</AssemblyName>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <TargetFramework>.NETStandard2.0</TargetFramework>
     <Mode>Echoes</Mode>
@@ -26,13 +26,6 @@
     <EnableUnmanagedDebugging>False</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Echoes" />
-    <ProjectReference Include="Moshine.MessagePipeline.Core">
-      <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
-      <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.pas" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -42,7 +35,17 @@
       <Generator>SettingsSingleFileGenerator</Generator>
     </None>
     <Compile Include="Properties\Settings.Designer.pas" />
-    <Compile Include="BodyMessage.pas" />
+    <Compile Include="InMemoryCache.pas" />
+  </ItemGroup>
+  <ItemGroup>
+    <NuGetReference Include="Microsoft.Extensions.Caching.Memory:[3.1.3]" />
+    <NuGetReference Include="Newtonsoft.Json:[12.0.1]" />
+    <ProjectReference Include="Moshine.MessagePipeline.Core">
+      <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
+      <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
+      <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.targets" />
 </Project>
