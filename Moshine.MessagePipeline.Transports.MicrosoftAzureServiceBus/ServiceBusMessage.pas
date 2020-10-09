@@ -39,7 +39,13 @@ type
 
     method GetBody: String;
     begin
-      exit Encoding.UTF8.GetString(_message.Body);
+      var messageBody := _message.Body;
+      if(not assigned(messageBody))then
+      begin
+        Logger.LogTrace('MessageBody is null');
+        exit nil;
+      end;
+      exit Encoding.UTF8.GetString(messageBody);
     end;
 
     method AsErrorAsync:Task;

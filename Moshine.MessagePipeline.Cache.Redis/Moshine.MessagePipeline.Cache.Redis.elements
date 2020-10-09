@@ -27,7 +27,7 @@
   </PropertyGroup>
   <ItemGroup>
     <NuGetReference Include="Newtonsoft.Json:[12.0.1]" />
-    <NuGetReference Include="StackExchange.Redis:[2.1.58]" />
+    <NuGetReference Include="StackExchange.Redis:[2.0.519]" />
     <ProjectReference Include="Moshine.MessagePipeline.Core">
       <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
