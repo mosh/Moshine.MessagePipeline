@@ -15,7 +15,7 @@ type
       parcelProcessor := parcelProcessImpl;
     end;
 
-    method Receive(parcel:MessageParcel):Task;
+    method ReceiveAsync(parcel:MessageParcel):Task;
     begin
 
       try
