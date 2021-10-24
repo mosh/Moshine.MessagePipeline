@@ -17,19 +17,21 @@ type
 
     end;
 
-    method &Add(key:String;value:Object);
+    method AddAsync(key:String;value:Object):Task;
     begin
       using db := connectionMultiplexor.GetDatabase do
       begin
         db.StringSet(key, JsonConvert.SerializeObject(value),new TimeSpan(0,0,30));
       end;
+
+      exit Task.CompletedTask;
     end;
 
-    method Get<T>(key:String):tuple of (Boolean, T);
+    method GetAsync<T>(key:String):Task<tuple of (Boolean, T)>;
     begin
       using db := connectionMultiplexor.GetDatabase do
       begin
-        var value := db.StringGet(key);
+        var value := await db.StringGetAsync(key);
 
         if(String.IsNullOrEmpty(value))then
         begin

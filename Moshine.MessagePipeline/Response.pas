@@ -43,7 +43,7 @@ type
 
           repeat
             token.ThrowIfCancellationRequested;
-            cacheResult := Cache.Get<T>(Id.ToString);
+            cacheResult := await Cache.GetAsync<T>(Id.ToString);
             if(cacheResult.Item1)then
             begin
               obj := cacheResult.Item2;

@@ -3,8 +3,8 @@
 type
 
   ICache = public interface
-    method &Add(key:String;value:Object);
-    method Get<T>(key:String):tuple of (Boolean, T);
+    method &AddAsync(key:String;value:Object):Task;
+    method GetAsync<T>(key:String):Task<tuple of (Boolean, T)>;
   end;
 
 end.

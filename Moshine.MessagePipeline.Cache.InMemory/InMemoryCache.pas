@@ -16,19 +16,24 @@ type
         _cache := new MemoryCache(new MemoryCacheOptions ( ));
     end;
 
-    method Add(key:String;value:Object);
+    method AddAsync(key:String;value:Object):Task;
     begin
       _cache.Set(key,JsonConvert.SerializeObject(value), DateTimeOffset.Now.AddHours(1));
+      exit Task.CompletedTask;
     end;
 
-    method Get<T>(key:String): tuple of (Boolean, T);
+    method GetAsync<T>(key:String): Task<tuple of (Boolean, T)>;
     begin
       var value : Object;
       if(_cache.TryGetValue(key, out value))then
       begin
-        exit (true,JsonConvert.DeserializeObject<T>(value.ToString));
+        var foundValue := (true,JsonConvert.DeserializeObject<T>(value.ToString));
+        exit Task.FromResult(foundValue);
       end;
-      exit (false,default(T));
+
+      var missingValue := (false,default(T));
+
+      exit Task.FromResult(missingValue);
     end;
 
 

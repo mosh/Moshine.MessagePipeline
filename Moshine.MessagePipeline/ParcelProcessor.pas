@@ -28,7 +28,7 @@ type
       if(assigned(returnValue))then
       begin
         Logger.LogTrace('Setting value from invoked action');
-        _cache.Add(someAction.Id.ToString,returnValue);
+        await _cache.AddAsync(someAction.Id.ToString,returnValue);
       end
       else
       begin
