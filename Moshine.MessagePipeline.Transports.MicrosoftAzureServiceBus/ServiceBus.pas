@@ -1,10 +1,8 @@
 ﻿namespace Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus;
 
 uses
+  Azure.Messaging.ServiceBus,
   Microsoft.Extensions.Logging,
-  Microsoft.Azure.ServiceBus,
-  Microsoft.Azure.ServiceBus.Core,
-  Microsoft.Azure.ServiceBus.Management,
   Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus.Models,
   Moshine.MessagePipeline.Core,
   System.Text,
@@ -19,8 +17,12 @@ type
     _topicName:String;
     _subscriptionName:String;
     _connectionString:String;
-    _topicClient:TopicClient;
-    _subscriptionReceiver:IMessageReceiver;
+
+
+    _client:ServiceBusClient;
+    _sender:ServiceBusSender;
+    _receiver:ServiceBusReceiver;
+
   public
 
     constructor (connectionInformation:IServiceBusConnectionInformation; loggerImpl:ILogger);
@@ -61,57 +63,74 @@ type
         raise new ArgumentException(message);
       end;
 
-      var client := new ManagementClient(_connectionString);
 
-      if (not await client.SubscriptionExistsAsync(_topicName,_subscriptionName)) then
+      var client := new Azure.Messaging.ServiceBus.Administration.ServiceBusAdministrationClient(_connectionString);
+
+      var response := await client.SubscriptionExistsAsync(_topicName, _subscriptionName);
+
+      if (not response.Value)then
       begin
         var message := $'Topic {_topicName} Subscription {_subscriptionName} does not exist';
         Logger.LogError(message);
         raise new ApplicationException(message);
       end;
 
-      var subscription := await client.GetSubscriptionAsync(_topicName, _subscriptionName);
+      var subscriptionResponse := await client.GetSubscriptionAsync(_topicName, _subscriptionName);
 
-      Logger.LogInformation($'MaxDeliveryCount is {subscription.MaxDeliveryCount} EnableDeadLetteringOnMessageExpiration {subscription.EnableDeadLetteringOnMessageExpiration}');
+      var subscriptionProperties := subscriptionResponse.Value;
 
-      if(not subscription.EnableDeadLetteringOnMessageExpiration)then
+      Logger.LogInformation($'MaxDeliveryCount is {subscriptionProperties.MaxDeliveryCount} EnableDeadLetteringOnMessageExpiration {subscriptionProperties.DeadLetteringOnMessageExpiration}');
+
+      if(not subscriptionProperties.DeadLetteringOnMessageExpiration)then
       begin
         var message := $'Topic {_topicName} Subscription {_subscriptionName} EnableDeadLetteringOnMessageExpiration must be enabled';
         Logger.LogError(message);
         raise new ApplicationException(message);
       end;
 
-      _topicClient := new TopicClient(_connectionString, _topicName);
-      var subscriptionPath: String := EntityNameHelper.FormatSubscriptionPath(_topicName, _subscriptionName);
-      _subscriptionReceiver := new MessageReceiver(_connectionString, subscriptionPath, ReceiveMode.PeekLock);
+
+      _client := new ServiceBusClient(_connectionString);
+      _sender := _client.CreateSender(_topicName);
+
+      var options := new ServiceBusReceiverOptions();
+      options.ReceiveMode := ServiceBusReceiveMode.PeekLock;
+
+      _receiver := _client.CreateReceiver(_topicName, _subscriptionName, options);
+
 
     end;
 
     method SendAsync(message: IMessage): Task;
     begin
+
       var internalMessage := (message as ServiceBusMessage).InternalMessage;
       Logger.LogTrace('Send');
-      await _topicClient.SendAsync(internalMessage);
+      await _sender.SendMessageAsync(new Azure.Messaging.ServiceBus.ServiceBusMessage(internalMessage));
       Logger.LogTrace('Sent');
+
     end;
 
     method SendAsync(messageContent: String; id: String): Task;
     begin
-      var message := new Message(Encoding.UTF8.GetBytes(messageContent));
-      message.UserProperties.Add('Id',id);
+
+      var message := new Azure.Messaging.ServiceBus.ServiceBusMessage(messageContent);
+      message.ApplicationProperties.Add('Id',id);
       Logger.LogTrace('Send');
-      await _topicClient.SendAsync(message);
+      await _sender.SendMessageAsync(message);
       Logger.LogTrace('Sent');
+
     end;
 
     method ReceiveAsync(serverWaitTime: TimeSpan): Task<IMessage>;
     begin
-      var receivedMessage := await _subscriptionReceiver.ReceiveAsync(serverWaitTime);
+
+      var receivedMessage := await _receiver.ReceiveMessageAsync(serverWaitTime);
 
       if(assigned(receivedMessage))then
       begin
         Logger.LogTrace('Received message');
-        exit new ServiceBusMessage(_subscriptionReceiver, receivedMessage, Logger)
+        exit new ServiceBusMessage(_receiver, receivedMessage, Logger);
+
       end;
       exit nil;
     end;

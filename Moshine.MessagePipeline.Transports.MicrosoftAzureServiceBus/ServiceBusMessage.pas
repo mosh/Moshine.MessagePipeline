@@ -1,10 +1,9 @@
 ﻿namespace Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus;
 
 uses
+  Azure.Messaging.ServiceBus,
   Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
-  Microsoft.Azure.ServiceBus,
-  Microsoft.Azure.ServiceBus.Core,
   System.Text,
   System.Threading.Tasks;
 type
@@ -13,28 +12,28 @@ type
   private
     property Logger: ILogger;
 
-    _message:Message;
-    _receiver:IMessageReceiver;
+    _message:ServiceBusReceivedMessage;
+    _receiver:ServiceBusReceiver;
   public
 
-    constructor(receiver:IMessageReceiver; message:Message; loggerImpl:ILogger);
+    constructor(receiver:ServiceBusReceiver; message:ServiceBusReceivedMessage; loggerImpl:ILogger);
     begin
       _message := message;
       _receiver := receiver;
       Logger := loggerImpl;
     end;
 
-    constructor(message:Message);
+    constructor(message:ServiceBusReceivedMessage);
     begin
       _message := message;
-      Logger.LogTrace($'DeliveryCoint {_message.SystemProperties.DeliveryCount}');
+      Logger.LogTrace($'DeliveryCoint {_message.DeliveryCount}');
 
     end;
 
 
     method Clone: IMessage;
     begin
-      exit new ServiceBusMessage(_receiver, _message.Clone, Logger);
+      exit new ServiceBusMessage(_receiver, _message, Logger);
     end;
 
     method GetBody: String;
@@ -56,7 +55,7 @@ type
         Logger.LogError(message);
         raise new ApplicationException(message);
       end;
-      await _receiver.AbandonAsync(_message.SystemProperties.LockToken);
+      await _receiver.AbandonMessageAsync(_message);
       Logger.LogTrace('AsError');
     end;
 
@@ -68,11 +67,11 @@ type
         Logger.LogError(message);
         raise new ApplicationException(message);
       end;
-      await _receiver.CompleteAsync(_message.SystemProperties.LockToken);
+      await _receiver.CompleteMessageAsync(_message);
       Logger.LogTrace('Completed');
     end;
 
-    property InternalMessage:Message read
+    property InternalMessage:ServiceBusReceivedMessage read
       begin
         exit _message;
       end;
