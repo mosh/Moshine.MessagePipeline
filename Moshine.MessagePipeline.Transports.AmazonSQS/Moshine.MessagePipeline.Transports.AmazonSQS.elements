@@ -12,7 +12,7 @@
     <AllowLegacyCreate>False</AllowLegacyCreate>
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NETStandard2.1</TargetFramework>
+    <TargetFramework>.NET5.0</TargetFramework>
     <DefaultUses>RemObjects.Elements.RTL</DefaultUses>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
