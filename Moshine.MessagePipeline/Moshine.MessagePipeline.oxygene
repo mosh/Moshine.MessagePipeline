@@ -12,7 +12,7 @@
     <AllowLegacyCreate>False</AllowLegacyCreate>
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NETStandard2.1</TargetFramework>
+    <TargetFramework>.NET5.0</TargetFramework>
     <Name>Moshine.MessagePipeline</Name>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <AssemblyVersion>2.0</AssemblyVersion>
