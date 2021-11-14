@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <AssemblyName>Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus</AssemblyName>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NET5.0</TargetFramework>
+    <TargetFramework>.NET6.0</TargetFramework>
     <Mode>Echoes</Mode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
