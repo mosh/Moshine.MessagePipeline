@@ -75,7 +75,7 @@ type
           Logger.LogTrace('LoadAction');
           await LoadAsync(savedAction);
           Logger.LogTrace('Loaded Action');
-          scope.Complete;
+          await scope.CompleteAsync;
         end;
 
         parcel.State := MessageStateEnum.Processed;
@@ -102,7 +102,7 @@ type
         var clone := parcel.Message.Clone;
         await clone.AsErrorAsync;
 
-        scope.Complete;
+        await scope.CompleteAsync;
       end;
       Logger.LogTrace('Faulted In Processing');
     end;
@@ -113,7 +113,7 @@ type
       using scope := _scopeProvider.Provide do
       begin
         await parcel.Message.CompleteAsync;
-        scope.Complete;
+        await scope.CompleteAsync;
       end;
       Logger.LogTrace('Finished Processing');
 

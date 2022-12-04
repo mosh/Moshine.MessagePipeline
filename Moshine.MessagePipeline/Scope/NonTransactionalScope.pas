@@ -36,9 +36,10 @@ type
       GC.SuppressFinalize(self);
     end;
 
-    method Complete;
+    method CompleteAsync:Task;
     begin
       Logger.LogTrace('Complete called');
+      exit Task.CompletedTask;
     end;
 
   end;

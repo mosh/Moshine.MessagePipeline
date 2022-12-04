@@ -2,7 +2,7 @@
 
 type
   IScope = public interface(IDisposable)
-    method Complete;
+    method CompleteAsync:Task;
   end;
 
 end.

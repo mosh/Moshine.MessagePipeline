@@ -31,7 +31,6 @@ type
     constructor;
     begin
       scope := new TransactionScope(TransactionScopeOption.RequiresNew);
-
     end;
 
 
@@ -41,9 +40,10 @@ type
       GC.SuppressFinalize(self);
     end;
 
-    method Complete;
+    method CompleteAsync:Task;
     begin
       scope.Complete;
+      exit Task.CompletedTask;
     end;
   end;
 
