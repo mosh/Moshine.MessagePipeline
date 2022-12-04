@@ -2,9 +2,9 @@
 
 type
   IOutbox = public interface
-    method TryGet(id:Guid):Boolean;
-    method Store(id:Guid);
-    method SetDispatched(id:Guid);
+    method TryGetAsync(id:Guid):Task<Boolean>;
+    method StoreAsync(id:Guid):Task;
+    method SetDispatchedAsync(id:Guid):Task;
   end;
 
 end.

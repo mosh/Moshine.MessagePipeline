@@ -16,29 +16,29 @@ type
       self.ConnectionString := connectionString;
     end;
 
-    method SetDispatched(id:System.Guid);
+    method SetDispatchedAsync(id:System.Guid):Task;
     begin
       using connection := new Npgsql.NpgsqlConnection(ConnectionString) do
         begin
-          connection.Execute('update outbox set dispatched=true,dispatched_at=CURRENT_TIMESTAMP where id=@id', new class(id));
+          await connection.ExecuteAsync('update outbox set dispatched=true,dispatched_at=CURRENT_TIMESTAMP where id=@id', new class(id));
         end;
 
     end;
 
-    method Store(id:System.Guid);
+    method StoreAsync(id:System.Guid):Task;
     begin
       using connection := new Npgsql.NpgsqlConnection(ConnectionString) do
       begin
-         connection.Execute("insert into outbox(id) values(@id)",new class(id));
+         await connection.ExecuteAsync("insert into outbox(id) values(@id)",new class(id));
       end;
 
     end;
 
-    method TryGet(id:System.Guid):Boolean;
+    method TryGetAsync(id:System.Guid):Task<Boolean>;
     begin
       using connection := new Npgsql.NpgsqlConnection(ConnectionString) do
       begin
-          var count := connection.Query<Integer>('select count(*) from outbox where id=@id', new class(id)).FirstOrDefault;
+          var count := (await connection.QueryAsync<Integer>('select count(*) from outbox where id=@id', new class(id))).FirstOrDefault;
           exit iif(count > 0,true,false);
       end;
 
