@@ -38,7 +38,7 @@ type
     begin
       using connection := new Npgsql.NpgsqlConnection(ConnectionString) do
       begin
-          exit (await connection.QueryAsync<Outbox>('select id, dispatched,dispatched_at from outbox where id=@id', new class(id))).FirstOrDefault;
+          exit (await connection.QueryAsync<Outbox>('select id, dispatched,dispatched_at as dispatchedat from outbox where id=@id', new class(id))).FirstOrDefault;
       end;
 
     end;
