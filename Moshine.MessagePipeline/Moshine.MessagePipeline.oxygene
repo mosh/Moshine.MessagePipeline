@@ -54,7 +54,7 @@
   </PropertyGroup>
   <ItemGroup>
     <NuGetReference Include="Newtonsoft.Json:[13.0.1]" />
-    <NuGetReference Include="System.Threading.Tasks.Dataflow:[5.0.0]" />
+    <NuGetReference Include="System.Threading.Tasks.Dataflow:[7.0.0]" />
     <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements">
       <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
