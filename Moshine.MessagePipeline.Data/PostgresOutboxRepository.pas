@@ -6,7 +6,7 @@ uses
 
 type
 
-  PostgresOutboxRepository = public class(IOutbox)
+  PostgresOutboxRepository = public class(IOutboxRepository)
   private
     property ConnectionString:String;
   public

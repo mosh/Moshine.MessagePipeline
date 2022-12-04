@@ -5,7 +5,7 @@ uses
   Moshine.MessagePipeline.Core, System.Data.SqlClient, Moshine.MessagePipeline.Core.Models;
 
 type
-  SqlServerOutboxRepository = public class(IOutbox)
+  SqlServerOutboxRepository = public class(IOutboxRepository)
   private
     property ConnectionString:String;
   public
