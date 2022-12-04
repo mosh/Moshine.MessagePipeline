@@ -2,7 +2,7 @@
 
 uses
   Dapper,
-  Moshine.MessagePipeline.Core, System.Data.SqlClient;
+  Moshine.MessagePipeline.Core, System.Data.SqlClient, Moshine.MessagePipeline.Core.Models;
 
 type
   SqlServerOutboxRepository = public class(IOutbox)
@@ -33,12 +33,11 @@ type
 
     end;
 
-    method TryGetAsync(id:System.Guid):Task<Boolean>;
+    method GetAsync(id:System.Guid):Task<Outbox>;
     begin
       using connection := new SqlConnection(ConnectionString) do
       begin
-        var count := (await connection.QueryAsync<Integer>('Select count(*) from Outbox where Id=@id', new class(id))).FirstOrDefault;
-        exit iif(count > 0,true,false);
+        exit (await connection.QueryAsync<Outbox>('Select Id,Dispatched,DispatchedAt from Outbox where Id=@id', new class(id))).FirstOrDefault;
       end;
 
     end;

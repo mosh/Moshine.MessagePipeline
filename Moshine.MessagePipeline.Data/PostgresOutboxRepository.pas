@@ -2,7 +2,7 @@
 
 uses
   Dapper,
-  Moshine.MessagePipeline.Core;
+  Moshine.MessagePipeline.Core, Moshine.MessagePipeline.Core.Models;
 
 type
 
@@ -34,12 +34,11 @@ type
 
     end;
 
-    method TryGetAsync(id:System.Guid):Task<Boolean>;
+    method GetAsync(id:System.Guid):Task<Outbox>;
     begin
       using connection := new Npgsql.NpgsqlConnection(ConnectionString) do
       begin
-          var count := (await connection.QueryAsync<Integer>('select count(*) from outbox where id=@id', new class(id))).FirstOrDefault;
-          exit iif(count > 0,true,false);
+          exit (await connection.QueryAsync<Outbox>('select id, dispatched,dispatched_at from outbox where id=@id', new class(id))).FirstOrDefault;
       end;
 
     end;

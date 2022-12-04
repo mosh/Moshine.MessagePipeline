@@ -1,8 +1,11 @@
 ﻿namespace Moshine.MessagePipeline.Core;
 
+uses
+  Moshine.MessagePipeline.Core.Models;
+
 type
   IOutbox = public interface
-    method TryGetAsync(id:Guid):Task<Boolean>;
+    method GetAsync(id:Guid):Task<Outbox>;
     method StoreAsync(id:Guid):Task;
     method SetDispatchedAsync(id:Guid):Task;
   end;
