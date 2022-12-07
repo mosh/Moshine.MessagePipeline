@@ -42,6 +42,7 @@
     </None>
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="BodyMessage.pas" />
+    <Compile Include="BodyMessageBuilder.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.targets" />
 </Project>

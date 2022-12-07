@@ -10,6 +10,7 @@ type
   private
     disposed:Boolean := false;
     scope:TransactionScope;
+    _repository:IOutboxRepository;
 
   protected
 
@@ -28,9 +29,10 @@ type
 
   public
 
-    constructor;
+    constructor(repository:IOutboxRepository);
     begin
-      scope := new TransactionScope(TransactionScopeOption.RequiresNew);
+      scope := new TransactionScope(TransactionScopeOption.RequiresNew, TransactionScopeAsyncFlowOption.Enabled);
+      _repository := repository;
     end;
 
 
@@ -40,10 +42,10 @@ type
       GC.SuppressFinalize(self);
     end;
 
-    method CompleteAsync:Task;
+    method CompleteAsync(scopeId:Guid):Task;
     begin
+      await _repository.StoreAsync(scopeId);
       scope.Complete;
-      exit Task.CompletedTask;
     end;
   end;
 

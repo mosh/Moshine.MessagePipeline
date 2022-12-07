@@ -18,6 +18,7 @@ type
     _cache:ICache;
     _actionInvokerHelpers:IActionInvokerHelpers;
     _scopeProvider:IScopeProvider;
+    _manager:IManager;
 
     method LoadAsync(someAction:SavedAction):Task;
     begin
@@ -41,13 +42,14 @@ type
   public
 
     constructor(actionSerializer:PipelineSerializer<SavedAction>;actionInvokerHelpers:IActionInvokerHelpers;
-      cache:ICache; scopeProvider:IScopeProvider;loggerImpl:ILogger);
+      cache:ICache; scopeProvider:IScopeProvider; manager:IManager; loggerImpl:ILogger);
     begin
       _actionSerializer := actionSerializer;
       _actionInvokerHelpers := actionInvokerHelpers;
       _cache := cache;
       _scopeProvider := scopeProvider;
       Logger := loggerImpl;
+      _manager := manager;
     end;
 
     method ProcessMessageAsync(parcel:MessageParcel):Task;
@@ -68,14 +70,18 @@ type
           Logger.LogTrace('Got body');
         end;
 
-        var savedAction := _actionSerializer.Deserialize<SavedAction>(body);
-
-        using scope := _scopeProvider.Provide do
+        if (not await _manager.HasActionExecutedAsync(parcel.Message.Id))then
         begin
-          Logger.LogTrace('LoadAction');
-          await LoadAsync(savedAction);
-          Logger.LogTrace('Loaded Action');
-          await scope.CompleteAsync;
+
+          var savedAction := _actionSerializer.Deserialize<SavedAction>(body);
+
+          using scope := _scopeProvider.Provide do
+          begin
+            Logger.LogTrace('LoadAction');
+            await LoadAsync(savedAction);
+            Logger.LogTrace('Loaded Action');
+            await scope.CompleteAsync(parcel.Message.Id);
+          end;
         end;
 
         parcel.State := MessageStateEnum.Processed;
@@ -96,25 +102,17 @@ type
     begin
       Logger.LogTrace('Faulting In Processing');
 
-      using scope := _scopeProvider.Provide do
-      begin
+      var clone := parcel.Message.Clone;
+      await clone.AsErrorAsync;
 
-        var clone := parcel.Message.Clone;
-        await clone.AsErrorAsync;
-
-        await scope.CompleteAsync;
-      end;
       Logger.LogTrace('Faulted In Processing');
     end;
 
     method FinishProcessingAsync(parcel:MessageParcel):Task;
     begin
       Logger.LogTrace('Finishing Processing');
-      using scope := _scopeProvider.Provide do
-      begin
-        await parcel.Message.CompleteAsync;
-        await scope.CompleteAsync;
-      end;
+      await _manager.CompleteActionExecutionAsync(parcel.Message.Id);
+      await parcel.Message.CompleteAsync;
       Logger.LogTrace('Finished Processing');
 
     end;

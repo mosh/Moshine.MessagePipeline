@@ -25,7 +25,7 @@ type
       Logger.LogTrace('Entering');
       var stringRepresentation := _actionSerializer.Serialize(someAction);
       Logger.LogTrace('SendAsync');
-      _bus.SendAsync(stringRepresentation, someAction.Id.ToString).Wait;
+      _bus.SendAsync(stringRepresentation, someAction.Id).Wait;
       Logger.LogTrace('SentAsync');
 
     end;
@@ -35,7 +35,7 @@ type
       Logger.LogTrace('Entering');
       var stringRepresentation := _actionSerializer.Serialize(someAction);
       Logger.LogTrace('SendAsync');
-      await _bus.SendAsync(stringRepresentation, someAction.Id.ToString);
+      await _bus.SendAsync(stringRepresentation, someAction.Id);
       Logger.LogTrace('SentAsync');
 
     end;

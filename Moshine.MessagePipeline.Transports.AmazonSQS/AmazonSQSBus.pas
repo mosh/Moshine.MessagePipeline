@@ -34,7 +34,7 @@ type
     end;
 
 
-    method SendMessageAsync(id:String; messageBody:String):Task<SendMessageResponse>;
+    method SendMessageAsync(id:Guid; messageBody:String):Task<SendMessageResponse>;
     begin
       Guard;
 
@@ -42,8 +42,8 @@ type
         var messageRequest := new SendMessageRequest;
         messageRequest.QueueUrl := _url.QueueUrl;
         messageRequest.MessageBody := messageBody;
-        messageRequest.MessageDeduplicationId := id;
-        messageRequest.MessageGroupId := id;
+        messageRequest.MessageDeduplicationId := id.ToString;
+        messageRequest.MessageGroupId := id.ToString;
 
         exit await _client.SendMessageAsync(messageRequest);
 
@@ -104,7 +104,7 @@ type
       exit Task.CompletedTask;
     end;
 
-    method SendAsync(messageContent:String;id:String):Task;
+    method SendAsync(messageContent:String;id:Guid):Task;
     begin
       await SendMessageAsync(id, messageContent);
     end;
@@ -112,7 +112,7 @@ type
     method SendAsync(message:IMessage):Task;
     begin
       var amazonMessage := message as AmazonSQSMessage;
-      await SendMessageAsync(amazonMessage.GetBody, amazonMessage.Id);
+      await SendMessageAsync(amazonMessage.Id, amazonMessage.GetBody);
     end;
 
     method DeleteMessageAsync(message:Message):Task;

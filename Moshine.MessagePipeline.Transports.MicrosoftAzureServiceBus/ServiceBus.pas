@@ -110,7 +110,7 @@ type
 
     end;
 
-    method SendAsync(messageContent: String; id: String): Task;
+    method SendAsync(messageContent: String; id: Guid): Task;
     begin
 
       var message := new Azure.Messaging.ServiceBus.ServiceBusMessage(messageContent);

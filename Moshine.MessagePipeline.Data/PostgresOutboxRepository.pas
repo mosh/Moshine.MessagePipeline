@@ -8,17 +8,17 @@ type
 
   PostgresOutboxRepository = public class(IOutboxRepository)
   private
-    property ConnectionString:String;
+    property Config:ISystemConfig;
   public
 
-    constructor(connectionString:String);
+    constructor(config:ISystemConfig);
     begin
-      self.ConnectionString := connectionString;
+      self.Config := config;
     end;
 
     method SetDispatchedAsync(id:System.Guid):Task;
     begin
-      using connection := new Npgsql.NpgsqlConnection(ConnectionString) do
+      using connection := new Npgsql.NpgsqlConnection(Config.DatabaseConnectionString) do
         begin
           await connection.ExecuteAsync('update outbox set dispatched=true,dispatched_at=CURRENT_TIMESTAMP where id=@id', new class(id));
         end;
@@ -27,7 +27,7 @@ type
 
     method StoreAsync(id:System.Guid):Task;
     begin
-      using connection := new Npgsql.NpgsqlConnection(ConnectionString) do
+      using connection := new Npgsql.NpgsqlConnection(Config.DatabaseConnectionString) do
       begin
          await connection.ExecuteAsync("insert into outbox(id) values(@id)",new class(id));
       end;
@@ -36,7 +36,7 @@ type
 
     method GetAsync(id:System.Guid):Task<Outbox>;
     begin
-      using connection := new Npgsql.NpgsqlConnection(ConnectionString) do
+      using connection := new Npgsql.NpgsqlConnection(Config.DatabaseConnectionString) do
       begin
           exit (await connection.QueryAsync<Outbox>('select id, dispatched,dispatched_at as dispatchedat from outbox where id=@id', new class(id))).FirstOrDefault;
       end;

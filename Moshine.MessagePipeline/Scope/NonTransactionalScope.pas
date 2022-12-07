@@ -36,7 +36,7 @@ type
       GC.SuppressFinalize(self);
     end;
 
-    method CompleteAsync:Task;
+    method CompleteAsync(scopeId:Guid):Task;
     begin
       Logger.LogTrace('Complete called');
       exit Task.CompletedTask;

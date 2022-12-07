@@ -77,6 +77,9 @@
     <Compile Include="IParcelProcessor.pas" />
     <Compile Include="Models\Outbox.pas" />
     <Compile Include="IOutboxRepository.pas" />
+    <Compile Include="IManager.pas" />
+    <Compile Include="ISystemConfig.pas" />
+    <Compile Include="PipelineSerializer.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

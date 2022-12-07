@@ -12,11 +12,6 @@ type
   [DataContract]
   SavedAction = public class
   public
-    constructor;
-    begin
-      self.Id := Guid.NewGuid;
-    end;
-
     [DataMember]
     property &Type:String;
     [DataMember]
