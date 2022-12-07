@@ -14,15 +14,6 @@ type
     _sendMessageRequest:SendMessageRequest;
     _bus : AmazonSQSBus;
 
-    method get_InternalMessage: Message;
-    begin
-      exit _message;
-    end;
-
-    method get_Id:String;
-    begin
-      exit iif(assigned(_message), _message.MessageId, _sendMessageRequest.MessageDeduplicationId);
-    end;
 
   protected
   public
@@ -41,16 +32,25 @@ type
       _sendMessageRequest := sendMessageRequest;
     end;
 
-    property InternalMessage:Message read get_InternalMessage;
-    property Id:String read get_Id;
+    property InternalMessage:Message read
+      begin
+        exit _message;
+      end;
+
+    property Id:Guid read
+      begin
+        var value := iif(assigned(_message), _message.MessageId, _sendMessageRequest.MessageDeduplicationId);
+        exit Guid.Parse(value);
+      end;
+
 
     method Clone:IMessage;
     begin
       var sendMessageRequest := new SendMessageRequest;
       sendMessageRequest.QueueUrl := _bus.Url.QueueUrl;
       sendMessageRequest.MessageBody := self.GetBody;
-      sendMessageRequest.MessageDeduplicationId := self.Id;
-      sendMessageRequest.MessageGroupId := self.Id;
+      sendMessageRequest.MessageDeduplicationId := self.Id.ToString;
+      sendMessageRequest.MessageGroupId := self.Id.ToString;
       exit new AmazonSQSMessage(_bus, sendMessageRequest);
     end;
 

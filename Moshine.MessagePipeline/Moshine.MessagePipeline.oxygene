@@ -64,7 +64,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Pipeline.pas" />
-    <Compile Include="PipelineSerializer.pas" />
     <Compile Include="Properties\AssemblyInfo.pas" />
     <Compile Include="Response.pas" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -85,6 +84,8 @@
     <Compile Include="Scope\NonTransactionalScopeProvider.pas" />
     <Compile Include="Scope\TransactionalScopeProvider.pas" />
     <Compile Include="ParcelReceiver.pas" />
+    <Compile Include="DeduplicatingManager.pas" />
+    <Compile Include="SimpleManager.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>

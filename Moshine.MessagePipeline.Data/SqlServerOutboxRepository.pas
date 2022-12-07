@@ -7,17 +7,17 @@ uses
 type
   SqlServerOutboxRepository = public class(IOutboxRepository)
   private
-    property ConnectionString:String;
+    property Config:ISystemConfig;
   public
 
-    constructor(connectionString:String);
+    constructor(config:ISystemConfig);
     begin
-      self.ConnectionString := connectionString;
+      self.Config := config;
     end;
 
     method SetDispatchedAsync(id:System.Guid):Task;
     begin
-      using connection := new SqlConnection(ConnectionString) do
+      using connection := new SqlConnection(Config.DatabaseConnectionString) do
       begin
         await connection.ExecuteAsync('Update Outbox set Dispatched=1,DispatchedAt=CURRENT_TIMESTAMP where Id=@id', new class(id));
       end;
@@ -26,7 +26,7 @@ type
 
     method StoreAsync(id:System.Guid):Task;
     begin
-      using connection := new SqlConnection(ConnectionString) do
+      using connection := new SqlConnection(Config.DatabaseConnectionString) do
       begin
         await connection.ExecuteAsync("Insert into Outbox(Id) values(@id)",new class(id));
       end;
@@ -35,7 +35,7 @@ type
 
     method GetAsync(id:System.Guid):Task<Outbox>;
     begin
-      using connection := new SqlConnection(ConnectionString) do
+      using connection := new SqlConnection(Config.DatabaseConnectionString) do
       begin
         exit (await connection.QueryAsync<Outbox>('Select Id,Dispatched,DispatchedAt from Outbox where Id=@id', new class(id))).FirstOrDefault;
       end;

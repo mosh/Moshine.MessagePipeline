@@ -9,6 +9,7 @@ type
     method GetBody:String;
     method AsErrorAsync:Task;
     method CompleteAsync:Task;
+    property Id:Guid read;
   end;
 
 end.

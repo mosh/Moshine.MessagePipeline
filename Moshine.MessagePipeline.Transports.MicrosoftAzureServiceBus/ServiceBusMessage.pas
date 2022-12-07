@@ -30,6 +30,11 @@ type
 
     end;
 
+    property Id:Guid read
+      begin
+        exit Guid.Parse(_message.ApplicationProperties['Id'].ToString);
+      end;
+
 
     method Clone: IMessage;
     begin
