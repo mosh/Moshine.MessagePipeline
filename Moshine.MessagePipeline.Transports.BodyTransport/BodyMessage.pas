@@ -11,7 +11,7 @@ type
     property messageId:Guid;
   public
 
-    constructor(messageBody:String; messageId:Guid);
+    assembly constructor(messageBody:String; messageId:Guid);
     begin
       body := messageBody;
       self.messageId:=messageId;
