@@ -59,18 +59,18 @@ type
 
   public
 
-    constructor (credentialsFilename:String;profileName:String; serviceUrl:String;queueName:String;accountId:String;loggerImpl:ILogger);
+    constructor (configuration:IAmazonConfiguration;loggerImpl:ILogger);
     begin
 
-      _serviceUrl := serviceUrl;
-      _accountId := accountId;
-      _queueName := queueName;
+      _serviceUrl := configuration.ServiceUrl;
+      _accountId := configuration.AccountId;
+      _queueName := configuration.QueueName;
 
       _config := new AmazonSQSConfig;
       _config.ServiceURL := _serviceUrl;
 
-      var chain := new CredentialProfileStoreChain(credentialsFilename);
-      chain.TryGetAWSCredentials(profileName, out _credentials);
+      var chain := new CredentialProfileStoreChain(configuration.Credentials);
+      chain.TryGetAWSCredentials(configuration.Profile, out _credentials);
 
       Logger := loggerImpl;
 

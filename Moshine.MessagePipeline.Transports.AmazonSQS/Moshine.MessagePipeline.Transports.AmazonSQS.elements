@@ -72,6 +72,8 @@
     <Compile Include="AmazonSQSBus.pas" />
     <Compile Include="AmazonSQSMessage.pas" />
     <None Include="Moshine.MessagePipeline.Transports.AmazonSQS.Nuspec" />
+    <Compile Include="IAmazonConfiguration.pas" />
+    <Compile Include="AmazonConfiguration.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>
