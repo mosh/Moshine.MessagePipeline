@@ -73,7 +73,18 @@ type
         if (not await _manager.HasActionExecutedAsync(parcel.Message.Id))then
         begin
 
-          var savedAction := _actionSerializer.Deserialize<SavedAction>(body);
+          var savedAction:SavedAction := nil;
+          try
+            savedAction := _actionSerializer.Deserialize<SavedAction>(body);
+          except
+            on SE: System.Runtime.Serialization.SerializationException do
+            begin
+              var message := 'Failed to deserilize action';
+              Logger.LogError(SE,$'{message} with body {body}');
+              raise;
+            end;
+          end;
+
 
           using scope := _scopeProvider.Provide do
           begin

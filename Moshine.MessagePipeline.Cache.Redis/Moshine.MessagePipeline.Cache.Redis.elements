@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <AssemblyName>Moshine.MessagePipeline.Cache.Redis</AssemblyName>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NET6.0</TargetFramework>
+    <TargetFramework>.NET7.0</TargetFramework>
     <Mode>Echoes</Mode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -26,8 +26,8 @@
     <EnableUnmanagedDebugging>False</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <NuGetReference Include="Newtonsoft.Json:[12.0.1]" />
-    <NuGetReference Include="StackExchange.Redis:[2.0.519]" />
+    <NuGetReference Include="Newtonsoft.Json:[13.0.1]" />
+    <NuGetReference Include="StackExchange.Redis:[2.6.80]" />
     <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements">
       <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>

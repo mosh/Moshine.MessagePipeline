@@ -14,7 +14,6 @@ type
   private
     _serializer:DataContractSerializer;
 
-
   public
 
     constructor(parameterTypes:List<&Type>);
@@ -43,12 +42,11 @@ type
 
     method Deserialize<T>(value:String):T;
     begin
-
       var sReader:= new StringReader(value);
       var xReader := XmlReader.Create(sReader);
       exit _serializer.ReadObject(xReader) as T;
-
     end;
+
  end;
 
 end.
