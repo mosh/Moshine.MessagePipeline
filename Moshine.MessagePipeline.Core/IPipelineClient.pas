@@ -5,6 +5,7 @@ uses
   Moshine.MessagePipeline.Core.Models,
   System.Linq.Expressions,
   System.Collections.Generic,
+  System.Threading,
   System.Threading.Tasks;
 
 type
@@ -13,12 +14,10 @@ type
 
     method InitializeAsync:Task;
 
-    method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
-    method Send<T>(methodCall: Expression<System.Action<T>>):IResponse;
-    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<IResponse>;
-    method Send<T>(methodCall: Expression<System.Func<T,Object>>):IResponse;
+    method SendAsync<T>(methodCall: Expression<System.Action<T>>; cancellationToken:CancellationToken := default):Task<IResponse>;
+    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>; cancellationToken:CancellationToken := default):Task<IResponse>;
 
-    method ReceiveAsync(serverWaitTime:TimeSpan):Task<MessageParcel>;
+    method ReceiveAsync(serverWaitTime:TimeSpan; cancellationToken:CancellationToken := default):Task<MessageParcel>;
 
 
   end;

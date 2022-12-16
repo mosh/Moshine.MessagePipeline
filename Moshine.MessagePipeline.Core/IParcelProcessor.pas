@@ -2,14 +2,15 @@
 
 uses
   Moshine.MessagePipeline.Core.Models,
+  system.Threading,
   System.Threading.Tasks;
 
 type
 
   IParcelProcessor = public interface
-    method ProcessMessageAsync(parcel:MessageParcel):Task;
-    method FaultedInProcessingAsync(parcel:MessageParcel):Task;
-    method FinishProcessingAsync(parcel:MessageParcel):Task;
+    method ProcessMessageAsync(parcel:MessageParcel; cancellationToken:CancellationToken := default):Task;
+    method FaultedInProcessingAsync(parcel:MessageParcel; cancellationToken:CancellationToken := default):Task;
+    method FinishProcessingAsync(parcel:MessageParcel; cancellationToken:CancellationToken := default):Task;
   end;
 
 end.

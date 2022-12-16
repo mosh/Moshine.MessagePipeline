@@ -4,6 +4,7 @@ uses
   Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Core.Models,
+  System.Threading,
   System.Threading.Tasks;
 
 type
@@ -52,7 +53,7 @@ type
       _manager := manager;
     end;
 
-    method ProcessMessageAsync(parcel:MessageParcel):Task;
+    method ProcessMessageAsync(parcel:MessageParcel; cancellationToken:CancellationToken := default):Task;
     begin
 
       try
@@ -109,7 +110,7 @@ type
 
     end;
 
-    method FaultedInProcessingAsync(parcel:MessageParcel):Task;
+    method FaultedInProcessingAsync(parcel:MessageParcel; cancellationToken:CancellationToken := default):Task;
     begin
       Logger.LogTrace('Faulting In Processing');
 
@@ -119,7 +120,7 @@ type
       Logger.LogTrace('Faulted In Processing');
     end;
 
-    method FinishProcessingAsync(parcel:MessageParcel):Task;
+    method FinishProcessingAsync(parcel:MessageParcel; cancellationToken:CancellationToken := default):Task;
     begin
       Logger.LogTrace('Finishing Processing');
       await _manager.CompleteActionExecutionAsync(parcel.Message.Id);

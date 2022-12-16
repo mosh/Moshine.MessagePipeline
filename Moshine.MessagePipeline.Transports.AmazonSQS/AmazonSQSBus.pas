@@ -9,6 +9,7 @@ uses
   Moshine.MessagePipeline.Core,
   System,
   System.Linq,
+  System.Threading,
   System.Threading.Tasks;
 
 type
@@ -34,7 +35,7 @@ type
     end;
 
 
-    method SendMessageAsync(id:Guid; messageBody:String):Task<SendMessageResponse>;
+    method SendMessageAsync(id:Guid; messageBody:String; cancellationToken:CancellationToken := default):Task<SendMessageResponse>;
     begin
       Guard;
 
@@ -45,7 +46,7 @@ type
         messageRequest.MessageDeduplicationId := id.ToString;
         messageRequest.MessageGroupId := id.ToString;
 
-        exit await _client.SendMessageAsync(messageRequest);
+        exit await _client.SendMessageAsync(messageRequest, cancellationToken);
 
       except
         on E:Exception do
@@ -99,23 +100,22 @@ type
       request.QueueName := _queueName;
       request.QueueOwnerAWSAccountId := _accountId;
 
-      _url := _client.GetQueueUrlAsync(request).Result;
+      _url := await _client.GetQueueUrlAsync(request);
 
-      exit Task.CompletedTask;
     end;
 
-    method SendAsync(messageContent:String;id:Guid):Task;
+    method SendAsync(messageContent:String;id:Guid; cancellationToken:CancellationToken := default):Task;
     begin
-      await SendMessageAsync(id, messageContent);
+      await SendMessageAsync(id, messageContent, cancellationToken);
     end;
 
-    method SendAsync(message:IMessage):Task;
+    method SendAsync(message:IMessage; cancellationToken:CancellationToken := default):Task;
     begin
       var amazonMessage := message as AmazonSQSMessage;
-      await SendMessageAsync(amazonMessage.Id, amazonMessage.GetBody);
+      await SendMessageAsync(amazonMessage.Id, amazonMessage.GetBody, cancellationToken);
     end;
 
-    method DeleteMessageAsync(message:Message):Task;
+    method DeleteMessageAsync(message:Message; cancellationToken:CancellationToken := default):Task;
     begin
       Guard;
       var deleteMessageRequest := new DeleteMessageRequest();
@@ -123,10 +123,10 @@ type
       deleteMessageRequest.QueueUrl := _url.QueueUrl;
       deleteMessageRequest.ReceiptHandle := message.ReceiptHandle;
 
-      await _client.DeleteMessageAsync(deleteMessageRequest);
+      await _client.DeleteMessageAsync(deleteMessageRequest, cancellationToken);
     end;
 
-    method ReturnMessage(message:Message);
+    method ReturnMessageAsync(message:Message; cancellationToken:CancellationToken := default):Task;
     begin
 
       var request := new ChangeMessageVisibilityRequest;
@@ -134,11 +134,11 @@ type
       request.ReceiptHandle := message.ReceiptHandle;
       request.VisibilityTimeout := 0;
 
-      _client.ChangeMessageVisibilityAsync(request).Wait;
+      await _client.ChangeMessageVisibilityAsync(request, cancellationToken);
 
     end;
 
-    method ReceiveAsync(serverWaitTime:TimeSpan):Task<IMessage>;
+    method ReceiveAsync(serverWaitTime:TimeSpan; cancellationToken:CancellationToken := default):Task<IMessage>;
     begin
       Guard;
 
@@ -148,7 +148,7 @@ type
       receiveMessageRequest.MaxNumberOfMessages := 1; // only return 1 message
       receiveMessageRequest.QueueUrl := _url.QueueUrl;
 
-      var receiveMessageResponse := await _client.ReceiveMessageAsync(receiveMessageRequest);
+      var receiveMessageResponse := await _client.ReceiveMessageAsync(receiveMessageRequest, cancellationToken);
 
       var someMessage := receiveMessageResponse.Messages.FirstOrDefault;
 

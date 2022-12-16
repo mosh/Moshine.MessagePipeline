@@ -6,6 +6,7 @@ uses
   Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus.Models,
   Moshine.MessagePipeline.Core,
   System.Text,
+  System.Threading,
   System.Threading.Tasks;
 
 type
@@ -100,31 +101,31 @@ type
 
     end;
 
-    method SendAsync(message: IMessage): Task;
+    method SendAsync(message: IMessage; cancellationToken:CancellationToken := default): Task;
     begin
 
       var internalMessage := (message as ServiceBusMessage).InternalMessage;
       Logger.LogTrace('Send');
-      await _sender.SendMessageAsync(new Azure.Messaging.ServiceBus.ServiceBusMessage(internalMessage));
+      await _sender.SendMessageAsync(new Azure.Messaging.ServiceBus.ServiceBusMessage(internalMessage), cancellationToken);
       Logger.LogTrace('Sent');
 
     end;
 
-    method SendAsync(messageContent: String; id: Guid): Task;
+    method SendAsync(messageContent: String; id: Guid; cancellationToken:CancellationToken := default): Task;
     begin
 
       var message := new Azure.Messaging.ServiceBus.ServiceBusMessage(messageContent);
       message.ApplicationProperties.Add('Id',id);
       Logger.LogTrace('Send');
-      await _sender.SendMessageAsync(message);
+      await _sender.SendMessageAsync(message, cancellationToken);
       Logger.LogTrace('Sent');
 
     end;
 
-    method ReceiveAsync(serverWaitTime: TimeSpan): Task<IMessage>;
+    method ReceiveAsync(serverWaitTime: TimeSpan; cancellationToken:CancellationToken := default): Task<IMessage>;
     begin
 
-      var receivedMessage := await _receiver.ReceiveMessageAsync(serverWaitTime);
+      var receivedMessage := await _receiver.ReceiveMessageAsync(serverWaitTime, cancellationToken);
 
       if(assigned(receivedMessage))then
       begin

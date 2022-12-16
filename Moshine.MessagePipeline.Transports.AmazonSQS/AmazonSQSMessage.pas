@@ -68,8 +68,7 @@ type
         raise new ApplicationException('No available message');
       end;
 
-      self._bus.ReturnMessage(_message);
-      exit Task.CompletedTask;
+      await self._bus.ReturnMessageAsync(_message);
     end;
 
     method CompleteAsync:Task;

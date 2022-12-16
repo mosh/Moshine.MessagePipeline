@@ -1,7 +1,8 @@
 ﻿namespace Moshine.MessagePipeline;
 
 uses
-  Moshine.MessagePipeline.Core;
+  Moshine.MessagePipeline.Core,
+  System.Threading;
 
 type
   DeduplicatingManager = public class(IManager)
@@ -14,7 +15,7 @@ type
       _outboxRepository := outboxRepository;
     end;
 
-    method HasActionExecutedAsync(id:Guid):Task<Boolean>;
+    method HasActionExecutedAsync(id:Guid; cancellationToken:CancellationToken := default):Task<Boolean>;
     begin
       var row := await _outboxRepository.GetAsync(id);
       if(not assigned(row))then
@@ -24,7 +25,7 @@ type
       exit true;
     end;
 
-    method CompleteActionExecutionAsync(id:Guid):Task;
+    method CompleteActionExecutionAsync(id:Guid; cancellationToken:CancellationToken := default):Task;
     begin
       await _outboxRepository.SetDispatchedAsync(id);
     end;

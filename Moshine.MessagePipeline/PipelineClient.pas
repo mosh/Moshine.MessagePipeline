@@ -7,6 +7,7 @@ uses
   System.Collections.Generic,
   System.Linq,
   System.Linq.Expressions,
+  System.Threading,
   System.Threading.Tasks;
 
 type
@@ -20,23 +21,13 @@ type
     _methodCallHelpers:MethodCallHelpers;
     cache:ICache;
 
-    method EnQueue(someAction:SavedAction);
+    method EnQueueAsync(someAction:SavedAction; cancellationToken:CancellationToken := default):Task;
     begin
-      Logger.LogTrace('Entering');
+      Logger.LogTrace('Starting EnQueueAsync');
       var stringRepresentation := _actionSerializer.Serialize(someAction);
-      Logger.LogTrace('SendAsync');
-      _bus.SendAsync(stringRepresentation, someAction.Id).Wait;
-      Logger.LogTrace('SentAsync');
-
-    end;
-
-    method EnQueueAsync(someAction:SavedAction):Task;
-    begin
-      Logger.LogTrace('Entering');
-      var stringRepresentation := _actionSerializer.Serialize(someAction);
-      Logger.LogTrace('SendAsync');
-      await _bus.SendAsync(stringRepresentation, someAction.Id);
-      Logger.LogTrace('SentAsync');
+      Logger.LogTrace('EnQueueAsync SendAsync');
+      await _bus.SendAsync(stringRepresentation, someAction.Id, cancellationToken);
+      Logger.LogTrace('EnQueueAsync SentAsync');
 
     end;
 
@@ -49,7 +40,6 @@ type
       cache := cacheImpl;
       _methodCallHelpers := new MethodCallHelpers(Logger);
       _actionSerializer := actionSerializerImpl;
-      Logger.LogTrace('Exiting');
     end;
 
     method InitializeAsync:Task;
@@ -59,7 +49,7 @@ type
       Logger.LogTrace('Initialized');
     end;
 
-    method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
+    method SendAsync<T>(methodCall: Expression<System.Action<T>>; cancellationToken:CancellationToken := default):Task<IResponse>;
     begin
       if(assigned(methodCall))then
       begin
@@ -73,7 +63,7 @@ type
           Logger.LogTrace('methodCallHelpers not assigned');
         end;
         var saved := _methodCallHelpers.Save(methodCall);
-        await EnQueueAsync(saved);
+        await EnQueueAsync(saved, cancellationToken);
         var r := new Response(cache,Logger);
         r.Id := saved.Id;
         exit r;
@@ -85,34 +75,7 @@ type
 
     end;
 
-
-    method Send<T>(methodCall: Expression<System.Action<T>>):IResponse;
-    begin
-      if(assigned(methodCall))then
-      begin
-        Logger.LogTrace('methodCall assigned');
-        if(assigned(_methodCallHelpers))then
-        begin
-          Logger.LogTrace('_methodCallHelpers assigned');
-        end
-        else
-        begin
-          Logger.LogTrace('_methodCallHelpers not assigned');
-        end;
-        var saved := _methodCallHelpers.Save(methodCall);
-        EnQueue(saved);
-        var r := new Response(cache, Logger);
-        r.Id := saved.Id;
-        exit r;
-      end
-      else
-      begin
-        Logger.LogTrace('methodCall not assigned');
-      end;
-
-    end;
-
-    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<IResponse>;
+    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>; cancellationToken:CancellationToken := default):Task<IResponse>;
     begin
       if(not assigned(methodCall))then
       begin
@@ -121,32 +84,15 @@ type
       end;
 
       var saved := _methodCallHelpers.Save(methodCall);
-      await EnQueueAsync(saved);
+      await EnQueueAsync(saved, cancellationToken);
       var r := new Response(cache, Logger);
       r.Id := saved.Id;
       exit r;
     end;
 
-
-    method Send<T>(methodCall: Expression<System.Func<T,Object>>):IResponse;
+    method ReceiveAsync(serverWaitTime:TimeSpan; cancellationToken:CancellationToken := default):Task<MessageParcel>;
     begin
-      if(assigned(methodCall))then
-      begin
-        Logger.LogTrace('methodCall not assigned');
-        raise new ArgumentNullException('methodcall not assigned');
-      end;
-
-      var saved := _methodCallHelpers.Save(methodCall);
-      EnQueue(saved);
-      var r := new Response(cache, Logger);
-      r.Id := saved.Id;
-      exit r;
-
-    end;
-
-    method ReceiveAsync(serverWaitTime:TimeSpan):Task<MessageParcel>;
-    begin
-      var someMessage := await _bus.ReceiveAsync(serverWaitTime);
+      var someMessage := await _bus.ReceiveAsync(serverWaitTime, cancellationToken);
 
       if(assigned(someMessage))then
       begin

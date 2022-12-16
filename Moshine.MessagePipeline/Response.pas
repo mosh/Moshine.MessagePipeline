@@ -29,7 +29,7 @@ type
 
     method WaitForResultAsync<T>:Task<T>;
     begin
-      Logger.LogTrace('Started');
+      Logger.LogTrace('Started WaitForResultAsync');
 
       var source := new CancellationTokenSource;
       var token := source.Token;
@@ -67,7 +67,7 @@ type
       except
         on E:Exception do
           begin
-            Logger.LogTrace('Caught exception in WhenAny');
+            Logger.LogError(E,'Caught exception in WhenAny');
           end;
       end;
 

@@ -41,29 +41,33 @@ type
 
     method InitializeAsync:Task;
     begin
-      Logger.LogTrace('Initializing');
+      Logger.LogTrace('Initializing Pipeline');
 
       await _client.InitializeAsync;
 
       SetupPipeline;
 
-      Logger.LogTrace('Initialized');
+      Logger.LogTrace('Initialized Pipeline');
     end;
 
 
-    method MessageReceiver:Task;
+    method MessageReceiverAsync:Task;
     begin
       try
-        Logger.LogTrace('Starting to receive');
+        Logger.LogTrace('Starting to receive messages');
 
         repeat
-          var parcel := await _client.ReceiveAsync(ServerWaitTime);
+          var parcel := await _client.ReceiveAsync(ServerWaitTime, token);
 
           if(assigned(parcel))then
           begin
             Logger.LogTrace('Posting parcel');
             processMessage.Post(parcel);
             Logger.LogTrace('Posted parcel');
+          end
+          else
+          begin
+            Logger.LogTrace('No parcel to process');
           end;
 
         until token.IsCancellationRequested;
@@ -85,7 +89,7 @@ type
           begin
             try
               Logger.LogTrace('Process Message');
-              await _parcelProcessor.ProcessMessageAsync(parcel);
+              await _parcelProcessor.ProcessMessageAsync(parcel, token);
               Logger.LogTrace('Processed Message');
             except
               on e:Exception do
@@ -105,7 +109,7 @@ type
           begin
             try
               Logger.LogTrace('Faulting in processing');
-              await _parcelProcessor.FaultedInProcessingAsync(parcel);
+              await _parcelProcessor.FaultedInProcessingAsync(parcel, token);
               Logger.LogTrace('Faulted in processing');
             except
               on e:Exception do
@@ -120,7 +124,7 @@ type
           begin
             try
               Logger.LogTrace('Finishing processing');
-              await _parcelProcessor.FinishProcessingAsync(parcel);
+              await _parcelProcessor.FinishProcessingAsync(parcel, token);
               Logger.LogTrace('Finished processing');
             except
               on e:Exception do
@@ -191,7 +195,7 @@ type
 
       await InitializeAsync;
 
-      t := Task.Factory.StartNew( () -> MessageReceiver, token);
+      t := Task.Factory.StartNew( () -> MessageReceiverAsync, token);
 
     end;
 
@@ -205,19 +209,9 @@ type
       exit await _client.SendAsync<T>(methodCall);
     end;
 
-    method Send<T>(methodCall: Expression<System.Action<T>>):IResponse;
-    begin
-      exit _client.Send<T>(methodCall);
-    end;
-
     method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<IResponse>;
     begin
       exit _client.SendAsync<T>(methodCall);
-    end;
-
-    method Send<T>(methodCall: Expression<System.Func<T,Object>>):IResponse;
-    begin
-      exit _client.Send<T>(methodCall);
     end;
 
   end;
