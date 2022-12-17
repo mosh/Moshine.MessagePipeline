@@ -79,7 +79,6 @@ type
         on e:Exception do
         begin
           Logger.LogError(e,'Error receiving messages');
-          raise;
         end;
       end;
 
