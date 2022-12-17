@@ -16,6 +16,9 @@ type
     _receiver:ServiceBusReceiver;
   public
 
+    // identification attribute for queues
+    const IdAttribute:String = 'Id';
+
     constructor(receiver:ServiceBusReceiver; message:ServiceBusReceivedMessage; loggerImpl:ILogger);
     begin
       _message := message;
@@ -32,7 +35,7 @@ type
 
     property Id:Guid read
       begin
-        exit Guid.Parse(_message.ApplicationProperties['Id'].ToString);
+        exit Guid.Parse(_message.ApplicationProperties[IdAttribute].ToString);
       end;
 
 

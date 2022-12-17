@@ -115,7 +115,7 @@ type
     begin
 
       var message := new Azure.Messaging.ServiceBus.ServiceBusMessage(messageContent);
-      message.ApplicationProperties.Add('Id',id);
+      message.ApplicationProperties.Add(ServiceBusMessage.IdAttribute,id);
       Logger.LogTrace('Send');
       await _sender.SendMessageAsync(message, cancellationToken);
       Logger.LogTrace('Sent');

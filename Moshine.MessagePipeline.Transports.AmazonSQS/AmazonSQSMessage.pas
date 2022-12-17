@@ -13,10 +13,14 @@ type
     _message:Message;
     _sendMessageRequest:SendMessageRequest;
     _bus : AmazonSQSBus;
+    _receiptHandle:String;
 
 
   protected
   public
+
+    // identification attribute for standard queues
+    const IdAttribute:String = 'Id';
 
     // constructing with a message that has been received
     constructor(bus:AmazonSQSBus; message:Message);
@@ -26,10 +30,11 @@ type
     end;
 
     // constructing with message that we intend to send
-    constructor(bus:AmazonSQSBus; sendMessageRequest:SendMessageRequest);
+    constructor(bus:AmazonSQSBus; sendMessageRequest:SendMessageRequest; receiptMessageHandle:String);
     begin
       _bus := bus;
       _sendMessageRequest := sendMessageRequest;
+      _receiptHandle := receiptMessageHandle;
     end;
 
     property InternalMessage:Message read
@@ -37,9 +42,27 @@ type
         exit _message;
       end;
 
+    property ReceiptHandle:String read
+      begin
+        if(assigned(_message))then
+        begin
+          exit _message.ReceiptHandle;
+        end;
+        exit _receiptHandle;
+      end;
+
     property Id:Guid read
       begin
-        var value := iif(assigned(_message), _message.MessageId, _sendMessageRequest.MessageDeduplicationId);
+        var value:String;
+        if(_bus.IsFifo)then
+        begin
+          value := iif(assigned(_message), _message.MessageId, _sendMessageRequest.MessageDeduplicationId);
+        end
+        else
+        begin
+          var attribute := _message.MessageAttributes[IdAttribute];
+          value := attribute.StringValue;
+        end;
         exit Guid.Parse(value);
       end;
 
@@ -49,9 +72,19 @@ type
       var sendMessageRequest := new SendMessageRequest;
       sendMessageRequest.QueueUrl := _bus.Url.QueueUrl;
       sendMessageRequest.MessageBody := self.GetBody;
-      sendMessageRequest.MessageDeduplicationId := self.Id.ToString;
-      sendMessageRequest.MessageGroupId := self.Id.ToString;
-      exit new AmazonSQSMessage(_bus, sendMessageRequest);
+      if(_bus.IsFifo)then
+      begin
+        sendMessageRequest.MessageDeduplicationId := self.Id.ToString;
+        sendMessageRequest.MessageGroupId := self.Id.ToString;
+      end
+      else
+      begin
+        var attribute := new MessageAttributeValue();
+        attribute.DataType := 'String';
+        attribute.StringValue := Id.ToString;
+        sendMessageRequest.MessageAttributes.Add(IdAttribute,attribute);
+      end;
+      exit new AmazonSQSMessage(_bus, sendMessageRequest,InternalMessage.ReceiptHandle);
     end;
 
     method GetBody:String;
@@ -61,14 +94,15 @@ type
 
     method AsErrorAsync:Task;
     begin
-      // assuming we have setup a dead-letter queue this shouldnt be required
-      // also
-      if(not assigned(_message))then
+      if(not _bus.IsFifo)then
       begin
-        raise new ApplicationException('No available message');
+        var receiptForMessageToBeReturned := ReceiptHandle;
+        if(String.IsNullOrEmpty(receiptForMessageToBeReturned))then
+        begin
+          raise new ApplicationException('No receipthandle');
+        end;
+        await self._bus.ReturnMessageAsync(receiptForMessageToBeReturned);
       end;
-
-      await self._bus.ReturnMessageAsync(_message);
     end;
 
     method CompleteAsync:Task;
