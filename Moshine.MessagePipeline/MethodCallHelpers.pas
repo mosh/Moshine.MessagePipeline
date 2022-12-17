@@ -26,6 +26,7 @@ type
       end;
 
       var saved := new SavedAction;
+      saved.Id := Guid.NewGuid;
       saved.&Type := expression.Method.DeclaringType.ToString;
       saved.Method := expression.Method.Name;
       saved.Function:= true;
