@@ -34,7 +34,7 @@ type
     processMessage:TransformBlock<MessageParcel, MessageParcel>;
     finishProcessing:ActionBlock<MessageParcel>;
     faultedInProcessing:ActionBlock<MessageParcel>;
-    t:Task;
+    messageReceiveTask:Task;
 
     _client:IPipelineClient;
     _parcelProcessor:IParcelProcessor;
@@ -72,6 +72,10 @@ type
 
         until token.IsCancellationRequested;
       except
+        on tc:TaskCanceledException do
+        begin
+          Logger.LogInformation('Shutting down');
+        end;
         on e:Exception do
         begin
           Logger.LogError(e,'Error receiving messages');
@@ -115,7 +119,6 @@ type
               on e:Exception do
               begin
                 Logger.LogError(e,'Exception in faultedInProcessing Block');
-                raise;
               end;
             end;
           end);
@@ -130,7 +133,6 @@ type
               on e:Exception do
               begin
                 Logger.LogError(e,'exception in finishProcessing block');
-                raise;
               end;
             end;
           end);
@@ -166,24 +168,17 @@ type
 
     method StopAsync:Task;
     begin
-      Logger.LogTrace('Token cancelled');
+      Logger.LogTrace('Stopping');
       tokenSource.Cancel;
 
       processMessage.Complete;
 
       Logger.LogTrace('Stopped processing messages');
 
-      if(not finishProcessing.Completion.Wait(TimeSpan.FromSeconds(30))) then
-      begin
-        Logger.LogTrace('Timed out waiting after 30 seconds for finish processing messages');
-      end
-      else
-      begin
-        Logger.LogTrace('Stopped finish processing messages');
-      end;
+      await processMessage.Completion.WaitAsync(TimeSpan.FromSeconds(30));
 
       Logger.LogTrace('Waiting to stop');
-      await Task.WhenAll(t);
+      await Task.WhenAll(messageReceiveTask);
       Logger.LogTrace('Stopped');
 
     end;
@@ -195,7 +190,7 @@ type
 
       await InitializeAsync;
 
-      t := Task.Factory.StartNew( () -> MessageReceiverAsync, token);
+      messageReceiveTask := Task.Factory.StartNew( () -> MessageReceiverAsync, token);
 
     end;
 
