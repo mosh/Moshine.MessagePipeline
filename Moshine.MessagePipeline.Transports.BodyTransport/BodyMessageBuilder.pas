@@ -4,7 +4,7 @@ uses
   Moshine.MessagePipeline.Core, Moshine.MessagePipeline.Core.Models;
 
 type
-  BodyMessageBuilder = public class
+  BodyMessageBuilder = public class(IBodyMessageBuilder)
   private
     _serializer:PipelineSerializer<SavedAction>;
   public

@@ -86,6 +86,7 @@
     <Compile Include="ParcelReceiver.pas" />
     <Compile Include="DeduplicatingManager.pas" />
     <Compile Include="SimpleManager.pas" />
+    <Compile Include="NullCache.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>
