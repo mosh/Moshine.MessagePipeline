@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <AssemblyName>Moshine.MessagePipeline.Cache.InMemory</AssemblyName>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NET7.0</TargetFramework>
+    <TargetFramework>.NET6.0</TargetFramework>
     <Mode>Echoes</Mode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

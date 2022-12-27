@@ -8,7 +8,7 @@
     <AssemblyName>Moshine.MessagePipeline.Consumers.AmazonSQS</AssemblyName>
     <ApplicationIcon>Properties\App.ico</ApplicationIcon>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NET7.0</TargetFramework>
+    <TargetFramework>.NET6.0</TargetFramework>
     <Mode>Echoes</Mode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
