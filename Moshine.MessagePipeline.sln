@@ -11,7 +11,9 @@ Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Con
 EndProject
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Core", "Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements", "{D6FDDD36-602C-49C1-B399-30852F6F8B98}"
 EndProject
-Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Data", "Moshine.MessagePipeline.Data\Moshine.MessagePipeline.Data.elements", "{2A720D8C-7A14-4A9C-A43F-E65863191C43}"
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Data.Postgres", "Moshine.MessagePipeline.Data.Postgres\Moshine.MessagePipeline.Data.Postgres.elements", "{866A252E-59B7-499B-A490-907E88B3556C}"
+EndProject
+Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Data.SqlServer", "Moshine.MessagePipeline.Data.SqlServer\Moshine.MessagePipeline.Data.SqlServer.elements", "{D41A5F22-35E5-4EBD-8709-945772614E44}"
 EndProject
 Project("{656346D9-4656-40DA-A068-22D5425D4639}") = "Moshine.MessagePipeline.Transports.AmazonSQS", "Moshine.MessagePipeline.Transports.AmazonSQS\Moshine.MessagePipeline.Transports.AmazonSQS.elements", "{9F703BFC-4459-43B8-A46C-6741901E9ACC}"
 EndProject
@@ -45,10 +47,14 @@ Global
 		{D6FDDD36-602C-49C1-B399-30852F6F8B98}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
 		{D6FDDD36-602C-49C1-B399-30852F6F8B98}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
 		{D6FDDD36-602C-49C1-B399-30852F6F8B98}.Release|AnyCPU.Build.0 = Release|AnyCPU
-		{2A720D8C-7A14-4A9C-A43F-E65863191C43}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
-		{2A720D8C-7A14-4A9C-A43F-E65863191C43}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
-		{2A720D8C-7A14-4A9C-A43F-E65863191C43}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
-		{2A720D8C-7A14-4A9C-A43F-E65863191C43}.Release|AnyCPU.Build.0 = Release|AnyCPU
+		{866A252E-59B7-499B-A490-907E88B3556C}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
+		{866A252E-59B7-499B-A490-907E88B3556C}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
+		{866A252E-59B7-499B-A490-907E88B3556C}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
+		{866A252E-59B7-499B-A490-907E88B3556C}.Release|AnyCPU.Build.0 = Release|AnyCPU
+		{D41A5F22-35E5-4EBD-8709-945772614E44}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
+		{D41A5F22-35E5-4EBD-8709-945772614E44}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
+		{D41A5F22-35E5-4EBD-8709-945772614E44}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
+		{D41A5F22-35E5-4EBD-8709-945772614E44}.Release|AnyCPU.Build.0 = Release|AnyCPU
 		{9F703BFC-4459-43B8-A46C-6741901E9ACC}.Debug|AnyCPU.ActiveCfg = Debug|AnyCPU
 		{9F703BFC-4459-43B8-A46C-6741901E9ACC}.Debug|AnyCPU.Build.0 = Debug|AnyCPU
 		{9F703BFC-4459-43B8-A46C-6741901E9ACC}.Release|AnyCPU.ActiveCfg = Release|AnyCPU
