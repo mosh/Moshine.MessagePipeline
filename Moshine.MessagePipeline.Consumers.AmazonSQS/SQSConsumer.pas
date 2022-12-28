@@ -73,7 +73,7 @@ type
 
       services.AddSingleton<IActionInvokerHelpers>(container ->
         begin
-          var logger := container.GetService<ILogger>;
+          var logger := container.GetService<ILogger<IActionInvokerHelpers>>;
           var serviceFactory := container.GetService<IServiceFactory>;
           var typeFinder := container.GetService<ITypeFinder>;
           exit new ActionInvokerHelpers(serviceFactory, typeFinder, logger);
@@ -82,7 +82,7 @@ type
 
       services.AddSingleton<IServiceFactory>(container ->
         begin
-          var logger := container.GetService<ILogger>;
+          var logger := container.GetService<ILogger<IServiceFactory>>;
           var systemConfig := container.GetService<ISystemConfig>;
           exit GetServiceFactory(logger, systemConfig);
         end);
@@ -99,7 +99,7 @@ type
         var cache := container.GetService<ICache>;
         var scopeProvider := container.GetService<IScopeProvider>;
         var manager := container.GetService<IManager>;
-        var logger := container.GetService<ILogger>;
+        var logger := container.GetService<ILogger<IParcelProcessor>>;
 
         exit new ParcelProcessor(actionSerializer, helpers, cache, scopeProvider, manager, logger);
 
