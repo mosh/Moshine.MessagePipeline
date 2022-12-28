@@ -27,9 +27,6 @@
     <EnableUnmanagedDebugging>False</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Echoes">
-      <Private>True</Private>
-    </Reference>
     <ProjectReference Include="..\Moshine.MessagePipeline\Moshine.MessagePipeline.oxygene">
       <HintPath>..\Moshine.MessagePipeline\bin\Debug\Moshine.MessagePipeline.dll</HintPath>
       <Project>{5116EDC8-7BF4-4A3B-BA8B-9F875F54FAB0}</Project>
