@@ -81,6 +81,7 @@
     <Compile Include="ISystemConfig.pas" />
     <Compile Include="PipelineSerializer.pas" />
     <Compile Include="IParcelReceiver.pas" />
+    <Compile Include="NullCache.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

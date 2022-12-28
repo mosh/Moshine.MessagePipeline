@@ -60,7 +60,7 @@
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
     </ProjectReference>
-    <NuGetReference Include="Microsoft.Extensions.Logging:[7.0.0]" />
+    <NuGetReference Include="Microsoft.Extensions.Logging:[6.0.0]" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Pipeline.pas" />
@@ -86,7 +86,6 @@
     <Compile Include="ParcelReceiver.pas" />
     <Compile Include="DeduplicatingManager.pas" />
     <Compile Include="SimpleManager.pas" />
-    <Compile Include="NullCache.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>

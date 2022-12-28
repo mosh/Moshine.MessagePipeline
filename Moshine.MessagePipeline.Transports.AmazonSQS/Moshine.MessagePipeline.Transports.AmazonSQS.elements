@@ -57,7 +57,7 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
     </ProjectReference>
     <NuGetReference Include="AWSSDK.SQS:[3.7.100.33]" />
-    <NuGetReference Include="Microsoft.Extensions.Logging:[7.0.0]" />
+    <NuGetReference Include="Microsoft.Extensions.Logging:[6.0.0]" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.pas" />
