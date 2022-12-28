@@ -51,9 +51,6 @@
     <NuGetReference Include="Amazon.Lambda.Serialization.SystemTextJson:[2.3.0]">
       <Private>True</Private>
     </NuGetReference>
-    <NuGetReference Include="Amazon.Sqs:[0.23.1]">
-      <Private>True</Private>
-    </NuGetReference>
     <NuGetReference Include="AWSSDK.SQS:[3.7.100.44]">
       <Private>True</Private>
     </NuGetReference>
