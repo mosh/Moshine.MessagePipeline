@@ -112,6 +112,13 @@ type
           exit new ParcelReceiver(processor);
         end);
 
+      services.AddSingleton<IBodyMessageBuilder>(container -> begin
+
+        var actionSerializer := new PipelineSerializer<SavedAction>(ParameterTypes());
+        exit new BodyMessageBuilder(actionSerializer);
+
+      end);
+
       exit services;
     end;
 
@@ -135,6 +142,15 @@ type
     begin
       _parcelReceiver := parcelReceiver;
       _bodyMessageBuilder := bodyMessageBuilder;
+      if(not assigned(_parcelReceiver))then
+      begin
+        raise new ApplicationException('IParcelReceiver not provided');
+      end;
+      if(not assigned(_bodyMessageBuilder))then
+      begin
+        raise new ApplicationException('IBodyMessageBuilder not provided');
+      end;
+
     end;
 
     method ParameterTypes:List<&Type>; abstract;
