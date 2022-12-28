@@ -3,7 +3,7 @@
 uses
   Microsoft.Extensions.Caching.Memory,
   Moshine.MessagePipeline.Core,
-  Newtonsoft.Json;
+  System.Text.Json;
 
 type
 
@@ -18,7 +18,7 @@ type
 
     method AddAsync(key:String;value:Object):Task;
     begin
-      _cache.Set(key,JsonConvert.SerializeObject(value), DateTimeOffset.Now.AddHours(1));
+      _cache.Set(key,JsonSerializer.Serialize(value), DateTimeOffset.Now.AddHours(1));
       exit Task.CompletedTask;
     end;
 
@@ -27,7 +27,7 @@ type
       var value : Object;
       if(_cache.TryGetValue(key, out value))then
       begin
-        var foundValue := (true,JsonConvert.DeserializeObject<T>(value.ToString));
+        var foundValue := (true,JsonSerializer.Deserialize<T>(value.ToString));
         exit Task.FromResult(foundValue);
       end;
 

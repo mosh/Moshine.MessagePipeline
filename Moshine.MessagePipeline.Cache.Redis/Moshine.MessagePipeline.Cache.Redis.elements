@@ -9,6 +9,7 @@
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
     <TargetFramework>.NET6.0</TargetFramework>
     <Mode>Echoes</Mode>
+    <NETCoreRuntimeVersion>6.0.4</NETCoreRuntimeVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>False</Optimize>
