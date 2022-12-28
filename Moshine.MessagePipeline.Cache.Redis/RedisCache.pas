@@ -2,8 +2,7 @@
 
 uses
   Moshine.MessagePipeline.Core,
-  Newtonsoft.Json,
-  StackExchange.Redis;
+  StackExchange.Redis, System.Text.Json;
 
 type
   RedisCache = public class(ICache)
@@ -21,7 +20,7 @@ type
     begin
       using db := connectionMultiplexor.GetDatabase do
       begin
-        db.StringSet(key, JsonConvert.SerializeObject(value),new TimeSpan(0,0,30));
+        db.StringSet(key, System.Text.Json.JsonSerializer.Serialize(value),new TimeSpan(0,0,30));
       end;
 
       exit Task.CompletedTask;
@@ -38,7 +37,7 @@ type
           exit (false,default(T));
         end;
 
-        exit (true,JsonConvert.DeserializeObject<T>(value));
+        exit (true,JsonSerializer.Deserialize<T>(value));
 
       end;
 

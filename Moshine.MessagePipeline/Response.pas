@@ -19,15 +19,13 @@ type
   public
     property MaximumWaitTimeInSeconds:Integer := 30;
 
-    property Id:Guid;
-
     constructor(cacheImpl:ICache; loggerImpl:ILogger);
     begin
       Cache := cacheImpl;
       Logger := loggerImpl;
     end;
 
-    method WaitForResultAsync<T>:Task<T>;
+    method WaitForResultAsync<T>(id:Guid):Task<T>;
     begin
       Logger.LogTrace('Started WaitForResultAsync');
 
@@ -43,7 +41,7 @@ type
 
           repeat
             token.ThrowIfCancellationRequested;
-            cacheResult := await Cache.GetAsync<T>(Id.ToString);
+            cacheResult := await Cache.GetAsync<T>(id.ToString);
             if(cacheResult.Item1)then
             begin
               obj := cacheResult.Item2;
@@ -82,9 +80,9 @@ type
     end;
 
 
-    method WaitForResult<T>:T;
+    method WaitForResult<T>(id:Guid):T;
     begin
-      exit WaitForResultAsync<T>.Result;
+      exit WaitForResultAsync<T>(id).Result;
     end;
 
 

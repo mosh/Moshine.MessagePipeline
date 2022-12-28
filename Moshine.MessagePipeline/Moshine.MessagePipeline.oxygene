@@ -53,7 +53,6 @@
     <WarnOnCaseMismatch>True</WarnOnCaseMismatch>
   </PropertyGroup>
   <ItemGroup>
-    <NuGetReference Include="Newtonsoft.Json:[13.0.2]" />
     <NuGetReference Include="System.Threading.Tasks.Dataflow:[7.0.0]" />
     <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements">
       <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>

@@ -19,7 +19,6 @@ type
     _actionSerializer:PipelineSerializer<SavedAction>;
     _bus:IBus;
     _methodCallHelpers:MethodCallHelpers;
-    cache:ICache;
 
     method EnQueueAsync(someAction:SavedAction; cancellationToken:CancellationToken := default):Task;
     begin
@@ -33,11 +32,10 @@ type
 
   public
 
-    constructor(bus:IBus;cacheImpl:ICache; actionSerializerImpl:PipelineSerializer<SavedAction>; loggerImpl:ILogger);
+    constructor(bus:IBus; actionSerializerImpl:PipelineSerializer<SavedAction>; loggerImpl:ILogger);
     begin
       Logger := loggerImpl;
       _bus := bus;
-      cache := cacheImpl;
       _methodCallHelpers := new MethodCallHelpers(Logger);
       _actionSerializer := actionSerializerImpl;
     end;
@@ -49,7 +47,7 @@ type
       Logger.LogTrace('Initialized');
     end;
 
-    method SendAsync<T>(methodCall: Expression<System.Action<T>>; cancellationToken:CancellationToken := default):Task<IResponse>;
+    method SendAsync<T>(methodCall: Expression<System.Action<T>>; cancellationToken:CancellationToken := default):Task<Guid>;
     begin
       if(assigned(methodCall))then
       begin
@@ -64,9 +62,7 @@ type
         end;
         var saved := _methodCallHelpers.Save(methodCall);
         await EnQueueAsync(saved, cancellationToken);
-        var r := new Response(cache,Logger);
-        r.Id := saved.Id;
-        exit r;
+        exit saved.Id;
       end
       else
       begin
@@ -75,7 +71,7 @@ type
 
     end;
 
-    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>; cancellationToken:CancellationToken := default):Task<IResponse>;
+    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>; cancellationToken:CancellationToken := default):Task<Guid>;
     begin
       if(not assigned(methodCall))then
       begin
@@ -85,9 +81,7 @@ type
 
       var saved := _methodCallHelpers.Save(methodCall);
       await EnQueueAsync(saved, cancellationToken);
-      var r := new Response(cache, Logger);
-      r.Id := saved.Id;
-      exit r;
+      exit saved.Id;
     end;
 
     method ReceiveAsync(serverWaitTime:TimeSpan; cancellationToken:CancellationToken := default):Task<MessageParcel>;

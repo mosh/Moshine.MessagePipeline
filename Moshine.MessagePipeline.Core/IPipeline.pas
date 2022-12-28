@@ -10,8 +10,8 @@ type
 
     method StartAsync:Task;
 
-    method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<IResponse>;
-    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<IResponse>;
+    method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<Guid>;
+    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<Guid>;
 
     method Version:String;
 
