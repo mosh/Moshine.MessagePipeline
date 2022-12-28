@@ -7,7 +7,7 @@ uses
 
 type
 
-  PostgresOutboxRepository = public class(IOutboxRepository)
+  OutboxRepository = public class(IOutboxRepository)
   private
     property Config:ISystemConfig;
   public

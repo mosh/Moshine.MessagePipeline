@@ -50,7 +50,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
     </None>
     <Compile Include="Properties\Settings.Designer.pas" />
-    <Compile Include="SqlServerOutboxRepository.pas" />
+    <Compile Include="OutboxRepository.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>
