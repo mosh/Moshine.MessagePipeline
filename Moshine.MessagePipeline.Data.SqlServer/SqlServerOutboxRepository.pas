@@ -1,4 +1,4 @@
-﻿namespace Moshine.MessagePipeline.Data;
+﻿namespace Moshine.MessagePipeline.Data.SqlServer;
 
 uses
   Dapper,
@@ -8,7 +8,7 @@ uses
   System.Threading;
 
 type
-  SqlServerOutboxRepository = public class(IOutboxRepository)
+  OutboxRepository = public class(IOutboxRepository)
   private
     property Config:ISystemConfig;
   public

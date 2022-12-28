@@ -1,4 +1,4 @@
-﻿namespace Moshine.MessagePipeline.Data;
+﻿namespace Moshine.MessagePipeline.Data.Postgres;
 
 uses
   Dapper,
