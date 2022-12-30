@@ -40,12 +40,6 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Moshine.MessagePipeline.Data\Moshine.MessagePipeline.Data.elements">
-      <HintPath>..\Moshine.MessagePipeline.Data\Bin\Debug\Moshine.MessagePipeline.Data.dll</HintPath>
-      <Project>{2A720D8C-7A14-4A9C-A43F-E65863191C43}</Project>
-      <ProjectFile>..\Moshine.MessagePipeline.Data\Moshine.MessagePipeline.Data.elements</ProjectFile>
-      <Private>True</Private>
-    </ProjectReference>
     <NuGetReference Include="Amazon.Lambda.Core:[2.1.0]">
       <Private>True</Private>
     </NuGetReference>
@@ -70,6 +64,12 @@
     </NuGetReference>
     <NuGetReference Include="Microsoft.Extensions.Logging:[6.0.0]" />
     <NuGetReference Include="Microsoft.Extensions.Logging.Console:[6.0.0]" />
+    <ProjectReference Include="..\Moshine.MessagePipeline.Data.Postgres\Moshine.MessagePipeline.Data.Postgres.elements">
+      <HintPath>..\Moshine.MessagePipeline.Data.Postgres\Bin\Release\Moshine.MessagePipeline.Data.Postgres.dll</HintPath>
+      <Project>{866A252E-59B7-499B-A490-907E88B3556C}</Project>
+      <ProjectFile>..\Moshine.MessagePipeline.Data.Postgres\Moshine.MessagePipeline.Data.Postgres.elements</ProjectFile>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.pas" />
