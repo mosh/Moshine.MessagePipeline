@@ -13,7 +13,6 @@
     <copyright></copyright>
     <tags></tags>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="9.0.1"  />
       <dependency id="System.Threading.Tasks.Dataflow" version="4.6.0"  />
       <dependency id="Moshine.MessagePipeline.Core" version="1.0.0"  />
     </dependencies>
