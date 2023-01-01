@@ -4,7 +4,7 @@ uses
   Dapper,
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Core.Models,
-  System.Data.SqlClient,
+  Microsoft.Data.SqlClient,
   System.Threading;
 
 type
