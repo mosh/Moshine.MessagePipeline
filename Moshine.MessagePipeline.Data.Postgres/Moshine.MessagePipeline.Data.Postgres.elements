@@ -28,7 +28,7 @@
     <EnableUnmanagedDebugging>False</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <NuGetReference Include="Dapper:[2.0.35]">
+    <NuGetReference Include="Dapper:[2.0.123]">
       <Private>True</Private>
     </NuGetReference>
     <NuGetReference Include="Npgsql:[7.0.1]">
