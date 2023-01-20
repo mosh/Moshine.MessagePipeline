@@ -122,13 +122,17 @@ type
 
     method SendAsync(messageContent:String;id:Guid; cancellationToken:CancellationToken := default):Task;
     begin
-      await SendMessageAsync(id, messageContent, cancellationToken);
+      var response := await SendMessageAsync(id, messageContent, cancellationToken);
+
+      Logger.LogDebug($'MessageId of sent message is {response.MessageId}');
     end;
 
     method SendAsync(message:IMessage; cancellationToken:CancellationToken := default):Task;
     begin
       var amazonMessage := message as AmazonSQSMessage;
-      await SendMessageAsync(amazonMessage.Id, amazonMessage.GetBody, cancellationToken);
+      var response := await SendMessageAsync(amazonMessage.Id, amazonMessage.GetBody, cancellationToken);
+
+      Logger.LogDebug($'MessageId of sent message is {response.MessageId}');
     end;
 
     method DeleteMessageAsync(message:Message; cancellationToken:CancellationToken := default):Task;
@@ -158,7 +162,7 @@ type
     begin
       Guard;
 
-      var receiveMessageRequest := new ReceiveMessageRequest();
+      var receiveMessageRequest := new ReceiveMessageRequest;
       if(not IsFifo)then
       begin
         receiveMessageRequest.MessageAttributeNames.Add(AmazonSQSMessage.IdAttribute);
@@ -171,6 +175,11 @@ type
       var receiveMessageResponse := await _client.ReceiveMessageAsync(receiveMessageRequest, cancellationToken);
 
       var someMessage := receiveMessageResponse.Messages.FirstOrDefault;
+
+      if(assigned(someMessage))then
+      begin
+        Logger.LogDebug($'MessageId of received message is {someMessage.MessageId}');
+      end;
 
       exit iif(assigned(someMessage),new AmazonSQSMessage(self,someMessage),nil);
 
