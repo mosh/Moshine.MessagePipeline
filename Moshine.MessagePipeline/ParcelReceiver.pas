@@ -2,7 +2,7 @@
 
 uses
   Moshine.MessagePipeline.Core,
-  Moshine.MessagePipeline.Core.Models;
+  Moshine.MessagePipeline.Core.Models, System.Threading;
 
 type
 
@@ -15,12 +15,12 @@ type
       parcelProcessor := parcelProcessImpl;
     end;
 
-    method ReceiveAsync(parcel:MessageParcel):Task;
+    method ReceiveAsync(parcel:MessageParcel; cancellationToken:CancellationToken := default):Task;
     begin
 
       try
-        await parcelProcessor.ProcessMessageAsync(parcel);
-        await parcelProcessor.FinishProcessingAsync(parcel);
+        await parcelProcessor.ProcessMessageAsync(parcel, cancellationToken);
+        await parcelProcessor.FinishProcessingAsync(parcel, cancellationToken);
       except
         on E:Exception do
         begin

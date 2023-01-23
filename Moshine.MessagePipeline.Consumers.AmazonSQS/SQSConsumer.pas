@@ -11,7 +11,7 @@ uses
   Moshine.MessagePipeline.Transports.BodyTransport,
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Core.Models,
-  Moshine.MessagePipeline.Scope;
+  Moshine.MessagePipeline.Scope, System.Threading;
 
 type
 
@@ -21,7 +21,7 @@ type
     _parcelReceiver:IParcelReceiver;
     _bodyMessageBuilder:IBodyMessageBuilder;
 
-    method DeleteMessageAsync(message:SQSEvent.SQSMessage):Task;
+    method DeleteMessageAsync(message:SQSEvent.SQSMessage; cancellationToken:CancellationToken := default):Task;
     begin
       var queueName := Environment.GetEnvironmentVariable('SQSqueueName');
 
@@ -31,7 +31,8 @@ type
       deleteMessageRequest.QueueUrl := queueName;
       deleteMessageRequest.ReceiptHandle := message.ReceiptHandle;
 
-      await client.DeleteMessageAsync(deleteMessageRequest);
+      await client.DeleteMessageAsync(deleteMessageRequest, cancellationToken);
+
 
     end;
 
@@ -159,17 +160,29 @@ type
     begin
       var raisedExceptions := new List<Exception>;
 
+      var tokenSource := new CancellationTokenSource(TimeSpan.FromSeconds(25));
+      var token := tokenSource.Token;
+
+
       for each &record in &event.Records do
-        begin
+      begin
         try
-          context.Logger.LogInformation('Processing message');
+
+
+
+          context.Logger.LogInformation($'Processing message with Id [{&record.MessageId}]');
 
           var parcel := new MessageParcel;
           parcel.Message := _bodyMessageBuilder.Build(&record.Body);
-          await _parcelReceiver.ReceiveAsync(parcel);
+          await _parcelReceiver.ReceiveAsync(parcel, token);
 
-          await DeleteMessageAsync(&record);
-          context.Logger.LogInformation('Deleted message');
+          context.Logger.LogInformation($'Processed message with Id [{&record.MessageId}]');
+
+          context.Logger.LogInformation($'Deleting message with Id [{&record.MessageId}]');
+
+          await DeleteMessageAsync(&record, token);
+
+          context.Logger.LogInformation($'Deleted message with Id [{&record.MessageId}]');
         except
           on ex:Exception do
           begin
