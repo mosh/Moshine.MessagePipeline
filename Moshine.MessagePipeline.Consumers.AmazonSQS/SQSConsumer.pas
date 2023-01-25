@@ -21,21 +21,6 @@ type
     _parcelReceiver:IParcelReceiver;
     _bodyMessageBuilder:IBodyMessageBuilder;
 
-    method DeleteMessageAsync(message:SQSEvent.SQSMessage; cancellationToken:CancellationToken := default):Task;
-    begin
-      var queueName := Environment.GetEnvironmentVariable('SQSqueueName');
-
-      var client := new AmazonSQSClient;
-      var deleteMessageRequest := new DeleteMessageRequest;
-
-      deleteMessageRequest.QueueUrl := queueName;
-      deleteMessageRequest.ReceiptHandle := message.ReceiptHandle;
-
-      await client.DeleteMessageAsync(deleteMessageRequest, cancellationToken);
-
-
-    end;
-
   protected
 
     method GetSystemConfig:ISystemConfig; abstract;
@@ -156,47 +141,54 @@ type
 
     method ParameterTypes:List<&Type>; abstract;
 
-    method FunctionHandlerAsync(&event:SQSEvent; context:ILambdaContext):Task;
+    method FunctionHandlerAsync(&event:SQSEvent; context:ILambdaContext):Task<SQSBatchResponse>;
     begin
-      var raisedExceptions := new List<Exception>;
+      var batchFailures := new List<SQSBatchResponse.BatchItemFailure>;
 
-      var tokenSource := new CancellationTokenSource(TimeSpan.FromSeconds(25));
-      var token := tokenSource.Token;
+      try
 
-
-      for each &record in &event.Records do
-      begin
-        try
+        var tokenSource := new CancellationTokenSource(TimeSpan.FromSeconds(25));
+        var token := tokenSource.Token;
 
 
+        for each &record in &event.Records do
+        begin
+          try
 
-          context.Logger.LogInformation($'Processing message with Id [{&record.MessageId}]');
+            context.Logger.LogInformation($'Processing message with Id [{&record.MessageId}]');
 
-          var parcel := new MessageParcel;
-          parcel.Message := _bodyMessageBuilder.Build(&record.Body);
-          await _parcelReceiver.ReceiveAsync(parcel, token);
+            var parcel := new MessageParcel;
+            parcel.Message := _bodyMessageBuilder.Build(&record.Body);
+            await _parcelReceiver.ReceiveAsync(parcel, token);
 
-          context.Logger.LogInformation($'Processed message with Id [{&record.MessageId}]');
+            context.Logger.LogInformation($'Processed message with Id [{&record.MessageId}]');
 
-          context.Logger.LogInformation($'Deleting message with Id [{&record.MessageId}]');
-
-          await DeleteMessageAsync(&record, token);
-
-          context.Logger.LogInformation($'Deleted message with Id [{&record.MessageId}]');
-        except
-          on ex:Exception do
-          begin
-            context.Logger.LogError($'MessageId {&record.MessageId} {ex.Message}');
-            raisedExceptions.Add(ex);
+          except
+            on TaskCanceledException do
+            begin
+              raise;
+            end
+            on ex:Exception do
+            begin
+              context.Logger.LogError($'Message with Id {&record.MessageId} failed with exception {ex.Message}');
+              batchFailures.Add( new SQSBatchResponse.BatchItemFailure(ItemIdentifier := &record.MessageId));
+            end;
           end;
+        end;
+      except
+        on TaskCanceledException do
+        begin
+          context.Logger.LogError('Task cancelled, failing all messages');
+          raise;
         end;
       end;
 
-      if(raisedExceptions.Any)then
+      if(batchFailures.Any)then
       begin
-        raise new AggregateException(raisedExceptions);
+        context.Logger.LogInformation($'{batchFailures.Count} failed out of {&event.Records.Count} messages failed');
       end;
 
+      exit new SQSBatchResponse(batchFailures);
 
     end;
   end;
