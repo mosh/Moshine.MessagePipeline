@@ -52,6 +52,7 @@
     <XmlDocWarningLevel>WarningOnPublicMembers</XmlDocWarningLevel>
     <EnableUnmanagedDebugging>False</EnableUnmanagedDebugging>
     <WarnOnCaseMismatch>True</WarnOnCaseMismatch>
+    <CreateNuGetPackage>True</CreateNuGetPackage>
   </PropertyGroup>
   <ItemGroup>
     <NuGetReference Include="System.Threading.Tasks.Dataflow:[7.0.0]" />
@@ -86,6 +87,7 @@
     <Compile Include="ParcelReceiver.pas" />
     <Compile Include="DeduplicatingManager.pas" />
     <Compile Include="SimpleManager.pas" />
+    <Compile Include="..\Moshine.MessagePipeline.Core\Properties\ProductVersion.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
   <PropertyGroup>

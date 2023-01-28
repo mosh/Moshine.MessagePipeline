@@ -25,6 +25,7 @@
     <OutputPath>.\Bin\Release</OutputPath>
     <CpuType>anycpu</CpuType>
     <EnableUnmanagedDebugging>False</EnableUnmanagedDebugging>
+    <CreateNuGetPackage>True</CreateNuGetPackage>
   </PropertyGroup>
   <ItemGroup>
     <NuGetReference Include="StackExchange.Redis:[2.6.80]" />
@@ -46,6 +47,7 @@
     </None>
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="RedisCache.pas" />
+    <Compile Include="..\Moshine.MessagePipeline.Core\Properties\ProductVersion.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.targets" />
 </Project>

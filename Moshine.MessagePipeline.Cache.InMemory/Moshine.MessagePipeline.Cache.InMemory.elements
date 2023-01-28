@@ -25,6 +25,7 @@
     <OutputPath>.\Bin\Release</OutputPath>
     <CpuType>anycpu</CpuType>
     <EnableUnmanagedDebugging>False</EnableUnmanagedDebugging>
+    <CreateNuGetPackage>True</CreateNuGetPackage>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.pas" />
@@ -37,6 +38,7 @@
     </None>
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="InMemoryCache.pas" />
+    <Compile Include="..\Moshine.MessagePipeline.Core\Properties\ProductVersion.pas" />
   </ItemGroup>
   <ItemGroup>
     <NuGetReference Include="Microsoft.Extensions.Caching.Memory:[6.0.0]" />

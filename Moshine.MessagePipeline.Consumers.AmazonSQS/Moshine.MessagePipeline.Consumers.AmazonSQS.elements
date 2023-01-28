@@ -26,6 +26,7 @@
     <OutputPath>.\Bin\Release</OutputPath>
     <CpuType>anycpu</CpuType>
     <EnableUnmanagedDebugging>False</EnableUnmanagedDebugging>
+    <CreateNuGetPackage>True</CreateNuGetPackage>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Moshine.MessagePipeline\Moshine.MessagePipeline.oxygene">
@@ -80,6 +81,7 @@
     </None>
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="SQSConsumer.pas" />
+    <Compile Include="..\Moshine.MessagePipeline.Core\Properties\ProductVersion.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>
