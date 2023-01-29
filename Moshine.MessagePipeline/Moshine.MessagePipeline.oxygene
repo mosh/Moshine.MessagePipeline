@@ -15,7 +15,6 @@
     <TargetFramework>.NET6.0</TargetFramework>
     <Name>Moshine.MessagePipeline</Name>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <AssemblyVersion>2.0</AssemblyVersion>
     <NETCoreRuntimeVersion>6.0.4</NETCoreRuntimeVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -77,7 +76,6 @@
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="MethodCallHelpers.pas" />
     <Compile Include="ActionInvokerHelpers.pas" />
-    <None Include="Moshine.MessagePipeline.Nuspec" />
     <Compile Include="PipelineClient.pas" />
     <Compile Include="ParcelProcessor.pas" />
     <Compile Include="Scope\NonTransactionalScope.pas" />
