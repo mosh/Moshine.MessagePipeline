@@ -82,6 +82,7 @@
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="SQSConsumer.pas" />
     <Compile Include="..\Moshine.MessagePipeline.Core\Properties\ProductVersion.pas" />
+    <Compile Include="ServiceStartupAttribute.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>

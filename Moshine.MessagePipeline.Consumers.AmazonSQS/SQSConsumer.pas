@@ -21,101 +21,45 @@ type
     _parcelReceiver:IParcelReceiver;
     _bodyMessageBuilder:IBodyMessageBuilder;
 
-  protected
-
-    method GetSystemConfig:ISystemConfig; abstract;
-    method GetServiceTypes:ITypeFinder; abstract;
-    method GetServiceFactory(logger:ILogger; systemConfig:ISystemConfig):IServiceFactory; abstract;
-
-    method Configure:IServiceCollection; virtual;
-    begin
-      var services := new ServiceCollection;
-
-      services.AddSingleton<ISystemConfig>(container ->
-        begin
-          exit GetSystemConfig;
-        end);
-
-      services.AddLogging(loggingBuilder ->  // AddLogging() requires Microsoft.Extensions.Logging NuGet package
-        begin
-            loggingBuilder.ClearProviders();
-            loggingBuilder.AddConsole(); // AddConsole() requires Microsoft.Extensions.Logging.Console NuGet package
-        end);
-
-      services.AddSingleton<ICache>(container ->
-        begin
-          exit new NullCache;
-        end);
-
-      services.AddSingleton<IScopeProvider>(container -> begin
-        var repository := container.GetService<IOutboxRepository>;
-        exit new TransactionalScopeProvider(repository);
-      end);
-
-      services.AddSingleton<IManager>(container -> begin
-        var repository := container.GetService<IOutboxRepository>;
-        exit new DeduplicatingManager(repository);
-      end);
-
-      services.AddSingleton<IActionInvokerHelpers>(container ->
-        begin
-          var logger := container.GetService<ILogger<IActionInvokerHelpers>>;
-          var serviceFactory := container.GetService<IServiceFactory>;
-          var typeFinder := container.GetService<ITypeFinder>;
-          exit new ActionInvokerHelpers(serviceFactory, typeFinder, logger);
-
-        end);
-
-      services.AddSingleton<IServiceFactory>(container ->
-        begin
-          var logger := container.GetService<ILogger<IServiceFactory>>;
-          var systemConfig := container.GetService<ISystemConfig>;
-          exit GetServiceFactory(logger, systemConfig);
-        end);
-
-      services.AddSingleton<ITypeFinder>(container ->
-        begin
-          exit GetServiceTypes;
-        end);
-
-      services.AddSingleton<IParcelProcessor>(container -> begin
-
-        var actionSerializer := new PipelineSerializer<SavedAction>(ParameterTypes());
-        var helpers := container.GetService<IActionInvokerHelpers>;
-        var cache := container.GetService<ICache>;
-        var scopeProvider := container.GetService<IScopeProvider>;
-        var manager := container.GetService<IManager>;
-        var logger := container.GetService<ILogger<IParcelProcessor>>;
-
-        exit new ParcelProcessor(actionSerializer, helpers, cache, scopeProvider, manager, logger);
-
-      end);
-
-      services.AddSingleton<IParcelReceiver>(container -> begin
-
-          var processor := container.GetService<IParcelProcessor>;
-
-          exit new ParcelReceiver(processor);
-        end);
-
-      services.AddSingleton<IBodyMessageBuilder>(container -> begin
-
-        var actionSerializer := new PipelineSerializer<SavedAction>(ParameterTypes());
-        exit new BodyMessageBuilder(actionSerializer);
-
-      end);
-
-      exit services;
-    end;
-
 
   public
 
     constructor;
     begin
 
-      var configuredServices := Configure;
-      var serviceProvider := configuredServices.BuildServiceProvider;
+      var collection := new ServiceCollection;
+
+      var callingAssembly := typeOf(SQSConsumer).Assembly.GetCallingAssembly;
+
+      var typeInCallingAssembly := callingAssembly.GetTypes.FirstOrDefault(t ->
+          begin
+            var attrs := t.GetCustomAttributes(typeOf(ServiceStartupAttribute),false);
+            exit assigned(attrs);
+          end);
+
+      if(assigned(typeInCallingAssembly))then
+      begin
+        var cons := typeInCallingAssembly.GetConstructor([]);
+
+        var instance := cons.Invoke([]);
+
+        var methodInfo := typeInCallingAssembly.GetMethod('Configure',[collection.GetType]);
+        if(assigned(methodInfo))then
+        begin
+          methodInfo.Invoke(instance,[collection]);
+        end
+        else
+        begin
+          raise new NotImplementedException('Class with ServiceStartup Attribute does not contain Configure method.');
+        end;
+
+      end
+      else
+      begin
+        raise new NotImplementedException('Cannot find class with ServiceStartup Attribute');
+      end;
+
+      var serviceProvider := collection.BuildServiceProvider;
 
       var parcelReceiver:IParcelReceiver := serviceProvider.GetService<IParcelReceiver>;
       var bodyMessageBuilder:IBodyMessageBuilder := serviceProvider.GetService<IBodyMessageBuilder>;
