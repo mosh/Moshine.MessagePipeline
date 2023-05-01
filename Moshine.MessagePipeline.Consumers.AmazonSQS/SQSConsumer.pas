@@ -1,6 +1,7 @@
 ﻿namespace Moshine.MessagePipeline.Consumers.AmazonSQS;
 
 uses
+  AWS.Lambda.Powertools.Logging,
   Amazon.Lambda.Core,
   Amazon.Lambda.SQSEvents,
   Amazon.Sqs,
@@ -34,7 +35,7 @@ type
       var typeInCallingAssembly := callingAssembly.GetTypes.FirstOrDefault(t ->
           begin
             var attrs := t.GetCustomAttributes(typeOf(ServiceStartupAttribute),false);
-            exit assigned(attrs);
+            exit attrs.Any;
           end);
 
       if(assigned(typeInCallingAssembly))then
@@ -52,7 +53,6 @@ type
         begin
           raise new NotImplementedException('Class with ServiceStartup Attribute does not contain Configure method.');
         end;
-
       end
       else
       begin
@@ -64,8 +64,16 @@ type
       var parcelReceiver:IParcelReceiver := serviceProvider.GetService<IParcelReceiver>;
       var bodyMessageBuilder:IBodyMessageBuilder := serviceProvider.GetService<IBodyMessageBuilder>;
 
-      constructor(parcelReceiver, bodyMessageBuilder);
+      if not assigned(parcelReceiver) then
+      begin
+        raise new ApplicationException('IParcelReceiver missing');
+      end;
 
+      if not assigned(bodyMessageBuilder) then
+      begin
+        raise new ApplicationException('IBodyMessageBuilder missing');
+      end;
+      constructor(parcelReceiver, bodyMessageBuilder);
     end;
 
     constructor(parcelReceiver:IParcelReceiver; bodyMessageBuilder:IBodyMessageBuilder);
@@ -85,6 +93,7 @@ type
 
     method ParameterTypes:List<&Type>; abstract;
 
+    [Logging]
     method FunctionHandlerAsync(&event:SQSEvent; context:ILambdaContext):Task<SQSBatchResponse>;
     begin
       var batchFailures := new List<SQSBatchResponse.BatchItemFailure>;
@@ -99,13 +108,14 @@ type
         begin
           try
 
-            context.Logger.LogInformation($'Processing message with Id [{&record.MessageId}]');
+
+            Logger.LogInformation($'Processing message with Id [{&record.MessageId}]');
 
             var parcel := new MessageParcel;
             parcel.Message := _bodyMessageBuilder.Build(&record.Body);
             await _parcelReceiver.ReceiveAsync(parcel, token);
 
-            context.Logger.LogInformation($'Processed message with Id [{&record.MessageId}]');
+            Logger.LogInformation($'Processed message with Id [{&record.MessageId}]');
 
           except
             on TaskCanceledException do
@@ -114,7 +124,7 @@ type
             end
             on ex:Exception do
             begin
-              context.Logger.LogError($'Message with Id {&record.MessageId} failed with exception {ex.Message}');
+              Logger.LogError($'Message with Id {&record.MessageId} failed with exception {ex.Message}');
               batchFailures.Add( new SQSBatchResponse.BatchItemFailure(ItemIdentifier := &record.MessageId));
             end;
           end;
@@ -122,14 +132,14 @@ type
       except
         on TaskCanceledException do
         begin
-          context.Logger.LogError('Task cancelled, failing all messages');
+          Logger.LogError('Task cancelled, failing all messages');
           raise;
         end;
       end;
 
       if(batchFailures.Any)then
       begin
-        context.Logger.LogInformation($'{batchFailures.Count} failed out of {&event.Records.Count} messages failed');
+        Logger.LogInformation($'{batchFailures.Count} failed out of {&event.Records.Count} messages failed');
       end;
 
       exit new SQSBatchResponse(batchFailures);

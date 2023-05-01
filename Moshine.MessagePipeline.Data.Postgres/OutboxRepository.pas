@@ -2,6 +2,7 @@
 
 uses
   Dapper,
+  Moshine.Foundation,
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Core.Models, System.Threading;
 
@@ -9,17 +10,17 @@ type
 
   OutboxRepository = public class(IOutboxRepository)
   private
-    property Config:ISystemConfig;
+    property Builder:IConnectionBuilder;
   public
 
-    constructor(config:ISystemConfig);
+    constructor(builderImpl:IConnectionBuilder);
     begin
-      self.Config := config;
+      Builder := builderImpl;
     end;
 
     method SetDispatchedAsync(id:System.Guid; cancellationToken:CancellationToken := default):Task;
     begin
-      using connection := new Npgsql.NpgsqlConnection(Config.DatabaseConnectionString) do
+      using connection := Builder.Build do
         begin
           await connection.ExecuteAsync('update outbox set dispatched=true,dispatched_at=CURRENT_TIMESTAMP where id=@id', new class(id));
         end;
@@ -28,7 +29,7 @@ type
 
     method StoreAsync(id:System.Guid; cancellationToken:CancellationToken := default):Task;
     begin
-      using connection := new Npgsql.NpgsqlConnection(Config.DatabaseConnectionString) do
+      using connection := Builder.Build do
       begin
          await connection.ExecuteAsync("insert into outbox(id) values(@id)",new class(id));
       end;
@@ -37,7 +38,7 @@ type
 
     method GetAsync(id:System.Guid; cancellationToken:CancellationToken := default):Task<Outbox>;
     begin
-      using connection := new Npgsql.NpgsqlConnection(Config.DatabaseConnectionString) do
+      using connection := Builder.Build do
       begin
           exit (await connection.QueryAsync<Outbox>('select id, dispatched,dispatched_at as dispatchedat from outbox where id=@id', new class(id))).FirstOrDefault;
       end;

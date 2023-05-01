@@ -2,9 +2,6 @@
 
 type
   ServiceStartupAttribute = public class(Attribute)
-  private
-  protected
-  public
   end;
 
 end.

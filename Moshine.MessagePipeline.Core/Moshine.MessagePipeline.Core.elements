@@ -80,7 +80,6 @@
     <Compile Include="Models\Outbox.pas" />
     <Compile Include="IOutboxRepository.pas" />
     <Compile Include="IManager.pas" />
-    <Compile Include="ISystemConfig.pas" />
     <Compile Include="PipelineSerializer.pas" />
     <Compile Include="IParcelReceiver.pas" />
     <Compile Include="NullCache.pas" />

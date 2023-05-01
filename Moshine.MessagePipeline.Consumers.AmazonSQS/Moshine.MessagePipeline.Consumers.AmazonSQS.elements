@@ -68,6 +68,9 @@
       <ProjectFile>..\Moshine.MessagePipeline.Data.Postgres\Moshine.MessagePipeline.Data.Postgres.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
+    <NuGetReference Include="AWS.Lambda.Powertools.Logging:[1.0.0]">
+      <Private>True</Private>
+    </NuGetReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.pas" />
