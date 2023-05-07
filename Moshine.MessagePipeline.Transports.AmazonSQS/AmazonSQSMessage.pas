@@ -4,6 +4,7 @@ uses
   Amazon.SQS.Model,
   Moshine.MessagePipeline.Core,
   System,
+  System.Threading,
   System.Threading.Tasks;
 
 type
@@ -92,7 +93,7 @@ type
       exit iif(assigned(_message), _message.Body, _sendMessageRequest.MessageBody);
     end;
 
-    method AsErrorAsync:Task;
+    method AsErrorAsync(cancellationToken:CancellationToken := default):Task;
     begin
       if(not _bus.IsFifo)then
       begin
@@ -101,13 +102,13 @@ type
         begin
           raise new ApplicationException('No receipthandle');
         end;
-        await self._bus.ReturnMessageAsync(receiptForMessageToBeReturned);
+        await self._bus.ReturnMessageAsync(receiptForMessageToBeReturned, cancellationToken);
       end;
     end;
 
-    method CompleteAsync:Task;
+    method CompleteAsync(cancellationToken:CancellationToken := default):Task;
     begin
-      await _bus.DeleteMessageAsync(_message);
+      await _bus.DeleteMessageAsync(_message, cancellationToken);
     end;
 
   end;

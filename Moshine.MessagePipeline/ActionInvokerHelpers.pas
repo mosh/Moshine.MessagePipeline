@@ -51,7 +51,7 @@ type
         raise new Exception(message);
       end;
 
-      Logger.LogTrace($'Found type {someAction.&Type}');
+      Logger.LogInformation($'Found type {someAction.&Type}');
 
       var obj := _factory.Create(someType);
 
@@ -69,17 +69,17 @@ type
         raise new Exception(message);
       end;
 
-      Logger.LogTrace($'Found method {someAction.Method} on Type {someAction.&Type}');
+      Logger.LogInformation($'Found method {someAction.Method} on Type {someAction.&Type}');
 
       if(someAction.Function)then
       begin
-        Logger.LogTrace($'Method {someAction.Method} on Type {someAction.&Type} returns value');
+        Logger.LogInformation($'Method {someAction.Method} on Type {someAction.&Type} returns value');
 
         var invokeObj := methodInfo.Invoke(obj,someAction.Parameters.ToArray);
 
         if((methodInfo.ReturnType.BaseType = typeOf(Task)) or (methodInfo.ReturnType = typeOf(Task)))then
         begin
-          Logger.LogTrace($'Method {someAction.Method} on Type {someAction.&Type} returns Task');
+          Logger.LogInformation($'Method {someAction.Method} on Type {someAction.&Type} returns Task');
 
           var aTask:Task := Task(invokeObj);
           await aTask;
@@ -98,7 +98,7 @@ type
       end
       else
       begin
-        Logger.LogTrace($'Method {someAction.Method} on Type {someAction.&Type} has no return value');
+        Logger.LogInformation($'Method {someAction.Method} on Type {someAction.&Type} has no return value');
 
         if(someAction.Parameters.Count > 0 )then
         begin

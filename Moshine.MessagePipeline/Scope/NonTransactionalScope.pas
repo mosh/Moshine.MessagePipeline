@@ -2,7 +2,8 @@
 
 uses
   Microsoft.Extensions.Logging,
-  Moshine.MessagePipeline.Core;
+  Moshine.MessagePipeline.Core,
+  System.Threading;
 
 type
 
@@ -36,9 +37,9 @@ type
       GC.SuppressFinalize(self);
     end;
 
-    method CompleteAsync(scopeId:Guid):Task;
+    method CompleteAsync(scopeId:Guid; cancellationToken:CancellationToken := default):Task;
     begin
-      Logger.LogTrace('Complete called');
+      Logger.LogInformation('Complete called');
       exit Task.CompletedTask;
     end;
 

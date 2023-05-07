@@ -41,33 +41,33 @@ type
 
     method InitializeAsync:Task;
     begin
-      Logger.LogTrace('Initializing Pipeline');
+      Logger.LogInformation('Initializing Pipeline');
 
       await _client.InitializeAsync;
 
       SetupPipeline;
 
-      Logger.LogTrace('Initialized Pipeline');
+      Logger.LogInformation('Initialized Pipeline');
     end;
 
 
     method MessageReceiverAsync:Task;
     begin
       try
-        Logger.LogTrace('Starting to receive messages');
+        Logger.LogInformation('Starting to receive messages');
 
         repeat
           var parcel := await _client.ReceiveAsync(ServerWaitTime, token);
 
           if(assigned(parcel))then
           begin
-            Logger.LogTrace('Posting parcel');
+            Logger.LogInformation('Posting parcel');
             processMessage.Post(parcel);
-            Logger.LogTrace('Posted parcel');
+            Logger.LogInformation('Posted parcel');
           end
           else
           begin
-            Logger.LogTrace('No parcel to process');
+            Logger.LogInformation('No parcel to process');
           end;
 
         until token.IsCancellationRequested;
@@ -86,14 +86,14 @@ type
 
     method SetupPipeline;
     begin
-      Logger.LogTrace('SetupPipeline');
+      Logger.LogInformation('SetupPipeline');
 
       processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel ->
           begin
             try
-              Logger.LogTrace('Process Message');
+              Logger.LogInformation('Process Message');
               await _parcelProcessor.ProcessMessageAsync(parcel, token);
-              Logger.LogTrace('Processed Message');
+              Logger.LogInformation('Processed Message');
             except
               on e:Exception do
               begin
@@ -111,9 +111,9 @@ type
       faultedInProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
             try
-              Logger.LogTrace('Faulting in processing');
+              Logger.LogInformation('Faulting in processing');
               await _parcelProcessor.FaultedInProcessingAsync(parcel, token);
-              Logger.LogTrace('Faulted in processing');
+              Logger.LogInformation('Faulted in processing');
             except
               on e:Exception do
               begin
@@ -125,9 +125,9 @@ type
       finishProcessing := new ActionBlock<MessageParcel>(parcel ->
           begin
             try
-              Logger.LogTrace('Finishing processing');
+              Logger.LogInformation('Finishing processing');
               await _parcelProcessor.FinishProcessingAsync(parcel, token);
-              Logger.LogTrace('Finished processing');
+              Logger.LogInformation('Finished processing');
             except
               on e:Exception do
               begin
@@ -161,31 +161,31 @@ type
       _client := clientImpl;
       _parcelProcessor := parcelProcessorImpl;
 
-      Logger.LogTrace('constructed');
+      Logger.LogInformation('constructed');
 
     end;
 
     method StopAsync:Task;
     begin
-      Logger.LogTrace('Stopping');
+      Logger.LogInformation('Stopping');
       tokenSource.Cancel;
 
       processMessage.Complete;
 
-      Logger.LogTrace('Stopped processing messages');
+      Logger.LogInformation('Stopped processing messages');
 
       await processMessage.Completion.WaitAsync(TimeSpan.FromSeconds(30));
 
-      Logger.LogTrace('Waiting to stop');
+      Logger.LogInformation('Waiting to stop');
       await Task.WhenAll(messageReceiveTask);
-      Logger.LogTrace('Stopped');
+      Logger.LogInformation('Stopped');
 
     end;
 
 
     method StartAsync:Task;
     begin
-      Logger.LogTrace('Start');
+      Logger.LogInformation('Start');
 
       await InitializeAsync;
 

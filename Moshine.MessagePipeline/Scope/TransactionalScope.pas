@@ -2,7 +2,7 @@
 
 uses
   Moshine.MessagePipeline.Core,
-  System.Transactions;
+  System.Transactions, System.Threading;
 
 type
 
@@ -42,9 +42,9 @@ type
       GC.SuppressFinalize(self);
     end;
 
-    method CompleteAsync(scopeId:Guid):Task;
+    method CompleteAsync(scopeId:Guid; cancellationToken:CancellationToken := default):Task;
     begin
-      await _repository.StoreAsync(scopeId);
+      await _repository.StoreAsync(scopeId, cancellationToken);
       scope.Complete;
     end;
   end;

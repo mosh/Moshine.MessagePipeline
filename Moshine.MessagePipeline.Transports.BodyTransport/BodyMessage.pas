@@ -1,7 +1,7 @@
 ﻿namespace Moshine.MessagePipeline.Transports.BodyTransport;
 
 uses
-  Moshine.MessagePipeline.Core;
+  Moshine.MessagePipeline.Core, System.Threading;
 
 type
 
@@ -27,12 +27,12 @@ type
       exit body;
     end;
 
-    method AsErrorAsync:Task;
+    method AsErrorAsync(cancellationToken:CancellationToken := default):Task;
     begin
       exit Task.CompletedTask;
     end;
 
-    method CompleteAsync:Task;
+    method CompleteAsync(cancellationToken:CancellationToken := default):Task;
     begin
       exit Task.CompletedTask;
     end;

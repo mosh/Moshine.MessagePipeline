@@ -23,18 +23,18 @@ type
 
     method LoadAsync(someAction:SavedAction):Task;
     begin
-      Logger.LogTrace('Invoking action');
+      Logger.LogInformation('Invoking action');
 
       var returnValue := await _actionInvokerHelpers.InvokeActionAsync(someAction);
 
       if(assigned(returnValue))then
       begin
-        Logger.LogTrace('Setting value from invoked action');
+        Logger.LogInformation('Setting value from invoked action');
         await _cache.AddAsync(someAction.Id.ToString,returnValue);
       end
       else
       begin
-        Logger.LogTrace('No value returned from invoked action');
+        Logger.LogInformation('No value returned from invoked action');
       end;
 
     end;
@@ -68,7 +68,7 @@ type
         end
         else
         begin
-          Logger.LogTrace('Got body');
+          Logger.LogInformation('Got body');
         end;
 
         if (not await _manager.HasActionExecutedAsync(parcel.Message.Id))then
@@ -89,15 +89,15 @@ type
 
           using scope := _scopeProvider.Provide do
           begin
-            Logger.LogTrace('LoadAction');
+            Logger.LogInformation('LoadAction');
             await LoadAsync(savedAction);
-            Logger.LogTrace('Loaded Action');
+            Logger.LogInformation('Loaded Action');
             await scope.CompleteAsync(parcel.Message.Id);
           end;
         end;
 
         parcel.State := MessageStateEnum.Processed;
-        Logger.LogTrace('Processed message');
+        Logger.LogInformation('Processed message');
       except
         on E:Exception do
         begin
@@ -112,20 +112,20 @@ type
 
     method FaultedInProcessingAsync(parcel:MessageParcel; cancellationToken:CancellationToken := default):Task;
     begin
-      Logger.LogTrace('Faulting In Processing');
+      Logger.LogInformation('Faulting In Processing');
 
       var clone := parcel.Message.Clone;
       await clone.AsErrorAsync;
 
-      Logger.LogTrace('Faulted In Processing');
+      Logger.LogInformation('Faulted In Processing');
     end;
 
     method FinishProcessingAsync(parcel:MessageParcel; cancellationToken:CancellationToken := default):Task;
     begin
-      Logger.LogTrace('Finishing Processing');
+      Logger.LogInformation('Finishing Processing');
       await _manager.CompleteActionExecutionAsync(parcel.Message.Id);
       await parcel.Message.CompleteAsync;
-      Logger.LogTrace('Finished Processing');
+      Logger.LogInformation('Finished Processing');
 
     end;
 

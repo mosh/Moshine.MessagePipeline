@@ -22,11 +22,11 @@ type
 
     method EnQueueAsync(someAction:SavedAction; cancellationToken:CancellationToken := default):Task;
     begin
-      Logger.LogTrace('Starting EnQueueAsync');
+      Logger.LogInformation('Starting EnQueueAsync');
       var stringRepresentation := _actionSerializer.Serialize(someAction);
-      Logger.LogTrace('EnQueueAsync SendAsync');
+      Logger.LogInformation('EnQueueAsync SendAsync');
       await _bus.SendAsync(stringRepresentation, someAction.Id, cancellationToken);
-      Logger.LogTrace('EnQueueAsync SentAsync');
+      Logger.LogInformation('EnQueueAsync SentAsync');
 
     end;
 
@@ -42,23 +42,23 @@ type
 
     method InitializeAsync:Task;
     begin
-      Logger.LogTrace('Initializing');
+      Logger.LogInformation('Initializing');
       await _bus.InitializeAsync;
-      Logger.LogTrace('Initialized');
+      Logger.LogInformation('Initialized');
     end;
 
     method SendAsync<T>(methodCall: Expression<System.Action<T>>; cancellationToken:CancellationToken := default):Task<Guid>;
     begin
       if(assigned(methodCall))then
       begin
-        Logger.LogTrace('methodCall assigned');
+        Logger.LogInformation('methodCall assigned');
         if(assigned(_methodCallHelpers))then
         begin
-          Logger.LogTrace('methodCallHelpers assigned');
+          Logger.LogInformation('methodCallHelpers assigned');
         end
         else
         begin
-          Logger.LogTrace('methodCallHelpers not assigned');
+          Logger.LogInformation('methodCallHelpers not assigned');
         end;
         var saved := _methodCallHelpers.Save(methodCall);
         await EnQueueAsync(saved, cancellationToken);
@@ -66,7 +66,7 @@ type
       end
       else
       begin
-        Logger.LogTrace('methodCall not assigned');
+        Logger.LogInformation('methodCall not assigned');
       end;
 
     end;
@@ -75,7 +75,7 @@ type
     begin
       if(not assigned(methodCall))then
       begin
-        Logger.LogTrace('methodCall not assigned');
+        Logger.LogInformation('methodCall not assigned');
         raise new ArgumentNullException('methodcall not assigned');
       end;
 

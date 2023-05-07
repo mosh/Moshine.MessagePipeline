@@ -27,7 +27,7 @@ type
 
     method WaitForResultAsync<T>(id:Guid):Task<T>;
     begin
-      Logger.LogTrace('Started WaitForResultAsync');
+      Logger.LogInformation('Started WaitForResultAsync');
 
       var source := new CancellationTokenSource;
       var token := source.Token;
@@ -71,10 +71,10 @@ type
 
       if((pollingTask.IsCompleted) and (not pollingTask.IsCanceled) and (not pollingTask.IsFaulted))then
       begin
-        Logger.LogTrace('Returning value');
+        Logger.LogInformation('Returning value');
         exit pollingTask.Result;
       end;
-      Logger.LogTrace('Returning default');
+      Logger.LogInformation('Returning default');
       exit default(T);
 
     end;
