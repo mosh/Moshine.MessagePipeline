@@ -17,7 +17,7 @@ type
 
     method HasActionExecutedAsync(id:Guid; cancellationToken:CancellationToken := default):Task<Boolean>;
     begin
-      var row := await _outboxRepository.GetAsync(id);
+      var row := await _outboxRepository.GetAsync(id, cancellationToken);
       if(not assigned(row))then
       begin
         exit false;
@@ -27,7 +27,7 @@ type
 
     method CompleteActionExecutionAsync(id:Guid; cancellationToken:CancellationToken := default):Task;
     begin
-      await _outboxRepository.SetDispatchedAsync(id);
+      await _outboxRepository.SetDispatchedAsync(id, cancellationToken);
     end;
   end;
 
