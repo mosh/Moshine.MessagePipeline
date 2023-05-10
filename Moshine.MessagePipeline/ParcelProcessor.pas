@@ -71,7 +71,7 @@ type
           Logger.LogInformation('Got body');
         end;
 
-        if (not await _manager.HasActionExecutedAsync(parcel.Message.Id))then
+        if (not await _manager.HasActionExecutedAsync(parcel.Message.Id, cancellationToken))then
         begin
 
           var savedAction:SavedAction := nil;
