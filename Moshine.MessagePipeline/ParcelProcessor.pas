@@ -21,11 +21,11 @@ type
     _scopeProvider:IScopeProvider;
     _manager:IManager;
 
-    method LoadAsync(someAction:SavedAction):Task;
+    method LoadAsync(someAction:SavedAction; cancellationToken:CancellationToken := default):Task;
     begin
       Logger.LogInformation('Invoking action');
 
-      var returnValue := await _actionInvokerHelpers.InvokeActionAsync(someAction);
+      var returnValue := await _actionInvokerHelpers.InvokeActionAsync(someAction, cancellationToken);
 
       if(assigned(returnValue))then
       begin

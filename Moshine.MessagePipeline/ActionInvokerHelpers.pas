@@ -5,6 +5,7 @@ uses
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Core.Models,
   System.Linq,
+  System.Threading,
   System.Threading.Tasks;
 
 type
@@ -31,7 +32,7 @@ type
       Logger := loggerImpl;
     end;
 
-    method InvokeActionAsync(someAction:SavedAction):Task<Object>;
+    method InvokeActionAsync(someAction:SavedAction; cancellationToken:CancellationToken := default):Task<Object>;
     begin
 
       if(not assigned(someAction))then
@@ -75,7 +76,17 @@ type
       begin
         Logger.LogInformation($'Method {someAction.Method} on Type {someAction.&Type} returns value');
 
-        var invokeObj := methodInfo.Invoke(obj,someAction.Parameters.ToArray);
+        var parameters := someAction.Parameters.ToArray;
+
+        for x:= 0 to parameters.Count-1 do
+        begin
+          if parameters[x].GetType = typeOf(CancellationToken) then
+          begin
+            parameters[x] := cancellationToken;
+          end;
+        end;
+
+        var invokeObj := methodInfo.Invoke(obj,parameters);
 
         if((methodInfo.ReturnType.BaseType = typeOf(Task)) or (methodInfo.ReturnType = typeOf(Task)))then
         begin
@@ -102,7 +113,17 @@ type
 
         if(someAction.Parameters.Count > 0 )then
         begin
-          methodInfo.Invoke(obj,someAction.Parameters.ToArray);
+          var parameters := someAction.Parameters.ToArray;
+
+          for x:= 0 to parameters.Count-1 do
+          begin
+            if parameters[x].GetType = typeOf(CancellationToken) then
+            begin
+              parameters[x] := cancellationToken;
+            end;
+          end;
+
+          methodInfo.Invoke(obj, parameters);
         end
         else
         begin
