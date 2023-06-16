@@ -46,4 +46,4 @@ Queue up the method invocation for later processing in a controlled manner using
 
 </code></pre>
 
-Developed in Oxygene for .Net using Azure ServiceBus or Amazon SQS.
+Developed in Oxygene for .Net using Azure ServiceBus or Amazon SQS. Support for hosting in AWS Lambdas.
