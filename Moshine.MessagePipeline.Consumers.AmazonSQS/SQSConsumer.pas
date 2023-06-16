@@ -8,11 +8,14 @@ uses
   Amazon.SQS.Model,
   Microsoft.Extensions.DependencyInjection,
   Microsoft.Extensions.Logging,
+  Moshine.Foundation.AWS,
   Moshine.MessagePipeline,
   Moshine.MessagePipeline.Transports.BodyTransport,
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Core.Models,
-  Moshine.MessagePipeline.Scope, System.Threading;
+  Moshine.MessagePipeline.Scope,
+  System.Reflection,
+  System.Threading;
 
 type
 
@@ -28,38 +31,9 @@ type
     constructor;
     begin
 
-      var collection := new ServiceCollection;
 
-      var callingAssembly := typeOf(SQSConsumer).Assembly.GetCallingAssembly;
 
-      var typeInCallingAssembly := callingAssembly.GetTypes.FirstOrDefault(t ->
-          begin
-            var attrs := t.GetCustomAttributes(typeOf(ServiceStartupAttribute),false);
-            exit attrs.Any;
-          end);
-
-      if(assigned(typeInCallingAssembly))then
-      begin
-        var cons := typeInCallingAssembly.GetConstructor([]);
-
-        var instance := cons.Invoke([]);
-
-        var methodInfo := typeInCallingAssembly.GetMethod('Configure',[collection.GetType]);
-        if(assigned(methodInfo))then
-        begin
-          methodInfo.Invoke(instance,[collection]);
-        end
-        else
-        begin
-          raise new NotImplementedException('Class with ServiceStartup Attribute does not contain Configure method.');
-        end;
-      end
-      else
-      begin
-        raise new NotImplementedException('Cannot find class with ServiceStartup Attribute');
-      end;
-
-      var serviceProvider := collection.BuildServiceProvider;
+      var serviceProvider := ServiceProviderHelpers.Build(&Assembly.GetCallingAssembly);
 
       var parcelReceiver:IParcelReceiver := serviceProvider.GetService<IParcelReceiver>;
       var bodyMessageBuilder:IBodyMessageBuilder := serviceProvider.GetService<IBodyMessageBuilder>;
@@ -102,7 +76,6 @@ type
 
         var tokenSource := new CancellationTokenSource(TimeSpan.FromSeconds(25));
         var token := tokenSource.Token;
-
 
         for each &record in &event.Records do
         begin

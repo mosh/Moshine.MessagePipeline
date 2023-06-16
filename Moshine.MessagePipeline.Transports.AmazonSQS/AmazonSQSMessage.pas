@@ -71,7 +71,7 @@ type
     method Clone:IMessage;
     begin
       var sendMessageRequest := new SendMessageRequest;
-      sendMessageRequest.QueueUrl := _bus.Url.QueueUrl;
+      sendMessageRequest.QueueUrl := _bus.Url;
       sendMessageRequest.MessageBody := self.GetBody;
       if(_bus.IsFifo)then
       begin

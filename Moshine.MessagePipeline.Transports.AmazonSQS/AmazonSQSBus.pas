@@ -1,11 +1,13 @@
 ﻿namespace Moshine.MessagePipeline.Transports.AmazonSQS;
 
 uses
+  Amazon,
   Amazon.Runtime,
   Amazon.Runtime.CredentialManagement,
   Amazon.SQS,
   Amazon.SQS.Model,
   Microsoft.Extensions.Logging,
+  Moshine.Foundation.AWS.Interfaces,
   Moshine.MessagePipeline.Core,
   System,
   System.Linq,
@@ -18,17 +20,13 @@ type
   private
     property Logger: ILogger;
 
-    _config:AmazonSQSConfig;
-    _credentials:AWSCredentials;
-    _client:AmazonSQSClient;
-    _serviceUrl:String;
-    _queueName:String;
-    _accountId:String;
-    _url:GetQueueUrlResponse;
+    property Client:AmazonSQSClient;
+    property CredentialsFactory:IAWSCredentialsFactory;
+    property Region:RegionEndpoint;
 
     method Guard;
     begin
-      if ((not assigned(_url)) or (not assigned(_client)))then
+      if ((String.IsNullOrEmpty(Url)) or (not assigned(Client)))then
       begin
         raise new ApplicationException('Initialize has not been called');
       end;
@@ -41,7 +39,7 @@ type
 
       try
         var messageRequest := new SendMessageRequest;
-        messageRequest.QueueUrl := _url.QueueUrl;
+        messageRequest.QueueUrl := Url;
         messageRequest.MessageBody := messageBody;
 
         if(IsFifo)then
@@ -51,14 +49,14 @@ type
         end
         else
         begin
-          var attribute := new MessageAttributeValue();
+          var attribute := new MessageAttributeValue;
           attribute.DataType := 'String';
           attribute.StringValue := id.ToString;
           messageRequest.MessageAttributes.Add(AmazonSQSMessage.IdAttribute,attribute);
         end;
 
 
-        exit await _client.SendMessageAsync(messageRequest, cancellationToken);
+        exit await Client.SendMessageAsync(messageRequest, cancellationToken);
 
       except
         on E:Exception do
@@ -72,25 +70,16 @@ type
 
   public
 
-    constructor (configuration:IAmazonConfiguration;loggerImpl:ILogger);
+    property Url:String;
+
+    constructor (urlImpl:String; regionImpl:RegionEndpoint; credentialsFactoryImpl:IAWSCredentialsFactory; loggerImpl:ILogger);
     begin
-
-      _serviceUrl := configuration.ServiceUrl;
-      _accountId := configuration.AccountId;
-      _queueName := configuration.QueueName;
-
-      _config := new AmazonSQSConfig;
-      _config.ServiceURL := _serviceUrl;
-
-      var chain := new CredentialProfileStoreChain(configuration.Credentials);
-      chain.TryGetAWSCredentials(configuration.Profile, out _credentials);
-
+      Url := urlImpl;
+      CredentialsFactory := credentialsFactoryImpl;
       Logger := loggerImpl;
-
+      Region := regionImpl;
 
     end;
-
-    property Url:GetQueueUrlResponse read _url;
 
     // The duration (in seconds) that the received messages are hidden from subsequent retrieve requests
     // after being retrieved by a ReceiveMessage request.
@@ -99,25 +88,14 @@ type
 
     property IsFifo:Boolean read
       begin
-        exit _url.QueueUrl.Contains('.fifo',StringComparison.InvariantCultureIgnoreCase);
+        exit Url.Contains('.fifo',StringComparison.InvariantCultureIgnoreCase);
       end;
 
-    method InitializeAsync:Task;
+    method InitializeAsync(cancellationToken:CancellationToken := default):Task;
     begin
-      if(not(assigned(_credentials)))then
-      begin
-        raise new ApplicationException('No credentials');
-      end;
-
-      _client := new AmazonSQSClient(_credentials,_config);
-
-      var request := new GetQueueUrlRequest;
-
-      request.QueueName := _queueName;
-      request.QueueOwnerAWSAccountId := _accountId;
-
-      _url := await _client.GetQueueUrlAsync(request);
-
+      var credentials := CredentialsFactory.Get;
+      Client := new AmazonSQSClient(credentials, Region);
+      exit Task.CompletedTask;
     end;
 
     method SendAsync(messageContent:String;id:Guid; cancellationToken:CancellationToken := default):Task;
@@ -140,21 +118,21 @@ type
       Guard;
       var deleteMessageRequest := new DeleteMessageRequest();
 
-      deleteMessageRequest.QueueUrl := _url.QueueUrl;
+      deleteMessageRequest.QueueUrl := Url;
       deleteMessageRequest.ReceiptHandle := message.ReceiptHandle;
 
-      await _client.DeleteMessageAsync(deleteMessageRequest, cancellationToken);
+      await Client.DeleteMessageAsync(deleteMessageRequest, cancellationToken);
     end;
 
     method ReturnMessageAsync(receiptHandle:String; cancellationToken:CancellationToken := default):Task;
     begin
 
       var request := new ChangeMessageVisibilityRequest;
-      request.QueueUrl := _url.QueueUrl;
+      request.QueueUrl := Url;
       request.ReceiptHandle := receiptHandle;
       request.VisibilityTimeout := 0;
 
-      await _client.ChangeMessageVisibilityAsync(request, cancellationToken);
+      await Client.ChangeMessageVisibilityAsync(request, cancellationToken);
 
     end;
 
@@ -170,9 +148,9 @@ type
       receiveMessageRequest.WaitTimeSeconds := Int32(serverWaitTime.TotalSeconds);
       receiveMessageRequest.VisibilityTimeout := VisibilityTimeout;
       receiveMessageRequest.MaxNumberOfMessages := 1; // only return 1 message
-      receiveMessageRequest.QueueUrl := _url.QueueUrl;
+      receiveMessageRequest.QueueUrl := Url;
 
-      var receiveMessageResponse := await _client.ReceiveMessageAsync(receiveMessageRequest, cancellationToken);
+      var receiveMessageResponse := await Client.ReceiveMessageAsync(receiveMessageRequest, cancellationToken);
 
       var someMessage := receiveMessageResponse.Messages.FirstOrDefault;
 

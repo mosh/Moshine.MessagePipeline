@@ -71,6 +71,11 @@
     <NuGetReference Include="AWS.Lambda.Powertools.Logging:[1.0.0]">
       <Private>True</Private>
     </NuGetReference>
+    <ProjectReference Include="..\..\..\Moshine.Foundation\Moshine.Foundation.AWS\Moshine.Foundation.AWS.elements">
+      <Project>{EF85F273-C62A-4B33-8A7F-11F69045A9EB}</Project>
+      <ProjectFile>..\..\..\Moshine.Foundation\Moshine.Foundation.AWS\Moshine.Foundation.AWS.elements</ProjectFile>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.pas" />
@@ -85,7 +90,6 @@
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="SQSConsumer.pas" />
     <Compile Include="..\Moshine.MessagePipeline.Core\Properties\ProductVersion.pas" />
-    <Compile Include="ServiceStartupAttribute.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
 </Project>
