@@ -3,7 +3,7 @@
 uses
   Dapper,
   Microsoft.Extensions.Logging,
-  Moshine.Foundation,
+  Moshine.Foundation.Contracts,
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Core.Models, System.Threading;
 

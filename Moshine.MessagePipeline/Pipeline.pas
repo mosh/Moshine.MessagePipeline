@@ -92,7 +92,8 @@ type
           begin
             try
               Logger.LogInformation('Process Message');
-              await _parcelProcessor.ProcessMessageAsync(parcel, token);
+              //await _parcelProcessor.ProcessMessageAsync(parcel, token);
+              _parcelProcessor.ProcessMessageAsync(parcel, token).wait;
               Logger.LogInformation('Processed Message');
             except
               on e:Exception do

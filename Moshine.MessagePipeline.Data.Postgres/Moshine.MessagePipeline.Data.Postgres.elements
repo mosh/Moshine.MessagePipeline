@@ -41,11 +41,9 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Moshine.Foundation\Moshine.Foundation.Contracts\Moshine.Foundation.Contracts.elements">
-      <Project>{D158CF2E-629D-4FAE-B978-8D93E435C07A}</Project>
-      <ProjectFile>..\..\..\Moshine.Foundation\Moshine.Foundation.Contracts\Moshine.Foundation.Contracts.elements</ProjectFile>
+    <NuGetReference Include="Moshine.Foundation.Contracts:[4.1.0]">
       <Private>True</Private>
-    </ProjectReference>
+    </NuGetReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.pas" />

@@ -5,6 +5,7 @@ uses
   Microsoft.Extensions.Logging,
   Moshine.MessagePipeline.Core,
   System.Text,
+  System.Threading,
   System.Threading.Tasks;
 type
 
@@ -55,7 +56,7 @@ type
       exit Encoding.UTF8.GetString(messageBody);
     end;
 
-    method AsErrorAsync:Task;
+    method AsErrorAsync(cancellationToken:CancellationToken):Task;
     begin
       if(not assigned(_receiver))then
       begin
@@ -63,11 +64,11 @@ type
         Logger.LogError(message);
         raise new ApplicationException(message);
       end;
-      await _receiver.AbandonMessageAsync(_message);
+      await _receiver.AbandonMessageAsync(_message, cancellationToken);
       Logger.LogTrace('AsError');
     end;
 
-    method CompleteAsync:Task;
+    method CompleteAsync(cancellationToken:CancellationToken):Task;
     begin
       if(not assigned(_receiver))then
       begin
@@ -75,7 +76,7 @@ type
         Logger.LogError(message);
         raise new ApplicationException(message);
       end;
-      await _receiver.CompleteMessageAsync(_message);
+      await _receiver.CompleteMessageAsync(_message, cancellationToken);
       Logger.LogTrace('Completed');
     end;
 

@@ -41,12 +41,9 @@
     <NuGetReference Include="Microsoft.Data.SqlClient:[5.0.1]">
       <Private>True</Private>
     </NuGetReference>
-    <ProjectReference Include="..\..\..\Moshine.Foundation\Moshine.Foundation.Contracts\Moshine.Foundation.Contracts.elements">
-      <HintPath>..\..\..\Moshine.Foundation\Moshine.Foundation.Contracts\Bin\Debug\Moshine.Foundation.Contracts.dll</HintPath>
-      <Project>{D158CF2E-629D-4FAE-B978-8D93E435C07A}</Project>
-      <ProjectFile>..\..\..\Moshine.Foundation\Moshine.Foundation.Contracts\Moshine.Foundation.Contracts.elements</ProjectFile>
+    <NuGetReference Include="Moshine.Foundation.Contracts:[4.1.0]">
       <Private>True</Private>
-    </ProjectReference>
+    </NuGetReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.pas" />

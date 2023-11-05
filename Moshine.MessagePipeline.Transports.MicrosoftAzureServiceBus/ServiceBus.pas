@@ -39,7 +39,7 @@ type
       Logger := loggerImpl;
     end;
 
-    method InitializeAsync:Task;
+    method InitializeAsync(cancellationToken:CancellationToken):Task;
     begin
       Logger.LogTrace('Initialize');
 
@@ -67,7 +67,7 @@ type
 
       var client := new Azure.Messaging.ServiceBus.Administration.ServiceBusAdministrationClient(_connectionString);
 
-      var response := await client.SubscriptionExistsAsync(_topicName, _subscriptionName);
+      var response := await client.SubscriptionExistsAsync(_topicName, _subscriptionName,cancellationToken);
 
       if (not response.Value)then
       begin
@@ -76,7 +76,7 @@ type
         raise new ApplicationException(message);
       end;
 
-      var subscriptionResponse := await client.GetSubscriptionAsync(_topicName, _subscriptionName);
+      var subscriptionResponse := await client.GetSubscriptionAsync(_topicName, _subscriptionName, cancellationToken);
 
       var subscriptionProperties := subscriptionResponse.Value;
 

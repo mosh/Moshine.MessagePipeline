@@ -2,7 +2,7 @@
 
 uses
   Dapper,
-  Moshine.Foundation,
+  Moshine.Foundation.Contracts,
   Moshine.MessagePipeline.Core,
   Moshine.MessagePipeline.Core.Models,
   Microsoft.Data.SqlClient,
