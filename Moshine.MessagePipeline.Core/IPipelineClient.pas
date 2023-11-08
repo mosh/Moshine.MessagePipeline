@@ -10,6 +10,9 @@ uses
 
 type
 
+  ///
+  /// Sends and Receives messages
+  ///
   IPipelineClient = public interface
 
     method InitializeAsync:Task;

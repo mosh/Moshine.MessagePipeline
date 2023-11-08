@@ -6,12 +6,12 @@ uses
 
 type
 
+  ///
+  /// Receives messages and invokes methods on classes
+  ///
   IPipeline = public interface
 
     method StartAsync:Task;
-
-    method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<Guid>;
-    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<Guid>;
 
     method Version:String;
 

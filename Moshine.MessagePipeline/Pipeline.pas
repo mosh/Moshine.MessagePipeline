@@ -199,16 +199,6 @@ type
       exit typeOf(Pipeline).Assembly.GetName.Version.ToString;
     end;
 
-    method SendAsync<T>(methodCall: Expression<System.Action<T>>):Task<Guid>;
-    begin
-      exit await _client.SendAsync<T>(methodCall);
-    end;
-
-    method SendAsync<T>(methodCall: Expression<System.Func<T,Object>>):Task<Guid>;
-    begin
-      exit _client.SendAsync<T>(methodCall);
-    end;
-
   end;
 
 end.
