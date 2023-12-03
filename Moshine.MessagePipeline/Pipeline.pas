@@ -26,6 +26,24 @@ type
 
   private
 
+    method InternalProcessMessageAsync(parcel:MessageParcel):Task<MessageParcel>;
+    begin
+      try
+        Logger.LogInformation('Process Message');
+        await _parcelProcessor.ProcessMessageAsync(parcel, token);
+        Logger.LogInformation('Processed Message');
+      except
+        on e:Exception do
+        begin
+          Logger.LogError(e,'Exception in processMessage Block');
+          parcel.State := MessageStateEnum.Faulted;
+          parcel.ReTryCount := parcel.ReTryCount+1;
+        end;
+      end;
+      exit parcel;
+    end;
+
+
     property Logger: ILogger;
 
     _maxRetries:Integer;
@@ -84,28 +102,12 @@ type
 
     end;
 
+
     method SetupPipeline;
     begin
       Logger.LogInformation('SetupPipeline');
 
-      processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel ->
-          begin
-            try
-              Logger.LogInformation('Process Message');
-              //await _parcelProcessor.ProcessMessageAsync(parcel, token);
-              _parcelProcessor.ProcessMessageAsync(parcel, token).wait;
-              Logger.LogInformation('Processed Message');
-            except
-              on e:Exception do
-              begin
-                Logger.LogError(e,'Exception in processMessage Block');
-                parcel.State := MessageStateEnum.Faulted;
-                parcel.ReTryCount := parcel.ReTryCount+1;
-              end;
-            end;
-
-            exit parcel;
-          end,
+      processMessage := new TransformBlock<MessageParcel, MessageParcel>(parcel -> InternalProcessMessageAsync(parcel),
           new ExecutionDataflowBlockOptions(MaxDegreeOfParallelism := 5)
           );
 
