@@ -12,10 +12,9 @@
     <AllowLegacyCreate>False</AllowLegacyCreate>
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NET6.0</TargetFramework>
+    <TargetFramework>.NET8.0</TargetFramework>
     <Name>Moshine.MessagePipeline</Name>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <NETCoreRuntimeVersion>6.0.4</NETCoreRuntimeVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>false</Optimize>
@@ -54,13 +53,13 @@
     <CreateNuGetPackage>True</CreateNuGetPackage>
   </PropertyGroup>
   <ItemGroup>
-    <NuGetReference Include="System.Threading.Tasks.Dataflow:[7.0.0]" />
+    <NuGetReference Include="System.Threading.Tasks.Dataflow:[8.0.0]" />
     <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements">
       <HintPath>..\Moshine.MessagePipeline.Core\bin\Debug\Moshine.MessagePipeline.Core.dll</HintPath>
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
     </ProjectReference>
-    <NuGetReference Include="Microsoft.Extensions.Logging:[6.0.0]" />
+    <NuGetReference Include="Microsoft.Extensions.Logging:[8.0.0]" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Pipeline.pas" />

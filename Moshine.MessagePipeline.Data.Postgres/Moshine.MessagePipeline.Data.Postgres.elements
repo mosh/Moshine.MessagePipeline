@@ -8,9 +8,8 @@
     <AssemblyName>Moshine.MessagePipeline.Data.Postgres</AssemblyName>
     <ApplicationIcon>Properties\App.ico</ApplicationIcon>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NET6.0</TargetFramework>
+    <TargetFramework>.NET8.0</TargetFramework>
     <Mode>Echoes</Mode>
-    <NETCoreRuntimeVersion>6.0.4</NETCoreRuntimeVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>False</Optimize>
@@ -29,10 +28,10 @@
     <CreateNuGetPackage>True</CreateNuGetPackage>
   </PropertyGroup>
   <ItemGroup>
-    <NuGetReference Include="Dapper:[2.0.123]">
+    <NuGetReference Include="Dapper:[2.1.44]">
       <Private>True</Private>
     </NuGetReference>
-    <NuGetReference Include="Npgsql:[7.0.1]">
+    <NuGetReference Include="Npgsql:[8.0.5]">
       <Private>True</Private>
     </NuGetReference>
     <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements">

@@ -8,9 +8,9 @@
     <AssemblyName>Moshine.MessagePipeline.Consumers.AmazonSQS</AssemblyName>
     <ApplicationIcon>Properties\App.ico</ApplicationIcon>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NET6.0</TargetFramework>
+    <TargetFramework>.NET8.0</TargetFramework>
     <Mode>Echoes</Mode>
-    <NETCoreRuntimeVersion>6.0.4</NETCoreRuntimeVersion>
+    <NETCoreRuntimeVersion>8.0.0</NETCoreRuntimeVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>False</Optimize>
@@ -59,9 +59,9 @@
       <ProjectFile>..\Moshine.MessagePipeline.Transports.BodyTransport\Moshine.MessagePipeline.Transports.BodyTransport.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="Microsoft.Extensions.DependencyInjection:[6.0.0]" />
-    <NuGetReference Include="Microsoft.Extensions.Logging:[6.0.0]" />
-    <NuGetReference Include="Microsoft.Extensions.Logging.Console:[6.0.0]" />
+    <NuGetReference Include="Microsoft.Extensions.DependencyInjection:[8.0.0]" />
+    <NuGetReference Include="Microsoft.Extensions.Logging:[8.0.0]" />
+    <NuGetReference Include="Microsoft.Extensions.Logging.Console:[8.0.0]" />
     <ProjectReference Include="..\Moshine.MessagePipeline.Data.Postgres\Moshine.MessagePipeline.Data.Postgres.elements">
       <HintPath>..\Moshine.MessagePipeline.Data.Postgres\Bin\Release\Moshine.MessagePipeline.Data.Postgres.dll</HintPath>
       <Project>{866A252E-59B7-499B-A490-907E88B3556C}</Project>

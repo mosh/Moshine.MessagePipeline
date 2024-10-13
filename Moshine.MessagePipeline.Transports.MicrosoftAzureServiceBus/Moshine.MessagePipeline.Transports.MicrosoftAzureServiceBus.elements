@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <AssemblyName>Moshine.MessagePipeline.Transports.MicrosoftAzureServiceBus</AssemblyName>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NET7.0</TargetFramework>
+    <TargetFramework>.NET8.0</TargetFramework>
     <Mode>Echoes</Mode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -32,8 +32,8 @@
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
     </ProjectReference>
-    <NuGetReference Include="Microsoft.Extensions.Logging:[7.0.0]" />
-    <NuGetReference Include="Azure.Messaging.ServiceBus:[7.4.0]">
+    <NuGetReference Include="Microsoft.Extensions.Logging:[8.0.0]" />
+    <NuGetReference Include="Azure.Messaging.ServiceBus:[7.18.2]">
       <Private>True</Private>
     </NuGetReference>
   </ItemGroup>

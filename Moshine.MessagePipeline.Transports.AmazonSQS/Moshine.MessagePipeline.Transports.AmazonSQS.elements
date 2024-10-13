@@ -12,9 +12,8 @@
     <AllowLegacyCreate>False</AllowLegacyCreate>
     <AllowUnsafeCode>False</AllowUnsafeCode>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NET6.0</TargetFramework>
+    <TargetFramework>.NET8.0</TargetFramework>
     <DefaultUses>RemObjects.Elements.RTL</DefaultUses>
-    <NETCoreRuntimeVersion>6.0.4</NETCoreRuntimeVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>False</Optimize>
@@ -58,8 +57,8 @@
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
     </ProjectReference>
-    <NuGetReference Include="AWSSDK.SQS:[3.7.100.33]" />
-    <NuGetReference Include="Microsoft.Extensions.Logging:[6.0.0]" />
+    <NuGetReference Include="AWSSDK.SQS:[3.7.400.33]" />
+    <NuGetReference Include="Microsoft.Extensions.Logging:[8.0.0]" />
     <NuGetReference Include="Moshine.Foundation.AWS:[4.1.0]">
       <Private>True</Private>
     </NuGetReference>

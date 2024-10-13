@@ -8,9 +8,8 @@
     <AssemblyName>Moshine.MessagePipeline.Data.SqlServer</AssemblyName>
     <ApplicationIcon>Properties\App.ico</ApplicationIcon>
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
-    <TargetFramework>.NET6.0</TargetFramework>
+    <TargetFramework>.NET8.0</TargetFramework>
     <Mode>Echoes</Mode>
-    <NETCoreRuntimeVersion>6.0.4</NETCoreRuntimeVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Optimize>False</Optimize>
@@ -38,7 +37,7 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="Microsoft.Data.SqlClient:[5.0.1]">
+    <NuGetReference Include="Microsoft.Data.SqlClient:[5.2.2]">
       <Private>True</Private>
     </NuGetReference>
     <NuGetReference Include="Moshine.Foundation.Contracts:[4.1.0]">
