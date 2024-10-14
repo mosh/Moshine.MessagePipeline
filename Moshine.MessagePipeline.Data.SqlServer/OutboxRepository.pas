@@ -22,7 +22,7 @@ type
 
     method SetDispatchedAsync(id:System.Guid; cancellationToken:CancellationToken := default):Task;
     begin
-      using connection :=  await Builder.BuildAsync(cancellationToken) do
+      using connection := await Builder.BuildAsync(cancellationToken) do
       begin
         await connection.ExecuteAsync('Update Outbox set Dispatched=1,DispatchedAt=CURRENT_TIMESTAMP where Id=@id', new class(id));
       end;

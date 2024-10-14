@@ -56,7 +56,7 @@ type
       exit Encoding.UTF8.GetString(messageBody);
     end;
 
-    method AsErrorAsync(cancellationToken:CancellationToken):Task;
+    method AsErrorAsync(cancellationToken:CancellationToken := default):Task;
     begin
       if(not assigned(_receiver))then
       begin
@@ -68,7 +68,7 @@ type
       Logger.LogTrace('AsError');
     end;
 
-    method CompleteAsync(cancellationToken:CancellationToken):Task;
+    method CompleteAsync(cancellationToken:CancellationToken := default):Task;
     begin
       if(not assigned(_receiver))then
       begin

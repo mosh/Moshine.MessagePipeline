@@ -39,7 +39,7 @@ type
       Logger := loggerImpl;
     end;
 
-    method InitializeAsync(cancellationToken:CancellationToken):Task;
+    method InitializeAsync(cancellationToken:CancellationToken := default):Task;
     begin
       Logger.LogTrace('Initialize');
 
