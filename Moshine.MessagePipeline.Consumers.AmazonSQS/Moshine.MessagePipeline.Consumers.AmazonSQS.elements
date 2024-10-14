@@ -41,16 +41,16 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="Amazon.Lambda.Core:[2.1.0]">
+    <NuGetReference Include="Amazon.Lambda.Core:[2.3.0]">
       <Private>True</Private>
     </NuGetReference>
     <NuGetReference Include="Amazon.Lambda.Serialization.SystemTextJson:[2.3.0]">
       <Private>True</Private>
     </NuGetReference>
-    <NuGetReference Include="AWSSDK.SQS:[3.7.100.44]">
+    <NuGetReference Include="AWSSDK.SQS:[3.7.400.33]">
       <Private>True</Private>
     </NuGetReference>
-    <NuGetReference Include="Amazon.Lambda.SQSEvents:[2.1.0]">
+    <NuGetReference Include="Amazon.Lambda.SQSEvents:[2.2.0]">
       <Private>True</Private>
     </NuGetReference>
     <ProjectReference Include="..\Moshine.MessagePipeline.Transports.BodyTransport\Moshine.MessagePipeline.Transports.BodyTransport.elements">
