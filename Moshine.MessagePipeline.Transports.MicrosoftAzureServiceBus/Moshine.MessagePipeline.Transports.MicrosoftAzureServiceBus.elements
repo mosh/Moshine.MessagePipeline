@@ -33,7 +33,7 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
     </ProjectReference>
     <NuGetReference Include="Microsoft.Extensions.Logging:[8.0.0]" />
-    <NuGetReference Include="Azure.Messaging.ServiceBus:[7.18.2]">
+    <NuGetReference Include="Azure.Messaging.ServiceBus:[7.19.0]">
       <Private>True</Private>
     </NuGetReference>
   </ItemGroup>

@@ -15,7 +15,7 @@ type
   private
     property Logger: ILogger;
 
-    _topicName:String;
+    _queueOrTopicName:String;
     _subscriptionName:String;
     _connectionString:String;
 
@@ -24,18 +24,29 @@ type
     _sender:ServiceBusSender;
     _receiver:ServiceBusReceiver;
 
+    _afterCreated:Action<Azure.Messaging.ServiceBus.ServiceBusMessage>;
+
   public
 
-    constructor (connectionInformation:IServiceBusConnectionInformation; loggerImpl:ILogger);
+    constructor (connectionInformation:IServiceBusConnectionInformation;
+      afterCreated:Action<Azure.Messaging.ServiceBus.ServiceBusMessage> := default;
+      loggerImpl:ILogger);
     begin
-      constructor(connectionInformation.ConnectionString, connectionInformation.TopicName, connectionInformation.SubscriptionName, loggerImpl);
+      constructor(connectionInformation.ConnectionString,
+                  connectionInformation.TopicName,
+                  connectionInformation.SubscriptionName,
+                  afterCreated,
+                  loggerImpl);
     end;
 
-    constructor(connectionString:String; topicName:String; subscriptionName:String; loggerImpl:ILogger);
+    constructor(connectionString:String; queueOrTopicName:String; subscriptionName:String;
+      afterCreated:Action<Azure.Messaging.ServiceBus.ServiceBusMessage> := default;
+      loggerImpl:ILogger);
     begin
-      _topicName := topicName;
+      _queueOrTopicName := queueOrTopicName;
       _connectionString := connectionString;
       _subscriptionName := subscriptionName;
+      _afterCreated := afterCreated;
       Logger := loggerImpl;
     end;
 
@@ -43,9 +54,9 @@ type
     begin
       Logger.LogTrace('Initialize');
 
-      if(String.IsNullOrEmpty(_topicName))then
+      if(String.IsNullOrEmpty(_queueOrTopicName))then
       begin
-        var message := 'topicName has not been set';
+        var message := 'queueOrTopicName has not been set';
         Logger.LogError(message);
         raise new ArgumentException(message);
       end;
@@ -57,46 +68,57 @@ type
         raise new ArgumentException(message);
       end;
 
-      if(String.IsNullOrEmpty(_subscriptionName))then
+      var properties := ServiceBusConnectionStringProperties.Parse(_connectionString);
+
+      if (_connectionString.IndexOf('UseDevelopmentEmulator=true',StringComparison.InvariantCultureIgnoreCase) = -1)then
       begin
-        var message := 'subscriptionName has not been set';
-        Logger.LogError(message);
-        raise new ArgumentException(message);
-      end;
 
+        var client := new Azure.Messaging.ServiceBus.Administration.ServiceBusAdministrationClient(_connectionString);
 
-      var client := new Azure.Messaging.ServiceBus.Administration.ServiceBusAdministrationClient(_connectionString);
+        if(not String.IsNullOrEmpty(_subscriptionName))then
+        begin
+          var response := await client.SubscriptionExistsAsync(_queueOrTopicName, _subscriptionName,cancellationToken);
 
-      var response := await client.SubscriptionExistsAsync(_topicName, _subscriptionName,cancellationToken);
+          if (not response.Value)then
+          begin
+            var message := $'Topic {_queueOrTopicName} Subscription {_subscriptionName} does not exist';
+            Logger.LogError(message);
+            raise new ApplicationException(message);
+          end;
 
-      if (not response.Value)then
+          var subscriptionResponse := await client.GetSubscriptionAsync(_queueOrTopicName, _subscriptionName, cancellationToken);
+
+          var subscriptionProperties := subscriptionResponse.Value;
+
+          Logger.LogInformation($'MaxDeliveryCount is {subscriptionProperties.MaxDeliveryCount} EnableDeadLetteringOnMessageExpiration {subscriptionProperties.DeadLetteringOnMessageExpiration}');
+
+          if(not subscriptionProperties.DeadLetteringOnMessageExpiration)then
+          begin
+            var message := $'Topic {_queueOrTopicName} Subscription {_subscriptionName} EnableDeadLetteringOnMessageExpiration must be enabled';
+            Logger.LogError(message);
+            raise new ApplicationException(message);
+          end;
+        end;
+      end
+      else
       begin
-        var message := $'Topic {_topicName} Subscription {_subscriptionName} does not exist';
-        Logger.LogError(message);
-        raise new ApplicationException(message);
+        Logger.LogTrace('Using development emulator not verifying connection string');
       end;
-
-      var subscriptionResponse := await client.GetSubscriptionAsync(_topicName, _subscriptionName, cancellationToken);
-
-      var subscriptionProperties := subscriptionResponse.Value;
-
-      Logger.LogInformation($'MaxDeliveryCount is {subscriptionProperties.MaxDeliveryCount} EnableDeadLetteringOnMessageExpiration {subscriptionProperties.DeadLetteringOnMessageExpiration}');
-
-      if(not subscriptionProperties.DeadLetteringOnMessageExpiration)then
-      begin
-        var message := $'Topic {_topicName} Subscription {_subscriptionName} EnableDeadLetteringOnMessageExpiration must be enabled';
-        Logger.LogError(message);
-        raise new ApplicationException(message);
-      end;
-
 
       _client := new ServiceBusClient(_connectionString);
-      _sender := _client.CreateSender(_topicName);
+      _sender := _client.CreateSender(_queueOrTopicName);
 
-      var options := new ServiceBusReceiverOptions();
+      var options := new ServiceBusReceiverOptions;
       options.ReceiveMode := ServiceBusReceiveMode.PeekLock;
 
-      _receiver := _client.CreateReceiver(_topicName, _subscriptionName, options);
+      if(String.IsNullOrEmpty(_subscriptionName)) then
+      begin
+        _receiver := _client.CreateReceiver(_queueOrTopicName, options);
+      end
+      else
+      begin
+        _receiver := _client.CreateReceiver(_queueOrTopicName, _subscriptionName, options);
+      end;
 
 
     end;
@@ -111,11 +133,18 @@ type
 
     end;
 
-    method SendAsync(messageContent: String; id: Guid; cancellationToken:CancellationToken := default): Task;
+    method SendAsync(messageContent: String; id: Guid;
+      cancellationToken:CancellationToken := default): Task;
     begin
 
       var message := new Azure.Messaging.ServiceBus.ServiceBusMessage(messageContent);
       message.ApplicationProperties.Add(ServiceBusMessage.IdAttribute,id);
+
+      if (_afterCreated <> default)then
+      begin
+        _afterCreated(message);
+      end;
+
       Logger.LogTrace('Send');
       await _sender.SendMessageAsync(message, cancellationToken);
       Logger.LogTrace('Sent');
