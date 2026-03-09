@@ -22,7 +22,7 @@ type
 
     property Client:AmazonSQSClient;
     property CredentialsFactory:IAWSCredentialsFactory;
-    property Region:RegionEndpoint;
+    property Region: nullable RegionEndpoint;
 
     method Guard;
     begin
@@ -72,12 +72,15 @@ type
 
     property Url:String;
 
-    constructor (urlImpl:String; regionImpl:RegionEndpoint; credentialsFactoryImpl:IAWSCredentialsFactory; loggerImpl:ILogger);
+    constructor (urlImpl:String; regionImpl:RegionEndpoint := nil; credentialsFactoryImpl:IAWSCredentialsFactory; loggerImpl:ILogger);
     begin
       Url := urlImpl;
       CredentialsFactory := credentialsFactoryImpl;
       Logger := loggerImpl;
-      Region := regionImpl;
+      if(regionImpl  ≠ nil)then
+      begin
+        Region := regionImpl;
+      end;
 
     end;
 
@@ -94,7 +97,19 @@ type
     method InitializeAsync(cancellationToken:CancellationToken := default):Task;
     begin
       var credentials := CredentialsFactory.Get;
-      Client := new AmazonSQSClient(credentials, Region);
+
+      var config := new AmazonSQSConfig
+      (
+          ServiceURL := Url
+      );
+
+      if Region ≠ nil then
+      begin
+        config.RegionEndpoint := Region;
+      end;
+
+      Client := new AmazonSQSClient(credentials, config);
+
       exit Task.CompletedTask;
     end;
 

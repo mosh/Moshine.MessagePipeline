@@ -58,8 +58,8 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
     </ProjectReference>
     <NuGetReference Include="AWSSDK.SQS:[3.7.400.33]" />
-    <NuGetReference Include="Microsoft.Extensions.Logging:[8.0.0]" />
-    <NuGetReference Include="Moshine.Foundation.AWS:[5.0.1]">
+    <NuGetReference Include="Microsoft.Extensions.Logging:[8.0.1]" />
+    <NuGetReference Include="Moshine.Foundation.AWS:[5.0.2]">
       <Private>True</Private>
     </NuGetReference>
   </ItemGroup>
@@ -75,7 +75,6 @@
     <Compile Include="Properties\Settings.Designer.pas" />
     <Compile Include="AmazonSQSBus.pas" />
     <Compile Include="AmazonSQSMessage.pas" />
-    <None Include="Moshine.MessagePipeline.Transports.AmazonSQS.Nuspec" />
     <Compile Include="..\Moshine.MessagePipeline.Core\Properties\ProductVersion.pas" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\RemObjects Software\Elements\RemObjects.Elements.Echoes.targets" />
