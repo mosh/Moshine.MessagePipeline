@@ -31,7 +31,7 @@
     <NuGetReference Include="Dapper:[2.1.44]">
       <Private>True</Private>
     </NuGetReference>
-    <NuGetReference Include="Npgsql:[8.0.5]">
+    <NuGetReference Include="Npgsql:[10.0.1]">
       <Private>True</Private>
     </NuGetReference>
     <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements">
@@ -40,7 +40,7 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="Moshine.Foundation.Contracts:[4.1.0]">
+    <NuGetReference Include="Moshine.Foundation.Contracts:[5.0.2]">
       <Private>True</Private>
     </NuGetReference>
   </ItemGroup>

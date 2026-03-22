@@ -57,9 +57,9 @@
       <Project>{D6FDDD36-602C-49C1-B399-30852F6F8B98}</Project>
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
     </ProjectReference>
-    <NuGetReference Include="AWSSDK.SQS:[3.7.400.33]" />
-    <NuGetReference Include="Microsoft.Extensions.Logging:[8.0.1]" />
-    <NuGetReference Include="Moshine.Foundation.AWS:[5.0.2]">
+    <NuGetReference Include="AWSSDK.SQS:[4.0.2.18]" />
+    <NuGetReference Include="Microsoft.Extensions.Logging:[10.0.1]" />
+    <NuGetReference Include="Moshine.Foundation.AWS:[5.0.4]">
       <Private>True</Private>
     </NuGetReference>
   </ItemGroup>

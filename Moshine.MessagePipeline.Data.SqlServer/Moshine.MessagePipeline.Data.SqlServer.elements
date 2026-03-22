@@ -28,7 +28,7 @@
     <CreateNuGetPackage>True</CreateNuGetPackage>
   </PropertyGroup>
   <ItemGroup>
-    <NuGetReference Include="Dapper:[2.0.123]">
+    <NuGetReference Include="Dapper:[2.1.44]">
       <Private>True</Private>
     </NuGetReference>
     <ProjectReference Include="..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements">

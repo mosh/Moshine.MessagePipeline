@@ -24,9 +24,23 @@ type
     property CredentialsFactory:IAWSCredentialsFactory;
     property Region: nullable RegionEndpoint;
 
+    property ServiceUrl:String;
+    property QueueName:String;
+
+    method GetQueueUrlAsync(queueName: String; cancellationToken: CancellationToken := default): Task<String>;
+    begin
+      var request := new GetQueueUrlRequest;
+      request.QueueName := queueName;
+
+      var response := await Client.GetQueueUrlAsync(request, cancellationToken);
+
+      exit response.QueueUrl;
+    end;
+
+
     method Guard;
     begin
-      if ((String.IsNullOrEmpty(Url)) or (not assigned(Client)))then
+      if ((String.IsNullOrEmpty(self.QueueUrl)) or (not assigned(Client)))then
       begin
         raise new ApplicationException('Initialize has not been called');
       end;
@@ -39,7 +53,7 @@ type
 
       try
         var messageRequest := new SendMessageRequest;
-        messageRequest.QueueUrl := Url;
+        messageRequest.QueueUrl := self.QueueUrl;
         messageRequest.MessageBody := messageBody;
 
         if(IsFifo)then
@@ -70,11 +84,14 @@ type
 
   public
 
-    property Url:String;
+    property QueueUrl:String read private write;
 
-    constructor (urlImpl:String; regionImpl:RegionEndpoint := nil; credentialsFactoryImpl:IAWSCredentialsFactory; loggerImpl:ILogger);
+    constructor (serviceUrl:String; queueName:String; regionImpl:RegionEndpoint := nil; credentialsFactoryImpl:IAWSCredentialsFactory; loggerImpl:ILogger);
     begin
-      Url := urlImpl;
+
+      self.ServiceUrl := serviceUrl;
+      self.QueueName := queueName;
+
       CredentialsFactory := credentialsFactoryImpl;
       Logger := loggerImpl;
       if(regionImpl  ≠ nil)then
@@ -91,7 +108,7 @@ type
 
     property IsFifo:Boolean read
       begin
-        exit Url.Contains('.fifo',StringComparison.InvariantCultureIgnoreCase);
+        exit self.QueueUrl.Contains('.fifo',StringComparison.InvariantCultureIgnoreCase);
       end;
 
     method InitializeAsync(cancellationToken:CancellationToken := default):Task;
@@ -100,7 +117,7 @@ type
 
       var config := new AmazonSQSConfig
       (
-          ServiceURL := Url
+          ServiceURL := self.ServiceUrl
       );
 
       if Region ≠ nil then
@@ -110,7 +127,7 @@ type
 
       Client := new AmazonSQSClient(credentials, config);
 
-      exit Task.CompletedTask;
+      self.QueueUrl := await GetQueueUrlAsync(self.QueueName, cancellationToken);
     end;
 
     method SendAsync(messageContent:String;id:Guid; cancellationToken:CancellationToken := default):Task;
@@ -123,6 +140,8 @@ type
     method SendAsync(message:IMessage; cancellationToken:CancellationToken := default):Task;
     begin
       var amazonMessage := message as AmazonSQSMessage;
+
+
       var response := await SendMessageAsync(amazonMessage.Id, amazonMessage.GetBody, cancellationToken);
 
       Logger.LogDebug($'MessageId of sent message is {response.MessageId}');
@@ -133,7 +152,7 @@ type
       Guard;
       var deleteMessageRequest := new DeleteMessageRequest();
 
-      deleteMessageRequest.QueueUrl := Url;
+      deleteMessageRequest.QueueUrl := self.QueueUrl;
       deleteMessageRequest.ReceiptHandle := message.ReceiptHandle;
 
       await Client.DeleteMessageAsync(deleteMessageRequest, cancellationToken);
@@ -143,7 +162,7 @@ type
     begin
 
       var request := new ChangeMessageVisibilityRequest;
-      request.QueueUrl := Url;
+      request.QueueUrl := self.QueueUrl;
       request.ReceiptHandle := receiptHandle;
       request.VisibilityTimeout := 0;
 
@@ -163,7 +182,7 @@ type
       receiveMessageRequest.WaitTimeSeconds := Int32(serverWaitTime.TotalSeconds);
       receiveMessageRequest.VisibilityTimeout := VisibilityTimeout;
       receiveMessageRequest.MaxNumberOfMessages := 1; // only return 1 message
-      receiveMessageRequest.QueueUrl := Url;
+      receiveMessageRequest.QueueUrl := self.QueueUrl;
 
       var receiveMessageResponse := await Client.ReceiveMessageAsync(receiveMessageRequest, cancellationToken);
 
