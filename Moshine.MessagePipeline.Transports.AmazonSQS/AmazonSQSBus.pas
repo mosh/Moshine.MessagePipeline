@@ -18,19 +18,23 @@ type
 
   AmazonSQSBus = public class(IBus)
   private
-    property Logger: ILogger;
+    _logger: ILogger;
+    _region: nullable RegionEndpoint;
+    _serviceUrl:String;
+    _queueName:String;
+    _awsAccessKeyId:String;
+    _awsSecretAccessKey:String;
 
     property Client:AmazonSQSClient;
     property CredentialsFactory:IAWSCredentialsFactory;
-    property Region: nullable RegionEndpoint;
+    property UsingCredentialsFactory:Boolean;
 
-    property ServiceUrl:String;
-    property QueueName:String;
 
-    method GetQueueUrlAsync(queueName: String; cancellationToken: CancellationToken := default): Task<String>;
+
+    method GetQueueUrlAsync(cancellationToken: CancellationToken := default): Task<String>;
     begin
       var request := new GetQueueUrlRequest;
-      request.QueueName := queueName;
+      request.QueueName := _queueName;
 
       var response := await Client.GetQueueUrlAsync(request, cancellationToken);
 
@@ -63,9 +67,12 @@ type
         end
         else
         begin
+          _logger.LogDebug('Adding attribute');
+
           var attribute := new MessageAttributeValue;
           attribute.DataType := 'String';
           attribute.StringValue := id.ToString;
+          messageRequest.MessageAttributes := new Dictionary<String, MessageAttributeValue>;
           messageRequest.MessageAttributes.Add(AmazonSQSMessage.IdAttribute,attribute);
         end;
 
@@ -75,7 +82,7 @@ type
       except
         on E:Exception do
         begin
-          Console.WriteLine(E.Message);
+          _logger.LogError(E.Message, 'Failed to send message');
           raise;
         end;
       end;
@@ -86,18 +93,36 @@ type
 
     property QueueUrl:String read private write;
 
-    constructor (serviceUrl:String; queueName:String; regionImpl:RegionEndpoint := nil; credentialsFactoryImpl:IAWSCredentialsFactory; loggerImpl:ILogger);
+    constructor (serviceUrl:String; queueName:String; awsAccessKeyId:String; awsSecretAccessKey:String; region:RegionEndpoint := nil; logger:ILogger);
+    begin
+      _serviceUrl := serviceUrl;
+      _queueName := queueName;
+
+      _logger := logger;
+      if(region  ≠ nil)then
+      begin
+        _region := region;
+      end;
+      UsingCredentialsFactory := false;
+      _awsAccessKeyId := awsAccessKeyId;
+      _awsSecretAccessKey := awsSecretAccessKey;
+
+    end;
+
+
+    constructor (serviceUrl:String; queueName:String; region:RegionEndpoint := nil; credentialsFactoryImpl:IAWSCredentialsFactory; logger:ILogger);
     begin
 
-      self.ServiceUrl := serviceUrl;
-      self.QueueName := queueName;
+      _serviceUrl := serviceUrl;
+      _queueName := queueName;
 
       CredentialsFactory := credentialsFactoryImpl;
-      Logger := loggerImpl;
-      if(regionImpl  ≠ nil)then
+      _logger := logger;
+      if(region  ≠ nil)then
       begin
-        Region := regionImpl;
+        _region := region;
       end;
+      UsingCredentialsFactory := true;
 
     end;
 
@@ -113,38 +138,48 @@ type
 
     method InitializeAsync(cancellationToken:CancellationToken := default):Task;
     begin
-      var credentials := CredentialsFactory.Get;
 
       var config := new AmazonSQSConfig
       (
-          ServiceURL := self.ServiceUrl
+          ServiceURL := _serviceUrl
       );
 
-      if Region ≠ nil then
+      if _region ≠ nil then
       begin
-        config.RegionEndpoint := Region;
+        config.RegionEndpoint := _region;
       end;
 
-      Client := new AmazonSQSClient(credentials, config);
+      if (UsingCredentialsFactory) then
+      begin
+        _logger.LogDebug('Using credentials');
+        var credentials := CredentialsFactory.Get;
+        Client := new AmazonSQSClient(credentials, config);
 
-      self.QueueUrl := await GetQueueUrlAsync(self.QueueName, cancellationToken);
+      end
+      else
+      begin
+        _logger.LogDebug('Not using credentials');
+
+        Client := new AmazonSQSClient(_awsAccessKeyId, _awsSecretAccessKey, config);
+      end;
+
+      self.QueueUrl := await GetQueueUrlAsync(cancellationToken);
     end;
 
     method SendAsync(messageContent:String;id:Guid; cancellationToken:CancellationToken := default):Task;
     begin
       var response := await SendMessageAsync(id, messageContent, cancellationToken);
 
-      Logger.LogDebug($'MessageId of sent message is {response.MessageId}');
+      _logger.LogDebug($'MessageId of sent message is {response.MessageId}');
     end;
 
     method SendAsync(message:IMessage; cancellationToken:CancellationToken := default):Task;
     begin
       var amazonMessage := message as AmazonSQSMessage;
 
-
       var response := await SendMessageAsync(amazonMessage.Id, amazonMessage.GetBody, cancellationToken);
 
-      Logger.LogDebug($'MessageId of sent message is {response.MessageId}');
+      _logger.LogDebug($'MessageId of sent message is {response.MessageId}');
     end;
 
     method DeleteMessageAsync(message:Message; cancellationToken:CancellationToken := default):Task;
@@ -154,7 +189,6 @@ type
 
       deleteMessageRequest.QueueUrl := self.QueueUrl;
       deleteMessageRequest.ReceiptHandle := message.ReceiptHandle;
-
       await Client.DeleteMessageAsync(deleteMessageRequest, cancellationToken);
     end;
 
@@ -177,6 +211,7 @@ type
       var receiveMessageRequest := new ReceiveMessageRequest;
       if(not IsFifo)then
       begin
+        receiveMessageRequest.MessageAttributeNames := new List<String>;
         receiveMessageRequest.MessageAttributeNames.Add(AmazonSQSMessage.IdAttribute);
       end;
       receiveMessageRequest.WaitTimeSeconds := Int32(serverWaitTime.TotalSeconds);
@@ -190,7 +225,7 @@ type
 
       if(assigned(someMessage))then
       begin
-        Logger.LogDebug($'MessageId of received message is {someMessage.MessageId}');
+        _logger.LogDebug($'MessageId of received message is {someMessage.MessageId}');
       end;
 
       exit iif(assigned(someMessage),new AmazonSQSMessage(self,someMessage),nil);

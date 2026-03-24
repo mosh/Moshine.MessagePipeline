@@ -40,7 +40,7 @@
     <NuGetReference Include="Microsoft.Data.SqlClient:[5.2.2]">
       <Private>True</Private>
     </NuGetReference>
-    <NuGetReference Include="Moshine.Foundation.Contracts:[4.1.0]">
+    <NuGetReference Include="Moshine.Foundation.Contracts:[5.0.8]">
       <Private>True</Private>
     </NuGetReference>
   </ItemGroup>

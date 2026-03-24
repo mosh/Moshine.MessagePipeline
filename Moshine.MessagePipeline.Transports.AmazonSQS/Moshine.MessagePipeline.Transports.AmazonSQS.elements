@@ -59,7 +59,7 @@
     </ProjectReference>
     <NuGetReference Include="AWSSDK.SQS:[4.0.2.18]" />
     <NuGetReference Include="Microsoft.Extensions.Logging:[10.0.1]" />
-    <NuGetReference Include="Moshine.Foundation.AWS:[5.0.4]">
+    <NuGetReference Include="Moshine.Foundation.AWS:[5.0.8]">
       <Private>True</Private>
     </NuGetReference>
   </ItemGroup>

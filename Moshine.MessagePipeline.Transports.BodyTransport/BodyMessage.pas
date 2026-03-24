@@ -14,7 +14,7 @@ type
     assembly constructor(messageBody:String; messageId:Guid);
     begin
       body := messageBody;
-      self.messageId:=messageId;
+      self.messageId := messageId;
     end;
 
     method Clone:IMessage;
