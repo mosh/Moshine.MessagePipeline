@@ -24,6 +24,7 @@ type
     _queueName:String;
     _awsAccessKeyId:String;
     _awsSecretAccessKey:String;
+    _authenticationRegion:String;
 
     property Client:AmazonSQSClient;
     property CredentialsFactory:IAWSCredentialsFactory;
@@ -93,7 +94,7 @@ type
 
     property QueueUrl:String read private write;
 
-    constructor (serviceUrl:String; queueName:String; awsAccessKeyId:String; awsSecretAccessKey:String; region:RegionEndpoint := nil; logger:ILogger);
+    constructor (serviceUrl:String; queueName:String; awsAccessKeyId:String; awsSecretAccessKey:String; authenticationRegion:String := nil; region:RegionEndpoint := nil; logger:ILogger);
     begin
       _serviceUrl := serviceUrl;
       _queueName := queueName;
@@ -103,6 +104,12 @@ type
       begin
         _region := region;
       end;
+
+      if(not String.IsNullOrEmpty(authenticationRegion))then
+      begin
+        _authenticationRegion := authenticationRegion;
+      end;
+
       UsingCredentialsFactory := false;
       _awsAccessKeyId := awsAccessKeyId;
       _awsSecretAccessKey := awsSecretAccessKey;
@@ -147,6 +154,11 @@ type
       if _region ≠ nil then
       begin
         config.RegionEndpoint := _region;
+      end;
+
+      if (not String.IsNullOrEmpty(_authenticationRegion))then
+      begin
+        config.AuthenticationRegion := _authenticationRegion;
       end;
 
       if (UsingCredentialsFactory) then
