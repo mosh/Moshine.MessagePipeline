@@ -41,7 +41,7 @@
       <ProjectFile>..\Moshine.MessagePipeline.Core\Moshine.MessagePipeline.Core.elements</ProjectFile>
       <Private>True</Private>
     </ProjectReference>
-    <NuGetReference Include="Amazon.Lambda.Core:[2.3.0]">
+    <NuGetReference Include="Amazon.Lambda.Core:[2.8.0]">
       <Private>True</Private>
     </NuGetReference>
     <NuGetReference Include="Amazon.Lambda.Serialization.SystemTextJson:[2.3.0]">

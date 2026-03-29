@@ -20,10 +20,8 @@ type
     begin
       using db := connectionMultiplexor.GetDatabase do
       begin
-        db.StringSet(key, System.Text.Json.JsonSerializer.Serialize(value),new TimeSpan(0,0,30));
+        await db.StringSetAsync(key, JsonSerializer.Serialize(value),new TimeSpan(0,0,30));
       end;
-
-      exit Task.CompletedTask;
     end;
 
     method GetAsync<T>(key:String):Task<tuple of (Boolean, T)>;
